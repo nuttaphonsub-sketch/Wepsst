@@ -4,21 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SST Transport | ทรัพย์สินขนส่ง - ขนส่งสัตว์เลี้ยง มอเตอร์ไซค์ ย้ายบ้านทั่วไทย</title>
-    <meta name="description" content="บริการรถรับจ้างขนส่งสัตว์เลี้ยง มอเตอร์ไซค์ ย้ายบ้าน รถตู้ทึบ เหมาคัน ทั่วประเทศไทย ราคามาตรฐาน มีประกันสินค้า ทีมงานขับเองทุกงาน โทร 096-410-4396">
-    <meta name="theme-color" content="#0A1F44">
+    <meta name="description" content="บริการรถรับจ้างขนส่งสัตว์เลี้ยง มอเตอร์ไซค์ ย้ายบ้าน รถตู้ทึบ เหมาคัน ทั่วประเทศไทย ราคามาตรฐาน มีประกันสินค้า ทีมงานขับเองทุกงาน">
     
     <link rel="icon" href="https://i.ibb.co/RT1fCdBh/circle-logo.jpg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <script type="application/ld+json">
     {
@@ -34,36 +33,74 @@
       }
     }
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "รถรับจ้างมีประกันสินค้าไหม?",
+        "acceptedAnswer": { "@type": "Answer", "text": "มีครับ! เรามีประกันสินค้าเสียหายระหว่างการขนส่งตามจริง ภายในวงเงินที่ตกลงกันไว้ มั่นใจได้เลยครับ" }
+      }, {
+        "@type": "Question",
+        "name": "ต้องจองคิวล่วงหน้ากี่วัน?",
+        "acceptedAnswer": { "@type": "Answer", "text": "เราเปิดบริการ 24 ชม. หากรถว่างเรียกได้ทันที แต่แนะนำจองล่วงหน้า 1-2 วันเพื่อความชัวร์ครับ" }
+      }, {
+        "@type": "Question",
+        "name": "ติดรถไปกับคนขับได้ไหม?",
+        "acceptedAnswer": { "@type": "Answer", "text": "ได้ครับ รถตู้ทึบและรถกระบะของเรา สามารถให้ลูกค้าติดรถไปได้ 1 ท่าน (นั่งหน้าคู่คนขับ) แอร์เย็นสบาย" }
+      }, {
+        "@type": "Question",
+        "name": "ขั้นตอนการชำระเงินเป็นอย่างไร?",
+        "acceptedAnswer": { "@type": "Answer", "text": "ลูกค้าสามารถชำระเงินปลายทางได้หลังจากของถึงเรียบร้อย หรือโอนมัดจำบางส่วนเพื่อล็อกคิวรถ" }
+      }, {
+        "@type": "Question",
+        "name": "ส่งสัตว์เลี้ยง น้องจะเครียดไหม?",
+        "acceptedAnswer": { "@type": "Answer", "text": "เราเชี่ยวชาญการส่งสัตว์เลี้ยงครับ คนขับรักสัตว์ ขับนิ่ม มีการจอดแวะพักให้น้องผ่อนคลาย รถแอร์เย็น" }
+      }, {
+        "@type": "Question",
+        "name": "ราคาที่ประเมินคือราคาสุดท้ายไหม?",
+        "acceptedAnswer": { "@type": "Answer", "text": "เป็นราคาประเมินเบื้องต้นครับ ราคาจริงอาจเปลี่ยนตามหน้างานเล็กน้อย ทีมงานจะแจ้งก่อนเริ่มงานเสมอครับ" }
+      }, {
+        "@type": "Question",
+        "name": "หากของเสียหายระหว่างขนส่ง ต้องทำอย่างไร?",
+        "acceptedAnswer": { "@type": "Answer", "text": "หากเกิดความเสียหาย ทีมงานรับผิดชอบตามเงื่อนไขประกัน และแจ้งขั้นตอนการดูแลให้ลูกค้าทราบทันทีครับ" }
+      }, {
+        "@type": "Question",
+        "name": "ถ้ารถไปถึงช้ากว่าที่นัดไว้?",
+        "acceptedAnswer": { "@type": "Answer", "text": "เราจะแจ้งสถานะการเดินทางให้ทราบตลอด หากมีเหตุสุดวิสัย ทีมงานจะแจ้งล่วงหน้าทุกครั้งครับ" }
+      }]
+    }
+    </script>
 
     <style>
         :root {
-            --primary: #0f172a;       /* ปรับสีให้เข้มขึ้น (Accessibility ผ่าน) */
-            --secondary: #1e40af;
-            --accent: #f59e0b;        /* ส้มทอง */
+            --primary: #0A1F44;
+            --secondary: #1e3a8a;
+            --accent: #F9C80E;
             --white: #ffffff;
-            --bg-light: #f8fafc;
-            --success: #16a34a;
+            --bg-light: #f3f6f9;
+            --success: #059669;
             --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
         }
 
-        /* Critical CSS (CSS พื้นฐานที่ต้องโหลดทันที) */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: 'Kanit', sans-serif;
             background: var(--bg-light);
-            color: #334155; /* สีตัวหนังสือเข้มขึ้น อ่านง่ายขึ้น */
+            color: #1e293b;
             line-height: 1.5;
             padding-bottom: 90px;
             overflow-x: hidden;
         }
 
-        /* HEADER */
+        /* --- HEADER --- */
         header {
             background: var(--primary);
             color: var(--white);
-            padding: 12px 0;
+            padding: 10px 0;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -73,30 +110,38 @@
         .nav-flex { display: flex; justify-content: space-between; align-items: center; }
         
         .brand { display: flex; align-items: center; gap: 10px; }
-        /* ใส่ width/height ชัดเจน ลด CLS */
-        .brand img { height: 45px; width: 45px; object-fit: contain; border-radius: 4px; } 
-        .brand-text h1 { font-size: 16px; color: var(--accent); line-height: 1.1; margin: 0; font-weight: 700; }
-        .brand-text p { font-size: 11px; opacity: 0.9; margin: 0; font-weight: 300; }
+        .brand img { height: 45px; width: auto; border-radius: 4px; object-fit: contain; }
+        .brand-text h1 { font-size: 16px; color: var(--accent); line-height: 1.1; margin: 0; }
+        .brand-text p { font-size: 10px; opacity: 0.9; margin: 0; font-weight: 300; }
 
         .nav-btn {
             background: linear-gradient(135deg, #F9C80E 0%, #f59e0b 100%);
-            color: #000; padding: 8px 16px; border-radius: 50px;
+            color: #000; padding: 6px 14px; border-radius: 50px;
             font-size: 13px; font-weight: 600; text-decoration: none;
             display: flex; align-items: center; gap: 6px;
             box-shadow: 0 4px 10px rgba(249, 200, 14, 0.3);
+            animation: pulse-gold 2s infinite;
         }
 
-        /* HERO SECTION */
+        /* --- HERO SECTION --- */
         .hero {
             position: relative;
             background: var(--primary);
-            min-height: auto; /* ปรับ auto ลดความสูงเกินจริง */
-            padding-bottom: 40px;
+            min-height: 580px;
+            display: flex;
+            align-items: flex-start;
             padding-top: 20px;
-            /* SPEED TIP: ใช้ CSS Gradient แทนรูปภาพหนักๆ หรือใช้รูปที่บีบอัดแล้ว */
-            background-image: linear-gradient(to bottom, rgba(10, 31, 68, 0.9), rgba(10, 31, 68, 0.95)), url('https://i.ibb.co/rSNphMh/hero-bg.jpg');
-            background-size: cover;
-            background-position: center;
+            overflow: hidden;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center bottom;
+            opacity: 0.35;
+            z-index: 1;
+            transform: scale(1.05); 
         }
         
         .hero-content {
@@ -105,138 +150,276 @@
             width: 100%;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 25px;
         }
         @media(min-width: 960px) {
-            .hero-content { grid-template-columns: 1fr 450px; gap: 40px; padding-top: 40px; }
+            .hero-content { grid-template-columns: 1fr 420px; gap: 50px; padding-top: 50px; }
+            .hero { align-items: center; min-height: 600px; }
         }
 
-        .hero-text { color: var(--white); text-align: center; margin-bottom: 10px; }
-        @media(min-width: 960px) { .hero-text { text-align: left; } }
-
-        .hero-text h2 { font-size: 26px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
+        .hero-text { color: var(--white); text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
+        .hero-text h2 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
         .hero-text h2 span { color: var(--accent); }
-        .hero-text p { font-size: 14px; opacity: 0.95; margin-bottom: 15px; font-weight: 300; max-width: 600px; margin-left: auto; margin-right: auto; }
-        @media(min-width: 960px) { .hero-text p { margin-left: 0; } }
+        .hero-text p { font-size: 15px; opacity: 0.9; margin-bottom: 20px; }
 
-        .trust-badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
-        @media(min-width: 960px) { .trust-badges { justify-content: flex-start; } }
-        
+        .trust-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
         .badge { 
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; 
-            display: flex; align-items: center; gap: 5px;
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; 
+            display: flex; align-items: center; gap: 6px;
         }
 
-        /* CALCULATOR CARD */
+        /* --- CALCULATOR PRO --- */
         .calc-card {
             background: var(--white);
             border-radius: var(--radius);
             padding: 20px;
-            box-shadow: var(--shadow);
-            border-top: 4px solid var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-top: 5px solid var(--accent);
             position: relative;
             z-index: 20;
-            max-width: 500px;
-            margin: 0 auto;
         }
         
         .calc-header { text-align: center; margin-bottom: 15px; position: relative; }
-        .calc-title { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .calc-title { font-size: 18px; font-weight: 700; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        .form-group { margin-bottom: 10px; position: relative; }
+        .form-group { margin-bottom: 12px; position: relative; }
         .form-input { 
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px;
-            font-size: 14px; background: #f8fafc; font-family: 'Kanit'; outline: none; color: #1e293b;
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 14px; background: #f8fafc; font-family: 'Kanit'; outline: none; transition: 0.3s;
         }
         .form-input:focus { border-color: var(--primary); background: #fff; }
         
-        /* Search Results */
-        .search-results {
-            position: absolute; top: 100%; left: 0; right: 0; background: #fff;
-            border: 1px solid #ddd; border-radius: 0 0 8px 8px; max-height: 180px;
-            overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .search-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px; cursor: pointer; color: #334155; }
-        
+        #subOptionContainer { display: none; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
         .btn-calc {
             width: 100%; background: var(--primary); color: #fff; border: none;
-            padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600;
+            padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600;
             cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
-            margin-top: 10px; transition: 0.2s;
+            transition: 0.2s; margin-top: 10px;
         }
+        .btn-calc:active { transform: scale(0.98); }
+
+        .search-results {
+            position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+            border: 1px solid #ddd; border-radius: 0 0 10px 10px; max-height: 180px;
+            overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .search-item { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; cursor: pointer; }
+        .search-item:hover { background: #f0f9ff; }
+
+        #resultBox { display: none; background: #f0f9ff; border: 1px dashed #bae6fd; border-radius: 10px; padding: 15px; margin-top: 15px; text-align: center; }
+        .price-big { font-size: 36px; font-weight: 800; color: var(--primary); line-height: 1; margin: 10px 0; }
+        .price-note { font-size: 12px; color: #dc2626; font-weight: 500; margin-top: 5px; }
         
-        /* Result Box */
-        #resultBox { display: none; background: #f0fdf4; border: 1px dashed #16a34a; border-radius: 10px; padding: 15px; margin-top: 15px; text-align: center; }
-        .price-big { font-size: 32px; font-weight: 800; color: #15803d; line-height: 1; margin: 5px 0; }
-        
+        /* ปุ่มส่วนลด */
+        .btn-discount {
+            background: linear-gradient(135deg, #ff4d4d 0%, #d32f2f 100%);
+            color: #fff; border: none; padding: 12px; width: 100%;
+            border-radius: 8px; font-weight: 600; margin-top: 10px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+            display: none;
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(249, 200, 14, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(249, 200, 14, 0); } 100% { box-shadow: 0 0 0 0 rgba(249, 200, 14, 0); } }
+
         .btn-line-copy {
-            background: #06C755; color: #fff; border: none; padding: 12px;
-            border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px; 
-            margin-top: 10px; width: 100%;
+            background: #06C755; color: #fff; border: none; padding: 12px 15px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
+            margin-top: 10px; width: 100%; transition: 0.2s;
         }
+        .btn-line-copy:hover { background: #058f3e; }
 
-        /* SECTIONS COMMON */
-        .section-title { text-align: center; font-size: 20px; color: var(--primary); margin: 30px 0 20px; font-weight: 700; }
+        /* --- SECTIONS --- */
+        .section-title { text-align: center; font-size: 22px; color: var(--primary); margin: 40px 0 25px; font-weight: 700; position: relative; }
         
-        /* SERVICE GRID */
-        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        @media(min-width: 768px) { .services-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
-
+        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .service-card {
-            background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer; transition: 0.2s; border: 1px solid #e2e8f0;
+            background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow);
+            cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent;
         }
-        /* กำหนดขนาดรูปภาพแน่นอน ลด Layout Shift */
-        .service-img-box { height: 120px; background: #eee; overflow: hidden; position: relative; }
-        .service-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .service-info { padding: 10px; text-align: center; }
-        .service-info h3 { font-size: 13px; margin-bottom: 4px; color: var(--primary); font-weight: 600; }
-        .service-tag { font-size: 10px; background: #ecfdf5; color: #059669; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .service-card:hover { transform: translateY(-5px); border-bottom-color: var(--accent); }
+        .service-img-box { height: 130px; background: #eee; overflow: hidden; }
+        .service-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .service-card:hover .service-img { transform: scale(1.1); }
+        .service-info { padding: 12px 10px; text-align: center; }
+        .service-info h3 { font-size: 14px; margin-bottom: 5px; color: var(--primary); }
+        .service-tag { font-size: 11px; background: #ecfdf5; color: #059669; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
 
-        /* REVIEWS */
-        .reviews { padding: 0 0 30px; }
-        .review-card {
-            background: #fff; border-radius: 8px; padding: 15px; margin-bottom: 10px;
-            border-left: 3px solid var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        /* Spec Cards */
+        .spec-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+        @media(min-width: 768px) { .spec-container { grid-template-columns: repeat(4, 1fr); } }
+        .spec-card { background: #fff; border-radius: 10px; padding: 15px; border: 1px solid #e2e8f0; text-align: center; transition: 0.3s; }
+        .spec-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .spec-icon { font-size: 24px; color: var(--secondary); margin-bottom: 10px; }
+        .spec-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .spec-detail { font-size: 12px; color: #64748b; line-height: 1.6; }
+        .spec-highlight { color: var(--accent); font-weight: 600; }
+
+        /* --- GALLERY --- */
+        .gallery-wrap { 
+            display: flex; gap: 15px; padding: 10px 16px 30px; 
+            overflow-x: auto; scroll-snap-type: x mandatory; 
+            -webkit-overflow-scrolling: touch;
         }
-        .r-text { font-size: 13px; color: #475569; font-style: italic; margin-bottom: 5px; }
-        .r-name { font-size: 12px; font-weight: 700; color: var(--primary); }
+        .gallery-item {
+            min-width: 85%; height: 240px; border-radius: 12px; overflow: hidden;
+            scroll-snap-align: center; box-shadow: var(--shadow); position: relative;
+            flex-shrink: 0; border: 1px solid #eee;
+        }
+        @media(min-width: 600px) { .gallery-item { min-width: 45%; } }
+        @media(min-width: 960px) { .gallery-item { min-width: 30%; } }
 
-        /* FOOTER */
-        footer { background: var(--primary); color: #94a3b8; padding: 40px 0 30px; text-align: center; font-size: 13px; }
-        footer h3 { color: #fff; font-size: 16px; margin-bottom: 5px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+            color: #fff; padding: 40px 15px 12px;
+        }
+        .gallery-text { font-size: 14px; font-weight: 500; }
 
-        /* STICKY BAR */
+        /* --- FAQ --- */
+        .faq-item {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+            margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .faq-item summary {
+            padding: 16px 20px; cursor: pointer; font-weight: 600; color: var(--primary);
+            list-style: none; display: flex; justify-content: space-between; align-items: center;
+        }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary::after { content: '+'; font-size: 20px; color: var(--accent); font-weight: 700; }
+        .faq-item[open] summary::after { content: '−'; }
+        .faq-item[open] summary { background: #f8fafc; border-bottom: 1px solid #eee; }
+        .faq-content { padding: 16px 20px; color: #475569; font-size: 14px; line-height: 1.7; }
+        .faq-cta { margin-top: 10px; font-weight: 600; color: #059669; }
+
+        /* --- ABOUT US --- */
+        .about-container {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        @media(min-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .about-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--accent);
+        }
+        .about-info {
+            background: linear-gradient(135deg, #0A1F44 0%, #1e3a8a 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        /* --- FOOTER & FLOATING BAR --- */
+        footer { background: var(--primary); color: #fff; padding: 50px 0 30px; text-align: center; }
+        .social-btn { 
+            display: inline-flex; align-items: center; gap: 8px; background: #1877F2; 
+            color: #fff; padding: 10px 24px; border-radius: 50px; text-decoration: none; 
+            font-size: 14px; font-weight: 500; margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(24, 119, 242, 0.4);
+        }
+
         .float-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: #fff;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.05); display: flex;
-            padding: 10px 16px; gap: 10px; z-index: 999;
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex;
+            padding: 12px 16px; gap: 12px; z-index: 999;
         }
         .float-btn {
-            flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px;
-            text-decoration: none; border-radius: 50px; padding: 10px; font-weight: 600; font-size: 14px;
+            flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px;
+            text-decoration: none; border-radius: 10px; padding: 12px; font-weight: 600; font-size: 16px;
         }
-        .btn-tel { background: var(--primary); color: #fff; flex: 0.4; }
-        .btn-line { background: #06C755; color: #fff; flex: 0.6; }
+        .btn-tel { background: var(--primary); color: #fff; }
+        .btn-line { background: #06C755; color: #fff; }
 
         /* Map */
-        #map { height: 200px; width: 100%; border-radius: 8px; margin-top: 15px; display: none; background: #e2e8f0; }
-        
+        #map { height: 180px; width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 1px solid #ddd; }
+
+        /* Saved Data Alert */
+        .saved-data-alert {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            border: 1px solid #60a5fa;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #1e40af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.3s ease;
+        }
+        .saved-data-alert button {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        /* Step Instructions */
+        .step-instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-size: 13px;
+            color: #475569;
+            animation: fadeIn 0.5s ease;
+        }
+
         /* Toast */
         .toast {
-            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.9); color: white; padding: 10px 20px;
-            border-radius: 30px; z-index: 2000; font-size: 13px;
-            opacity: 0; pointer-events: none; transition: 0.3s;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s;
+            animation-fill-mode: forwards;
+            max-width: 90%;
+            text-align: center;
+            font-size: 14px;
         }
-        .toast.show { opacity: 1; bottom: 100px; }
 
-        /* Sub Option */
-        #subOptionContainer { display: none; margin-bottom: 10px; }
+        /* Animations */
+        @keyframes slideUp {
+            from { transform: translate(-50%, 20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -244,52 +427,67 @@
     <header>
         <div class="container nav-flex">
             <div class="brand">
-                <img src="https://i.ibb.co/tpDSCtCM/20251220-014457-0000.png" alt="SST Transport" width="45" height="45">
+                <img src="https://i.ibb.co/tpDSCtCM/20251220-014457-0000.png" alt="SST Transport Logo">
                 <div class="brand-text">
                     <h1>SST Transport</h1>
-                    <p>ทรัพย์สินขนส่ง • 24 ชม.</p>
+                    <p>ทรัพย์สินขนส่ง • ทีมงานขับเองทุกงาน</p>
                 </div>
             </div>
             <a href="tel:0964104396" class="nav-btn">
-                <i class="fa-solid fa-phone"></i> โทรด่วน
+                <i class="fa-solid fa-phone-volume"></i> โทรด่วน
             </a>
         </div>
     </header>
 
     <section class="hero">
+        <img src="https://i.ibb.co/rSNphMh/hero-bg.jpg" class="hero-bg" alt="รถรับจ้างเหมาคัน" onerror="this.style.background='#0A1F44'">
+        
         <div class="container hero-content" data-aos="fade-up">
             <div class="hero-text">
                 <div class="trust-badges">
-                    <div class="badge"><i class="fa-solid fa-clock"></i> 24 ชม.</div>
-                    <div class="badge"><i class="fa-solid fa-shield-halved"></i> มีประกัน</div>
-                    <div class="badge"><i class="fa-solid fa-truck"></i> รถใหม่</div>
+                    <div class="badge"><i class="fa-solid fa-clock"></i> เปิด 24 ชม.</div>
+                    <div class="badge"><i class="fa-solid fa-shield-halved"></i> มีประกันสินค้า</div>
                 </div>
-                <h2>ขนส่งไว ไว้ใจ<br><span>ทรัพย์สินขนส่ง</span></h2>
-                <p>ทีมงานมืออาชีพ ขับเอง ไม่บวกหน้างาน รถตู้ทึบกันฝน 100% ดูแลสินค้าเหมือนของตัวเอง</p>
+                <h2>ขนส่งสัตว์เลี้ยง มอเตอร์ไซค์<br><span>ย้ายบ้าน ทั่วไทย</span></h2>
+                <p>ทีมงานมืออาชีพ ทีมงานขับเองทุกงาน ราคายุติธรรม ไม่บวกหน้างาน<br>รถใหม่ ตู้ทึบกันฝน 100% ดูแลสินค้าเหมือนของตัวเอง</p>
             </div>
 
-            <div class="calc-card" data-aos="zoom-in" data-aos-delay="100">
+            <div class="calc-card" data-aos="zoom-in" data-aos-delay="200">
                 <div class="calc-header">
-                    <div class="calc-title"><i class="fa-solid fa-calculator" style="color:var(--accent);"></i> เช็คราคาฟรี (รู้ผลทันที)</div>
-                    <button id="clearFormBtn" style="position: absolute; top:0; right:0; border:none; background:none; color:#94a3b8; cursor:pointer;" title="ล้างค่า"><i class="fa-solid fa-rotate-right"></i></button>
+                    <div class="calc-title"><i class="fa-solid fa-calculator" style="color:var(--accent);"></i> ประเมินราคาฟรี</div>
+                    <button id="clearFormBtn" style="
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        background: #f1f5f9;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 6px;
+                        padding: 5px 10px;
+                        cursor: pointer;
+                        color: #64748b;
+                        font-size: 12px;
+                        transition: 0.2s;
+                    " title="ล้างฟอร์มทั้งหมด">
+                        <i class="fa-solid fa-broom"></i>
+                    </button>
                 </div>
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <div class="form-group">
-                        <input type="text" id="custName" class="form-input" placeholder="ชื่อของคุณ">
+                        <input type="text" id="custName" class="form-input" placeholder="👤 ชื่อลูกค้า" autocomplete="off">
                     </div>
                     <div class="form-group">
-                        <input type="tel" id="custPhone" class="form-input" placeholder="เบอร์โทร">
+                        <input type="tel" id="custPhone" class="form-input" placeholder="📞 เบอร์โทร" autocomplete="off">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <input type="text" id="startLoc" class="form-input" placeholder="📍 ต้นทาง (ระบุจังหวัด)" autocomplete="off">
+                    <input type="text" id="startLoc" class="form-input" placeholder="📍 รับจาก (พิมพ์จังหวัด...)" autocomplete="off">
                     <div id="startList" class="search-results"></div>
                 </div>
 
                 <div class="form-group">
-                    <input type="text" id="endLoc" class="form-input" placeholder="🏁 ปลายทาง (ระบุจังหวัด)" autocomplete="off">
+                    <input type="text" id="endLoc" class="form-input" placeholder="🏁 ส่งที่ (พิมพ์จังหวัด...)" autocomplete="off">
                     <div id="endList" class="search-results"></div>
                 </div>
 
@@ -297,29 +495,48 @@
                     <select id="serviceType" class="form-input" onchange="updateSubOptions()">
                         <option value="" disabled selected>📦 เลือกประเภทบริการ</option>
                         <option value="pickup">รถกระบะตู้ทึบ (เหมาคัน)</option>
-                        <option value="pet">ส่งสัตว์เลี้ยง (ดูแลพิเศษ)</option>
+                        <option value="pet">ส่งสัตว์เลี้ยง (นั้งหน้า/แอร์)</option>
                         <option value="bike">ส่งมอเตอร์ไซค์</option>
                         <option value="truck6">รถ 6 ล้อ (ใหญ่)</option>
                     </select>
                 </div>
 
-                <div id="subOptionContainer">
+                <div class="form-group" id="subOptionContainer">
                     <select id="subServiceType" class="form-input"></select>
+                    <div id="serviceDesc" style="
+                        margin-top: 10px;
+                        padding: 10px;
+                        background: #f0f9ff;
+                        border-radius: 8px;
+                        font-size: 12px;
+                        color: #0369a1;
+                        border-left: 3px solid #0ea5e9;
+                        display: none;
+                    "></div>
                 </div>
 
                 <button class="btn-calc" onclick="calculatePrice()">
-                    <i class="fa-solid fa-magnifying-glass"></i> คำนวณราคา & รับส่วนลด
+                    <i class="fa-solid fa-magnifying-glass"></i> เช็คราคาประเมิน
                 </button>
 
                 <div id="map"></div>
                 
                 <div id="resultBox">
-                    <div style="font-size:13px; color:#64748b;">ราคาประเมินเบื้องต้น</div>
+                    <div style="font-size:13px; color:#64748b;">ระยะทางประมาณ <span id="distVal">0</span> กม.</div>
                     <div class="price-big" id="priceVal">0.-</div>
-                    <div style="font-size:12px; color:#dc2626; margin-top:5px;">*จองผ่านไลน์ ลดเพิ่มได้อีก!</div>
+                    <div id="discountTag" style="color:#059669; font-weight:600; font-size:14px; display:none;">
+                        <i class="fa-solid fa-check-circle"></i> (ได้รับส่วนลด 10% แล้ว)
+                    </div>
+
+                    <button id="btnDiscount" class="btn-discount" onclick="applyDiscount()">
+                        <i class="fa-solid fa-gift"></i> ยินดีด้วย! กดรับส่วนลด 10%
+                        <div style="font-size:10px; opacity:0.8; margin-top:2px; font-weight:400;">(สิทธิพิเศษเฉพาะจองผ่านเว็บ)</div>
+                    </button>
+
+                    <div class="price-note">* ราคาเบื้องต้นสำหรับการประเมินเท่านั้น</div>
                     
                     <button class="btn-line-copy" onclick="copyToLine()">
-                        <i class="fa-brands fa-line" style="font-size:20px;"></i> กดทัก LINE จองคิวรถ
+                        <i class="fa-brands fa-line" style="font-size:18px;"></i> คัดลอกแล้วทัก LINE
                     </button>
                 </div>
             </div>
@@ -327,11 +544,11 @@
     </section>
 
     <section class="container">
-        <h2 class="section-title">บริการยอดนิยม</h2>
+        <h2 class="section-title" data-aos="fade-up">บริการของเรา</h2>
         <div class="services-grid">
-            <div class="service-card" onclick="selectService('pet')" data-aos="fade-up">
+            <div class="service-card" onclick="selectService('pet')" data-aos="fade-up" data-aos-delay="100">
                 <div class="service-img-box">
-                    <img src="https://i.ibb.co/B5vVhm5W/cat-cage.jpg" class="service-img" alt="ส่งสัตว์เลี้ยง" loading="lazy" width="200" height="120">
+                    <img src="https://i.ibb.co/B5vVhm5W/cat-cage.jpg" class="service-img" alt="ส่งสัตว์เลี้ยง">
                 </div>
                 <div class="service-info">
                     <h3>ส่งสัตว์เลี้ยง</h3>
@@ -339,9 +556,9 @@
                 </div>
             </div>
             
-            <div class="service-card" onclick="selectService('bike')" data-aos="fade-up" data-aos-delay="100">
+            <div class="service-card" onclick="selectService('bike')" data-aos="fade-up" data-aos-delay="200">
                 <div class="service-img-box">
-                    <img src="https://i.ibb.co/b55R2vCH/bike-wrap.jpg" class="service-img" alt="ส่งมอเตอร์ไซค์" loading="lazy" width="200" height="120">
+                    <img src="https://i.ibb.co/b55R2vCH/bike-wrap.jpg" class="service-img" alt="ส่งมอเตอร์ไซค์">
                 </div>
                 <div class="service-info">
                     <h3>ส่งมอเตอร์ไซค์</h3>
@@ -349,37 +566,294 @@
                 </div>
             </div>
             
-            <div class="service-card" onclick="selectService('pickup')" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-card" onclick="selectService('pickup')" data-aos="fade-up" data-aos-delay="300">
                 <div class="service-img-box">
-                    <img src="https://i.ibb.co/23q70MYj/full-load.jpg" class="service-img" alt="เหมาคัน" loading="lazy" width="200" height="120">
+                    <img src="https://i.ibb.co/23q70MYj/full-load.jpg" class="service-img" alt="เหมาคัน">
                 </div>
                 <div class="service-info">
-                    <h3>เหมาคัน</h3>
+                    <h3>เหมาคัน/สินค้า</h3>
                     <span class="service-tag">คิดตามระยะทาง</span>
                 </div>
             </div>
             
-            <div class="service-card" onclick="selectService('truck6')" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-card" onclick="selectService('truck6')" data-aos="fade-up" data-aos-delay="400">
                 <div class="service-img-box">
-                    <img src="https://i.ibb.co/gBxP9N6/Picsart-25-12-20-01-50-37-293.jpg" class="service-img" alt="ย้ายบ้าน" loading="lazy" width="200" height="120">
+                    <img src="https://i.ibb.co/gBxP9N6/Picsart-25-12-20-01-50-37-293.jpg" class="service-img" alt="ย้ายบ้าน">
                 </div>
                 <div class="service-info">
-                    <h3>ย้ายบ้าน</h3>
-                    <span class="service-tag">มืออาชีพ</span>
+                    <h3>ย้ายบ้าน/ของหนัก</h3>
+                    <span class="service-tag">ทีมงานมืออาชีพ</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:40px;" data-aos="fade-up">
+            <h3 style="font-size:18px; color:#64748b; text-align:center; margin-bottom:15px;">🔍 สเปครถและพื้นที่บรรทุก</h3>
+            <div class="spec-container">
+                <div class="spec-card">
+                    <div class="spec-icon"><i class="fa-solid fa-truck-pickup"></i></div>
+                    <div class="spec-title">รถตู้ทึบ (4 ล้อ)</div>
+                    <div class="spec-detail">
+                        รับน้ำหนัก: <span class="spec-highlight">1.5 ตัน</span><br>
+                        กว้าง 1.50ม. x สูง 2.10ม.<br>
+                        กันฝน 100%
+                    </div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-icon"><i class="fa-solid fa-truck-moving"></i></div>
+                    <div class="spec-title">รถ 6 ล้อ (ใหญ่)</div>
+                    <div class="spec-detail">
+                        รับน้ำหนัก: <span class="spec-highlight">7 ตัน</span><br>
+                        ยาว 5.5 - 7.5 เมตร<br>
+                        งานโรงงาน/ย้ายบ้าน
+                    </div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-icon"><i class="fa-solid fa-dog"></i></div>
+                    <div class="spec-title">ขนส่งสัตว์เลี้ยง</div>
+                    <div class="spec-detail">
+                        <span class="spec-highlight">อัพเดทน้องตลอดทาง</span><br>
+                        เปิดแอร์/พัดลมระบาย<br>
+                        จอดพักดูแลตลอดทาง
+                    </div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                    <div class="spec-title">ขนส่งมอเตอร์ไซค์</div>
+                    <div class="spec-detail">
+                        <span class="spec-highlight">บรรได/ทางลาด</span><br>
+                        มัดล็อก 4-10 จุด<br>
+                        ซีนกันรอยรอบคัน
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="reviews container">
-        <h2 class="section-title" style="margin-top:40px;">ลูกค้าประทับใจ</h2>
-        <div class="review-card" data-aos="fade-up">
-            <div class="r-text">"เรียกตอนตี 2 ก็มารับงาน รถสะอาดมาก คนขับพูดจาดี ช่วยยกของด้วยครับ แนะนำเลย"</div>
-            <div class="r-name"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> คุณบอย (ย้ายหอพัก)</div>
+    <!-- ส่วน "เกี่ยวกับเรา" ใหม่ -->
+    <section class="container" style="margin-top: 50px;" data-aos="fade-up">
+        <h2 class="section-title">เกี่ยวกับเรา</h2>
+        <div class="about-container">
+            <div class="about-grid">
+                <div>
+                    <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 20px;">
+                        <i class="fa-solid fa-building" style="color: var(--accent); margin-right: 10px;"></i>
+                        SST Transport (ทรัพย์สินขนส่ง)
+                    </h3>
+                    <p style="line-height: 1.8; color: #475569; margin-bottom: 20px;">
+                        บริการขนส่งสินค้าทั่วไทยด้วยความใส่ใจและรับผิดชอบ เราเริ่มต้นธุรกิจตั้งแต่ปี 2019 
+                        ด้วยประสบการณ์มากกว่า 7 ปีในวงการขนส่ง โดยทีมงานที่มีความเชี่ยวชาญเฉพาะด้าน 
+                        เรามุ่งเน้นความปลอดภัยของสินค้าและความพึงพอใจของลูกค้าเป็นสำคัญ
+                    </p>
+                    
+                    <div class="about-card">
+                        <h4 style="color: var(--primary); font-size: 16px; margin-bottom: 8px;">
+                            <i class="fa-solid fa-bullseye" style="color: var(--secondary);"></i> วิสัยทัศน์
+                        </h4>
+                        <p style="font-size: 14px; color: #64748b;">
+                            เป็นผู้นำด้านบริการขนส่งเฉพาะทาง ด้วยระบบที่ทันสมัยและทีมงานมืออาชีพ
+                        </p>
+                    </div>
+                </div>
+
+                <div class="about-info">
+                    <h4 style="font-size: 18px; margin-bottom: 15px;">
+                        <i class="fa-solid fa-id-card"></i> ข้อมูลติดต่อบริษัท
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                        <div>
+                            <p style="font-size: 14px; margin-bottom: 8px;">
+                                <i class="fa-solid fa-phone"></i> 096-410-4396
+                            </p>
+                            <p style="font-size: 14px; margin-bottom: 8px;">
+                                <i class="fa-solid fa-clock"></i> เปิดบริการ 24 ชั่วโมง
+                            </p>
+                        </div>
+                        <div>
+                            <p style="font-size: 14px; margin-bottom: 8px;">
+                                <i class="fa-solid fa-envelope"></i> donpuntitsapsin@gmail.com
+                            </p>
+                            <p style="font-size: 14px;">
+                                <i class="fa-solid fa-location-dot"></i> ปฏิบัติงานทั่วประเทศไทย
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <h5 style="font-size: 16px; margin-bottom: 10px;">✅ มั่นใจได้ใน</h5>
+                        <ul style="font-size: 13px; list-style-type: none; padding-left: 0;">
+                            <li style="margin-bottom: 5px;">• ประกันสินค้าคุ้มครองตามจริง</li>
+                            <li style="margin-bottom: 5px;">• ทีมงานขับเองทุกงาน</li>
+                            <li style="margin-bottom: 5px;">• ราคายุติธรรม ไม่บวกเพิ่ม</li>
+                            <li>• ติดตามสถานะตลอดทาง</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="review-card" data-aos="fade-up">
-            <div class="r-text">"ส่งน้องแมวไปภูเก็ต น้องปลอดภัยดี คนขับส่งรูปให้ดูตลอดทาง สบายใจมากค่ะ"</div>
-            <div class="r-name"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> คุณมายด์ (ส่งสัตว์เลี้ยง)</div>
+    </section>
+
+    <section style="background: #fff; padding-top: 10px; margin-top:20px; padding-bottom:20px;">
+        <h2 class="section-title" data-aos="fade-up" style="margin-bottom:15px;">มาตรฐานความปลอดภัย</h2>
+        <div class="gallery-wrap" data-aos="fade-right">
+            <div class="gallery-item">
+                <img src="https://i.ibb.co/vC41pRbn/Picsart-25-12-20-01-42-58-675.jpg" alt="แพ็ค Bigbike แน่นหนา">
+                <div class="gallery-overlay"><div class="gallery-text">ส่งเร็วทันใจ</div></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://i.ibb.co/d4zby63L/bike-tie.jpg" alt="มัดยึด 10 จุด">
+                <div class="gallery-overlay"><div class="gallery-text">มัดยึดแน่นหนา 10 จุด</div></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://i.ibb.co/LD86skVt/trike.jpg" alt="รถ 3 ล้อ">
+                <div class="gallery-overlay"><div class="gallery-text">ขนส่งมอเตอร์ไซค์ทุกประเภท</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title" data-aos="fade-up">ลูกค้าจริง ส่งถึงมือจริง</h2>
+        <div class="gallery-wrap" data-aos="fade-left">
+            <div class="gallery-item">
+                <img src="https://i.ibb.co/BHD9sWXZ/Picsart-25-12-20-01-42-49-293.jpg" alt="ลูกค้ารับรถมอเตอร์ไซค์">
+                <div class="gallery-overlay"><div class="gallery-text">ส่งมอเตอร์ไซค์ถึงหน้าบ้าน</div></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://i.ibb.co/SXRRmk9k/customer-cat.jpg" alt="ลูกค้ารับแมว">
+                <div class="gallery-overlay"><div class="gallery-text">ส่งน้องถึงมือปลอดภัย</div></div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://i.ibb.co/G4SJTW56/customer-dog.jpg" alt="ลูกค้ารับหมา">
+                <div class="gallery-overlay"><div class="gallery-text">บริการด้วยใจ ไม่ทิ้งงาน</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ ปรับปรุงใหม่ -->
+    <section class="container" style="margin-top: 40px; margin-bottom: 40px;" data-aos="fade-up">
+        <h2 class="section-title">คำถามที่พบบ่อย (FAQ)</h2>
+        <div class="faq-container" style="max-width: 820px; margin: 0 auto;">
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--primary); font-size: 18px; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--accent);">
+                    📦 เกี่ยวกับบริการ
+                </h3>
+                <details class="faq-item">
+                    <summary>มีบริการขนส่งสัตว์เลี้ยงแบบใดบ้าง?</summary>
+                    <div class="faq-content">
+                        <p>เรามีบริการขนส่งสัตว์เลี้ยงครบวงจร:</p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>สัตว์เลี้ยงเล็ก (น้องแมว, สุนัขพันธุ์เล็ก)  นั่งหน้าแอร์เย็น</li>
+                            <li>สัตว์เลี้ยงขนาดกลาง-ใหญ่  ดูแลพิเศษ</li>
+                            <li>บริการรับ-ส่งถึงบ้าน พร้อมรายงานสถานะภาพระหว่างทาง</li>
+                        </ul>
+                        <p class="faq-cta">📞 โทรปรึกษาเรื่องสัตว์เลี้ยงได้ตลอด 24 ชม.</p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>ส่งมอเตอร์ไซค์ต้องเตรียมตัวอย่างไร?</summary>
+                    <div class="faq-content">
+                        <p><strong>ขั้นตอนง่ายๆ:</strong></p>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>ถ่ายรูปสภาพรถก่อนส่ง (เพื่อความชัดเจน)</li>
+                            <li>ถอดของมีค่าออกจากรถ (กุญแจ, สมุดเล่มเล็ก)</li>
+                            <li>แจ้งน้ำหนักรถและขนาดประมาณการ (หากทราบ)</li>
+                            <li>เตรียมที่อยู่จัดส่งที่ชัดเจน</li>
+                        </ol>
+                        <p>ทีมงานจะห่อหุ้มและมัดยึดรถให้เรียบร้อย</p>
+                    </div>
+                </details>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--primary); font-size: 18px; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--accent);">
+                    💰 เกี่ยวกับราคาและชำระเงิน
+                </h3>
+                <details class="faq-item">
+                    <summary>ขั้นตอนการชำระเงินเป็นอย่างไร?</summary>
+                    <div class="faq-content">
+                        <p>เรามีช่องทางการชำระเงินที่หลากหลาย:</p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li><strong>เงินสดปลายทาง</strong> - ชำระเมื่อของถึงปลายทาง</li>
+                            <li><strong>โอนมัดจำ</strong> - มัดจำ 30-50% เพื่อจองคิวรถ</li>
+                            <li><strong>ธนาคารที่รับ</strong> - KBANK, SCB, BBL</li>
+                        </ul>
+                        <p>ไม่ต้องกังวล เรามีใบเสร็จ/ใบรับสินค้าให้ทุกครั้ง</p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>ราคาที่ประเมินในเว็บคือราคาสุดท้ายไหม?</summary>
+                    <div class="faq-content">
+                        <p><strong>เกือบจะเป็นราคาสุดท้ายครับ!</strong></p>
+                        <p>ราคาที่คำนวณได้เป็นราคาประเมินเบื้องต้น (ประมาณ 90-95% ของราคาจริง)</p>
+                        <p>ปัจจัยที่อาจทำให้ราคาเปลี่ยนแปลง:</p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>ปริมาณสินค้าที่เพิ่มเติม</li>
+                            <li>จุดรับ-ส่งที่เข้าถึงยาก (ซอยลึก, ทางดิน)</li>
+                            <li>การรอขนถ่ายเกินเวลามาตรฐาน</li>
+                        </ul>
+                        <p><strong>ข้อดี:</strong> ทีมงานจะแจ้งราคาก่อนเริ่มงานทุกครั้ง ไม่มีการบวกเพิ่มโดยไม่บอก</p>
+                    </div>
+                </details>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--primary); font-size: 18px; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--accent);">
+                    🛡️ ความปลอดภัยและการประกัน
+                </h3>
+                <details class="faq-item">
+                    <summary>มีประกันสินค้าไหม? คุ้มครองเท่าไหร่?</summary>
+                    <div class="faq-content">
+                        <p><strong>มีประกันสินค้าให้ทุกงาน!</strong></p>
+                        <p>วงเงินประกันตามมูลค่าสินค้าที่แจ้ง:</p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>สินค้าทั่วไป: คุ้มครองสูงสุด 50,000 บาท</li>
+                            <li>มอเตอร์ไซค์ Big Bike: คุ้มครองสูงสุด 100,000 บาท</li>
+                            <li>สัตว์เลี้ยง: คุ้มครองค่ารักษาพยาบาล (เงื่อนไขตามที่ตกลง)</li>
+                        </ul>
+                        <p class="faq-cta">📋 สอบถามรายละเอียดเงื่อนไขประกันเพิ่มเติมได้ตลอดเวลา</p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>หากของเสียหายระหว่างขนส่งต้องทำอย่างไร?</summary>
+                    <div class="faq-content">
+                        <p><strong>ไม่ต้องกังวล เรารับผิดชอบเต็มที่!</strong></p>
+                        <p>ขั้นตอนการดำเนินการ:</p>
+                        <ol style="margin: 10px 0 10px 20px;">
+                            <li>แจ้งทีมงานทันทีที่พบความเสียหาย (ถ่ายรูปเป็นหลักฐาน)</li>
+                            <li>ทีมงานจะประสานงานกับบริษัทประกัน</li>
+                            <li>เราจะดูแลค่าซ่อมแซมหรือชดเชยตามมูลค่าที่ตกลง</li>
+                            <li>เสร็จสิ้นภายใน 3-7 วันทำการ</li>
+                        </ol>
+                        <p>เราให้ความสำคัญกับความพึงพอใจของลูกค้าเป็นอันดับหนึ่ง</p>
+                    </div>
+                </details>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--primary); font-size: 18px; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--accent);">
+                    ⏰ เวลาและการติดต่อ
+                </h3>
+                <details class="faq-item">
+                    <summary>ต้องจองล่วงหน้ากี่วัน? ติดตามสถานะได้ไหม?</summary>
+                    <div class="faq-content">
+                        <p><strong>ระยะเวลาการจอง:</strong></p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li><strong>ด่วน</strong>: จองล่วงหน้า 1-3 ชม. (รถว่างเท่านั้น)</li>
+                            <li><strong>ปกติ</strong>: จองล่วงหน้า 1-2 วัน</li>
+                            <li><strong>ช่วงเทศกาล</strong>: จองล่วงหน้า 3-7 วัน</li>
+                        </ul>
+                        <p><strong>การติดตามสถานะ:</strong></p>
+                        <ul style="margin: 10px 0 10px 20px;">
+                            <li>ได้รับ SMS แจ้งเตือนเมื่อรถออกและใกล้ถึง</li>
+                            <li>ติดต่อทีมงานได้ตลอด 24 ชม.</li>
+                            <li>แจ้งตำแหน่งรถแบบ real-time (หากลูกค้าต้องการ)</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
         </div>
     </section>
 
@@ -387,7 +861,10 @@
         <div class="container">
             <h3>SST Transport</h3>
             <p>ทรัพย์สินขนส่ง รับจ้างทั่วไทย</p>
-            <div style="margin-top:20px; font-size:12px; opacity:0.6;">© 2025 SST Transport.</div>
+            <a href="https://www.facebook.com/share/1EdpKtuX3z/" target="_blank" class="social-btn">
+                <i class="fa-brands fa-facebook"></i> ติดตามเพจ Facebook
+            </a>
+            <p style="margin-top:25px; font-size:12px; opacity:0.6;">© 2025 SST Transport. สงวนลิขสิทธิ์.</p>
         </div>
     </footer>
 
@@ -400,114 +877,369 @@
         </a>
     </div>
 
-    <div id="toast" class="toast">ข้อความแจ้งเตือน</div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-
     <script>
-        // รอให้หน้าเว็บโหลดเสร็จค่อยรัน Animation (แก้ LCP)
-        window.addEventListener('load', function() {
-            AOS.init({ duration: 600, once: true });
-            loadCustomerData();
-        });
+        // ========== INITIALIZATION ==========
+        AOS.init({ duration: 800, once: true });
+        
+        // Tab Blinking Title
+        let docTitle = document.title;
+        window.addEventListener("blur", () => { document.title = "🚚 SST Transport พร้อมให้บริการครับ"; });
+        window.addEventListener("focus", () => { document.title = docTitle; });
 
-        // --- Pricing Config ---
+        // ========== CONFIG ==========
         const pricingData = {
-            'pickup': { name: 'รถกระบะตู้ทึบ', base: 500, rate: 12, desc: 'สินค้าทั่วไป' },
-            'truck6': { name: 'รถ 6 ล้อใหญ่', base: 2000, rate: 25, desc: 'งานใหญ่/ย้ายบ้าน' },
+            'pickup': { 
+                name: 'รถกระบะตู้ทึบ (เหมา)', 
+                base: 500, 
+                rate: 12,
+                desc: 'เหมาะสำหรับสินค้าทั่วไป, ย้ายบ้านเล็ก, ของขนาดกลาง'
+            },
+            'truck6': { 
+                name: 'รถ 6 ล้อ (ใหญ่)', 
+                base: 2000, 
+                rate: 25,
+                desc: 'เหมาะสำหรับย้ายบ้านใหญ่, สินค้าจำนวนมาก, เครื่องจักร'
+            },
             'pet': {
-                name: 'ส่งสัตว์เลี้ยง', desc: 'ดูแลพิเศษ',
+                name: 'สัตว์เลี้ยง',
+                desc: 'บริการส่งสัตว์เลี้ยงด้วยความรักและความเอาใจใส่',
                 options: [
-                    { id: 'pet_small', label: 'สัตว์เลี้ยงเล็ก', base: 1500, rate: 3 },
-                    { id: 'pet_cat', label: 'แมวโต/สุนัขกลาง', base: 1800, rate: 3 },
-                    { id: 'pet_big', label: 'สุนัขใหญ่ (VIP)', base: 500, rate: 10 }
+                    { 
+                        id: 'pet_small', 
+                        label: 'สัตว์เลี้ยงเล็ก (ไม่เกิน 4 เดือน)', 
+                        base: 1500, 
+                        rate: 3,
+                        desc: 'เหมาะสำหรับลูกแมว, ลูกสุนัขพันธุ์เล็ก'
+                    },
+                    { 
+                        id: 'pet_cat', 
+                        label: 'แมวโต', 
+                        base: 1800, 
+                        rate: 3,
+                        desc: 'แมวโตเต็มวัย, นั้งหน้า, แอร์เย็น'
+                    },
+                    { 
+                        id: 'pet_big', 
+                        label: 'หมาใหญ่ (ระบบ VIP)', 
+                        base: 500, 
+                        rate: 10,
+                        desc: 'สุนัขพันธุ์ใหญ่, ดูแลพิเศษ, พักระหว่างทาง'
+                    }
                 ]
             },
             'bike': {
-                name: 'ส่งมอเตอร์ไซค์', desc: 'ประกันรอย',
+                name: 'มอเตอร์ไซค์',
+                desc: 'ขนส่งมอเตอร์ไซค์อย่างปลอดภัยด้วยอุปกรณ์มาตรฐาน',
                 options: [
-                    { id: 'bike_s', label: 'รถเล็ก (<150cc)', base: 1000, rate: 3 },
-                    { id: 'bike_m', label: 'รถกลาง (150-400cc)', base: 1500, rate: 3 },
-                    { id: 'bike_l', label: 'Bigbike (500cc+)', base: 2000, rate: 3 }
+                    { 
+                        id: 'bike_s', 
+                        label: '80-150cc', 
+                        base: 1000, 
+                        rate: 3,
+                        desc: 'รถมอเตอร์ไซค์ทั่วไป, สกู๊ตเตอร์'
+                    },
+                    { 
+                        id: 'bike_m', 
+                        label: '160-400cc', 
+                        base: 1500, 
+                        rate: 3,
+                        desc: 'บิ๊กไบค์เล็ก, ซีบีอาร์, เนเคด'
+                    },
+                    { 
+                        id: 'bike_l', 
+                        label: '500-1000cc', 
+                        base: 2000, 
+                        rate: 3,
+                        desc: 'ซูเปอร์ไบค์, ครูเซอร์, แอดเวนเจอร์'
+                    }
                 ]
             }
         };
 
-        let map, routeLayer, startCoords, endCoords;
-        let currentPrice = 0, finalPriceText = "";
-        const STORAGE_KEY = 'sst_data_lite';
+        // ========== LOCALSTORAGE FUNCTIONS ==========
+        const STORAGE_KEY = 'sst_customer_data';
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
+        // บันทึกข้อมูลลูกค้า
         function saveCustomerData() {
-            const data = {
+            const customerData = {
                 name: document.getElementById('custName').value,
                 phone: document.getElementById('custPhone').value,
                 startLoc: document.getElementById('startLoc').value,
                 endLoc: document.getElementById('endLoc').value,
                 serviceType: document.getElementById('serviceType').value,
-                subServiceType: document.getElementById('subServiceType').value
+                subServiceType: document.getElementById('subServiceType').value,
+                timestamp: new Date().getTime()
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(customerData));
         }
 
+        // โหลดข้อมูลลูกค้า
         function loadCustomerData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if(saved) {
-                try {
-                    const d = JSON.parse(saved);
-                    if(d.name) document.getElementById('custName').value = d.name;
-                    if(d.phone) document.getElementById('custPhone').value = d.phone;
-                    if(d.startLoc) document.getElementById('startLoc').value = d.startLoc;
-                    if(d.endLoc) document.getElementById('endLoc').value = d.endLoc;
-                    if(d.serviceType) {
-                        document.getElementById('serviceType').value = d.serviceType;
-                        updateSubOptions();
-                        setTimeout(() => { if(d.subServiceType) document.getElementById('subServiceType').value = d.subServiceType; }, 100);
-                    }
-                } catch(e) {}
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // โหลดข้อมูลลงฟอร์ม
+                if (data.name) document.getElementById('custName').value = data.name;
+                if (data.phone) document.getElementById('custPhone').value = data.phone;
+                if (data.startLoc) document.getElementById('startLoc').value = data.startLoc;
+                if (data.endLoc) document.getElementById('endLoc').value = data.endLoc;
+                
+                if (data.serviceType) {
+                    document.getElementById('serviceType').value = data.serviceType;
+                    updateSubOptions();
+                    
+                    // รอให้ DOM อัพเดทก่อนค่อยตั้งค่า subServiceType
+                    setTimeout(() => {
+                        if (data.subServiceType) {
+                            document.getElementById('subServiceType').value = data.subServiceType;
+                            showServiceDescription();
+                        }
+                    }, 100);
+                }
+                
+                // แสดงข้อความเตือนว่ามีข้อมูลบันทึกอยู่
+                showSavedDataAlert();
             }
         }
 
+        // แสดงแจ้งเตือนข้อมูลที่บันทึก
+        function showSavedDataAlert() {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'saved-data-alert';
+            
+            alertDiv.innerHTML = `
+                <div>
+                    <i class="fa-solid fa-info-circle"></i>
+                    โหลดข้อมูลที่บันทึกไว้ล่าสุดแล้ว
+                    <span style="font-size:11px; opacity:0.7;">(บันทึกอัตโนมัติทุกครั้ง)</span>
+                </div>
+                <button onclick="clearSavedData()">
+                    <i class="fa-solid fa-trash"></i> ล้าง
+                </button>
+            `;
+            
+            const calcCard = document.querySelector('.calc-card');
+            if (calcCard) {
+                const firstChild = calcCard.firstChild;
+                calcCard.insertBefore(alertDiv, firstChild);
+                
+                // ลบแจ้งเตือนหลังจาก 5 วินาที
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.style.opacity = '0';
+                        alertDiv.style.transition = 'opacity 0.3s';
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) alertDiv.remove();
+                        }, 300);
+                    }
+                }, 5000);
+            }
+        }
+
+        // ล้างข้อมูลที่บันทึก
+        function clearSavedData() {
+            localStorage.removeItem(STORAGE_KEY);
+            
+            // ล้างฟอร์ม
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('startLoc').value = '';
+            document.getElementById('endLoc').value = '';
+            document.getElementById('serviceType').selectedIndex = 0;
+            document.getElementById('subOptionContainer').style.display = 'none';
+            document.getElementById('serviceDesc').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('map').style.display = 'none';
+            document.getElementById('map').innerHTML = '';
+            
+            // แสดงข้อความยืนยัน
+            showToast('ล้างข้อมูลสำเร็จแล้ว', 'success');
+        }
+
+        // ========== UX IMPROVEMENTS ==========
+        // แสดง Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}" 
+                   style="margin-right: 8px;"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 3000);
+        }
+
+        // ========== API FALLBACK SYSTEM ==========
+        // คำนวณระยะทางด้วย Haversine formula (fallback)
+        function calculateDistanceFallback(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // แสดงแผนที่สำรอง
+        function showFallbackMap(startName, endName) {
+            const mapDiv = document.getElementById('map');
+            if (mapDiv) {
+                mapDiv.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #475569;">
+                        <i class="fa-solid fa-map" style="font-size: 24px; color: #94a3b8; margin-bottom: 10px;"></i>
+                        <p>แผนที่อยู่ในระหว่างการปรับปรุงชั่วคราว</p>
+                        <p style="font-size: 12px; margin-top: 10px;">
+                            <strong>เส้นทาง:</strong> ${startName} → ${endName}
+                        </p>
+                        <button onclick="retryApiCall()" style="
+                            margin-top: 10px;
+                            background: var(--primary);
+                            color: white;
+                            border: none;
+                            padding: 8px 15px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 12px;
+                        ">
+                            <i class="fa-solid fa-rotate"></i> ลองใหม่
+                        </button>
+                    </div>
+                `;
+                mapDiv.style.display = 'block';
+            }
+        }
+
+        // ลองเรียก API ใหม่
+        function retryApiCall() {
+            showToast('กำลังเชื่อมต่อใหม่...', 'info');
+            setTimeout(() => {
+                calculatePrice();
+            }, 1000);
+        }
+
+        // ========== MAIN FUNCTIONS ==========
+        let map, routeLayer, startCoords, endCoords;
+        let currentPrice = 0;
+        let isDiscountApplied = false;
+        let finalPriceText = "";
+
+        // Update Sub-options
         function updateSubOptions() {
             const mainType = document.getElementById('serviceType').value;
             const subContainer = document.getElementById('subOptionContainer');
             const subSelect = document.getElementById('subServiceType');
+            const serviceDesc = document.getElementById('serviceDesc');
+            
             subSelect.innerHTML = '';
             
             if (pricingData[mainType] && pricingData[mainType].options) {
                 pricingData[mainType].options.forEach(opt => {
                     const option = document.createElement('option');
-                    option.value = opt.id; option.text = opt.label;
+                    option.value = opt.id;
+                    option.text = opt.label;
+                    option.setAttribute('data-desc', opt.desc);
                     subSelect.appendChild(option);
                 });
                 subContainer.style.display = 'block';
+                
+                // แสดงคำอธิบายเมื่อเลือก
+                showServiceDescription();
             } else {
                 subContainer.style.display = 'none';
+                serviceDesc.style.display = 'none';
             }
+            
+            // บันทึกข้อมูล
             saveCustomerData();
         }
 
+        // แสดงคำอธิบายบริการ
+        function showServiceDescription() {
+            const mainType = document.getElementById('serviceType').value;
+            const subSelect = document.getElementById('subServiceType');
+            const serviceDesc = document.getElementById('serviceDesc');
+            
+            if (!serviceDesc) return;
+            
+            let description = '';
+            
+            if (subSelect && subSelect.selectedIndex >= 0) {
+                const selectedOption = subSelect.options[subSelect.selectedIndex];
+                if (selectedOption.getAttribute('data-desc')) {
+                    description = selectedOption.getAttribute('data-desc');
+                }
+            } else if (pricingData[mainType] && pricingData[mainType].desc) {
+                description = pricingData[mainType].desc;
+            }
+            
+            if (description) {
+                serviceDesc.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${description}`;
+                serviceDesc.style.display = 'block';
+            } else {
+                serviceDesc.style.display = 'none';
+            }
+        }
+
+        // Select Service from cards
+        function selectService(val) {
+            document.getElementById('serviceType').value = val;
+            updateSubOptions();
+            
+            // เลือกตัวเลือกแรกอัตโนมัติ
+            const subSelect = document.getElementById('subServiceType');
+            if (subSelect && subSelect.options.length > 0) {
+                subSelect.selectedIndex = 0;
+                showServiceDescription();
+            }
+            
+            // บันทึกข้อมูล
+            saveCustomerData();
+            
+            // Scroll to form
+            const hero = document.querySelector('.hero');
+            const offset = 100;
+            const elementPosition = hero.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+            
+            // แสดงคำแนะนำ
+            showStepInstructions();
+        }
+
+        // Search Location
         async function searchLocation(query, type) {
             if (query.length < 3) return;
+            
             const list = document.getElementById(type + 'List');
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=th&limit=5`);
                 const data = await res.json();
+                
                 list.innerHTML = '';
                 if (data.length > 0) {
                     list.style.display = 'block';
                     data.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'search-item';
-                        div.innerText = item.display_name.split(',')[0];
+                        div.innerHTML = `
+                            ${item.display_name.split(',')[0]}
+                            <span style="font-size:11px; color:#94a3b8; margin-left:5px;">
+                                ${item.display_name.split(',').slice(1, 3).join(',')}
+                            </span>
+                        `;
                         div.onclick = () => {
-                            document.getElementById(type + 'Loc').value = item.display_name.split(',')[0];
+                            document.getElementById(type + 'Loc').value = item.display_name;
                             if (type === 'start') startCoords = [item.lat, item.lon];
                             else endCoords = [item.lat, item.lon];
                             list.style.display = 'none';
@@ -516,55 +1248,138 @@
                         list.appendChild(div);
                     });
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error('Search API Error:', e);
+                // ไม่ต้องทำอะไร ถ้า API ล่ม
+            }
         }
 
-        document.getElementById('startLoc').addEventListener('input', (e) => searchLocation(e.target.value, 'start'));
-        document.getElementById('endLoc').addEventListener('input', (e) => searchLocation(e.target.value, 'end'));
-        document.addEventListener('click', (e) => {
-            if(!e.target.closest('div[style*="position:relative"]')) {
-                document.querySelectorAll('.search-results').forEach(el => el.style.display = 'none');
-            }
-        });
-        document.getElementById('clearFormBtn').onclick = () => { localStorage.removeItem(STORAGE_KEY); location.reload(); };
-
+        // Calculate Price (with fallback)
         async function calculatePrice() {
+            // ตรวจสอบข้อมูลพื้นฐาน
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             
-            if (!startCoords || !endCoords) {
-                showToast('❌ กรุณาเลือกจังหวัดจากรายการที่แนะนำ');
+            if (!name || !phone) {
+                showToast('กรุณากรอกชื่อและเบอร์โทรศัพท์', 'error');
                 return;
             }
             
-            showToast('🔄 กำลังประเมินราคา...');
-            document.getElementById('resultBox').style.display = 'none';
-            document.getElementById('map').style.display = 'none';
-
+            if (!startCoords || !endCoords) {
+                const startLoc = document.getElementById('startLoc').value;
+                const endLoc = document.getElementById('endLoc').value;
+                
+                if (!startLoc || !endLoc) {
+                    showToast('กรุณาเลือกจุดรับและส่ง', 'error');
+                    return;
+                }
+            }
+            
+            const mainType = document.getElementById('serviceType').value;
+            if (!mainType) {
+                showToast('กรุณาเลือกประเภทบริการ', 'error');
+                return;
+            }
+            
+            if (pricingData[mainType].options) {
+                const subVal = document.getElementById('subServiceType').value;
+                if (!subVal) {
+                    showToast('กรุณาเลือกประเภทย่อย', 'error');
+                    return;
+                }
+            }
+            
+            isDiscountApplied = false;
+            document.getElementById('discountTag').style.display = 'none';
+            
             try {
-                const url = `https://router.project-osrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson`;
-                const res = await fetch(url);
-                const routeData = await res.json();
-                const dist = (routeData.routes[0].distance / 1000).toFixed(1);
-
-                // Show Map ONLY when calculated
-                document.getElementById('map').style.display = 'block';
-                if (!map) { map = L.map('map'); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
-                if (routeLayer) map.removeLayer(routeLayer);
-                routeLayer = L.geoJSON(routeData.routes[0].geometry).addTo(map);
-                map.fitBounds(routeLayer.getBounds(), {padding: [20, 20]});
-
-                displayResult(dist);
-
+                showToast('กำลังคำนวณราคา...', 'info');
+                
+                let dist, routeData;
+                
+                try {
+                    // พยายามใช้ API หลัก
+                    const url = `https://router.project-osrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson`;
+                    const res = await fetch(url);
+                    
+                    if (!res.ok) throw new Error('API Error');
+                    
+                    routeData = await res.json();
+                    dist = (routeData.routes[0].distance / 1000).toFixed(1);
+                    
+                    // แสดงแผนที่
+                    document.getElementById('map').style.display = 'block';
+                    if (!map) {
+                        map = L.map('map');
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                    }
+                    if (routeLayer) map.removeLayer(routeLayer);
+                    routeLayer = L.geoJSON(routeData.routes[0].geometry).addTo(map);
+                    map.fitBounds(routeLayer.getBounds(), {padding: [20, 20]});
+                    
+                } catch (apiError) {
+                    console.log('Using fallback calculation');
+                    
+                    // ใช้ fallback calculation
+                    dist = calculateDistanceFallback(
+                        startCoords[0], startCoords[1],
+                        endCoords[0], endCoords[1]
+                    ).toFixed(1);
+                    
+                    // เพิ่ม 30% สำหรับเส้นทางถนน
+                    dist = (dist * 1.3).toFixed(1);
+                    
+                    // แสดงแผนที่สำรอง
+                    showFallbackMap(
+                        document.getElementById('startLoc').value,
+                        document.getElementById('endLoc').value
+                    );
+                }
+                
+                let priceObj;
+                if (pricingData[mainType].options) {
+                    const subId = document.getElementById('subServiceType').value;
+                    priceObj = pricingData[mainType].options.find(o => o.id === subId);
+                } else {
+                    priceObj = pricingData[mainType];
+                }
+                
+                let rawPrice = priceObj.base + (dist * priceObj.rate);
+                currentPrice = Math.ceil(rawPrice / 100) * 100;
+                
+                document.getElementById('distVal').innerText = dist;
+                document.getElementById('priceVal').innerText = currentPrice.toLocaleString() + ' บาท';
+                document.getElementById('resultBox').style.display = 'block';
+                
+                const btnDiscount = document.getElementById('btnDiscount');
+                if (currentPrice > 6000) {
+                    btnDiscount.style.display = 'block';
+                } else {
+                    btnDiscount.style.display = 'none';
+                }
+                
+                generateCopyText(dist, priceObj, false);
+                saveCustomerData();
+                
+                showToast('คำนวณราคาสำเร็จ!', 'success');
+                
             } catch (e) {
-                // Fallback
-                const distFallback = calculateDistanceFallback(startCoords[0], startCoords[1], endCoords[0], endCoords[1]);
-                const finalDist = (distFallback * 1.3).toFixed(1);
-                displayResult(finalDist);
+                console.error('Calculation Error:', e);
+                showToast('ระบบขัดข้องชั่วคราว กรุณาลองใหม่', 'error');
             }
         }
 
-        function displayResult(dist) {
+        // Apply Discount
+        function applyDiscount() {
+            if (isDiscountApplied) return;
+            
+            currentPrice = Math.ceil((currentPrice * 0.9) / 100) * 100;
+            document.getElementById('priceVal').innerText = currentPrice.toLocaleString() + ' บาท';
+            document.getElementById('btnDiscount').style.display = 'none';
+            document.getElementById('discountTag').style.display = 'block';
+            isDiscountApplied = true;
+            
+            const dist = document.getElementById('distVal').innerText;
             const mainType = document.getElementById('serviceType').value;
             let priceObj;
             if (pricingData[mainType].options) {
@@ -573,44 +1388,128 @@
             } else {
                 priceObj = pricingData[mainType];
             }
+            
+            generateCopyText(dist, priceObj, true);
+            saveCustomerData();
+            
+            showToast('ได้รับส่วนลด 10% แล้ว!', 'success');
+        }
 
-            let rawPrice = priceObj.base + (dist * priceObj.rate);
-            currentPrice = Math.ceil(rawPrice / 100) * 100;
-            
-            document.getElementById('priceVal').innerText = currentPrice.toLocaleString() + '.-';
-            document.getElementById('resultBox').style.display = 'block';
-            
-            const subLabel = priceObj.label || 'มาตรฐาน';
+        // Generate Copy Text
+        function generateCopyText(dist, priceObj, hasDiscount) {
             const name = document.getElementById('custName').value || '-';
             const phone = document.getElementById('custPhone').value || '-';
+            const start = document.getElementById('startLoc').value;
+            const end = document.getElementById('endLoc').value;
+            const date = new Date().toLocaleDateString('th-TH');
+            const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
             
-            finalPriceText = `สนใจจองคิวรถ SST Transport 🚚\n------------------\nชื่อ: ${name}\nเบอร์: ${phone}\n📍 ต้นทาง: ${document.getElementById('startLoc').value}\n🏁 ปลายทาง: ${document.getElementById('endLoc').value}\n📏 ระยะทาง: ${dist} กม.\n📦 บริการ: ${pricingData[mainType].name} (${subLabel})\n------------------\n💰 ราคาประเมิน: ${currentPrice.toLocaleString()} บาท\n------------------\n*ขอราคาโปรโมชั่น/เช็คคิวรถว่างครับ`;
-
-            setTimeout(() => { document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
+            const mainLabel = pricingData[document.getElementById('serviceType').value].name;
+            const subLabel = priceObj.label || '-';
+            
+            let discountText = hasDiscount ? '\n✅ (ได้รับส่วนลด 10% แล้ว)' : '';
+            
+            finalPriceText = `สอบถามราคาบริการขนส่ง SST Transport 🚚\n\n👤 ลูกค้า: ${name}\n📞 โทร: ${phone}\n\n📍 รับจาก: ${start}\n🏁 ส่งที่: ${end}\n📏 ระยะทาง: ${dist} กม.\n\n📦 บริการ: ${mainLabel}\n📋 ประเภท: ${subLabel}\n\n💰 ราคาประเมิน: ${currentPrice.toLocaleString()} บาท${discountText}\n\n⏰ วันที่สอบถาม: ${date} ${time}\n\n📝 หมายเหตุ: กรุณานำข้อความนี้ทักแชท LINE เพื่อดำเนินการจองคิว`;
         }
 
-        function calculateDistanceFallback(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
+        // Copy to LINE
         function copyToLine() {
-            if (!finalPriceText) return;
+            if (!finalPriceText) {
+                showToast('กรุณาคำนวณราคาก่อน', 'error');
+                return;
+            }
+            
             navigator.clipboard.writeText(finalPriceText).then(() => {
-                showToast('✅ คัดลอกแล้ว! กำลังเปิด LINE...');
-                setTimeout(() => window.location.href = 'https://lin.ee/nOeqY7l3', 1000);
+                showToast('คัดลอกข้อมูลแล้ว! กำลังเปิด LINE...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'https://lin.ee/nOeqY7l3';
+                }, 1000);
+            }).catch(err => {
+                showToast('ไม่สามารถคัดลอกได้', 'error');
             });
         }
-        
-        function selectService(type) {
-            document.getElementById('serviceType').value = type;
-            updateSubOptions();
-            document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
+
+        // แสดงคำแนะนำขั้นตอน
+        function showStepInstructions() {
+            const instructions = document.createElement('div');
+            instructions.className = 'step-instructions';
+            
+            instructions.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <i class="fa-solid fa-circle-info" style="color: var(--accent); margin-right: 8px;"></i>
+                    <strong>คำแนะนำการใช้งาน</strong>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div>
+                        <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 5px;">1</span>
+                        กรอกชื่อและเบอร์โทร
+                    </div>
+                    <div>
+                        <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 5px;">2</span>
+                        เลือกจุดรับและส่ง
+                    </div>
+                    <div>
+                        <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 5px;">3</span>
+                        เลือกประเภทบริการ
+                    </div>
+                    <div>
+                        <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 5px;">4</span>
+                        กดเช็คราคา
+                    </div>
+                </div>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
+                    <i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i>
+                    <strong>เคล็ดลับ:</strong> คลิกที่บริการด้านล่างเพื่อเลือกอัตโนมัติ
+                </div>
+            `;
+            
+            const calcCard = document.querySelector('.calc-card');
+            if (calcCard && !document.querySelector('.step-instructions')) {
+                calcCard.appendChild(instructions);
+            }
         }
+
+        // ========== EVENT LISTENERS ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // โหลดข้อมูลที่บันทึกไว้
+            loadCustomerData();
+            
+            // แสดงคำแนะนำขั้นตอน
+            setTimeout(showStepInstructions, 1000);
+            
+            // Event Listeners สำหรับ input
+            document.getElementById('custName').addEventListener('input', saveCustomerData);
+            document.getElementById('custPhone').addEventListener('input', saveCustomerData);
+            document.getElementById('startLoc').addEventListener('input', saveCustomerData);
+            document.getElementById('endLoc').addEventListener('input', saveCustomerData);
+            document.getElementById('serviceType').addEventListener('change', saveCustomerData);
+            document.getElementById('subServiceType').addEventListener('change', function() {
+                saveCustomerData();
+                showServiceDescription();
+            });
+            
+            // Event Listeners สำหรับ location search
+            document.getElementById('startLoc').addEventListener('input', (e) => searchLocation(e.target.value, 'start'));
+            document.getElementById('endLoc').addEventListener('input', (e) => searchLocation(e.target.value, 'end'));
+            
+            // ซ่อนผลลัพธ์ค้นหาเมื่อคลิกที่อื่น
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.form-group')) {
+                    document.querySelectorAll('.search-results').forEach(el => el.style.display = 'none');
+                }
+            });
+            
+            // ปุ่มล้างฟอร์ม
+            document.getElementById('clearFormBtn').addEventListener('click', clearSavedData);
+            document.getElementById('clearFormBtn').addEventListener('mouseenter', function() {
+                this.style.background = '#fee2e2';
+                this.style.color = '#dc2626';
+            });
+            document.getElementById('clearFormBtn').addEventListener('mouseleave', function() {
+                this.style.background = '#f1f5f9';
+                this.style.color = '#64748b';
+            });
+        });
     </script>
 </body>
 </html>
