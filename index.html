@@ -127,23 +127,23 @@
   @keyframes tickerScroll { from{ transform:translateX(0); } to{ transform:translateX(-100%); } }
 
   .reward-stack {
-    position:absolute; top:100px; right:4px; left:auto; transform:none; z-index:20;
-    display:flex; flex-direction:column; align-items:flex-end; gap:5px; pointer-events:none;
-    max-width:50vw;
+    position:absolute; top:150px; right:4px; left:auto; transform:none; z-index:20;
+    display:flex; flex-direction:column; align-items:flex-end; gap:4px; pointer-events:none;
+    max-width:42vw;
   }
   .reward-card {
-    background:rgba(15,13,28,0.55); border:1px solid rgba(74,222,128,0.35);
-    border-radius:9px; padding:5px 8px; min-width:0; max-width:150px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
+    background:rgba(15,13,28,0.45); border:1px solid rgba(74,222,128,0.3);
+    border-radius:7px; padding:3px 6px; min-width:0; max-width:120px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25);
     animation: rewardIn 0.25s ease-out, rewardOut 0.4s ease-in 2.1s forwards;
   }
-  .reward-card.legendary { border-color:rgba(253,224,71,0.5); box-shadow:0 2px 10px rgba(253,224,71,0.2); }
+  .reward-card.legendary { border-color:rgba(253,224,71,0.45); box-shadow:0 2px 8px rgba(253,224,71,0.18); }
   @keyframes rewardIn { from{opacity:0; transform:translateY(-8px) scale(0.92);} to{opacity:1; transform:translateY(0) scale(1);} }
   @keyframes rewardOut { from{opacity:1;} to{opacity:0; transform:translateY(-6px);} }
-  .reward-card .rc-title { font-size:9.5px; font-weight:800; color:#4ade80; display:flex; align-items:center; gap:4px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .reward-card .rc-title { font-size:8px; font-weight:800; color:#4ade80; display:flex; align-items:center; gap:3px; margin-bottom:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .reward-card.legendary .rc-title { color:#fde047; }
-  .reward-card .rc-stars { color:#fbbf24; font-size:8px; letter-spacing:0.5px; }
-  .reward-card .rc-row { display:flex; align-items:center; gap:4px; font-size:8.5px; color:#e2e8f0; padding:0.5px 0; white-space:nowrap; }
+  .reward-card .rc-stars { color:#fbbf24; font-size:7px; letter-spacing:0.5px; }
+  .reward-card .rc-row { display:flex; align-items:center; gap:3px; font-size:7px; color:#e2e8f0; padding:0.5px 0; white-space:nowrap; }
 
   .item-popup {
     position:fixed; z-index:80; background:rgba(15,13,28,0.98); border:1px solid rgba(139,92,246,0.5);
@@ -179,10 +179,11 @@
   .gm-float-btn {
     position:fixed; width:42px; height:42px; border-radius:50%;
     background:linear-gradient(135deg,#dc2626,#7f1d1d); color:#fff; font-size:17px;
-    display:flex; align-items:center; justify-content:center;
+    display:none; align-items:center; justify-content:center;
     z-index:60; box-shadow:0 4px 14px rgba(0,0,0,0.5); touch-action:none;
     top:410px; left:8px; border:2px solid rgba(255,255,255,0.25);
   }
+  .gm-float-btn.unlocked { display:flex; }
   .gm-panel {
     position:fixed; width:210px; max-height:64vh; overflow-y:auto;
     background:rgba(15,13,28,0.96); border:1px solid rgba(239,68,68,0.5); border-radius:14px;
@@ -3779,9 +3780,7 @@
     const z = zoneAt(player.x, player.y);
     if(z.name !== currentZoneName){
       currentZoneName = z.name;
-      zoneNameEl.textContent = z.name;
-      const zc = z.name==='ป่าเริ่มต้น' ? '#4ade80' : (z.name==='ทุ่งกลาง' ? '#38bdf8' : '#f87171');
-      showZoneBanner(z.name, zc);
+      zoneNameEl.textContent = MAPS[currentMapId].name;
     }
   }
 
@@ -4469,11 +4468,11 @@
 
   let lastTs = 0;
   function updateBossHpBar(){
-    const boss = monsters.find(m=>m.isBoss);
+    const boss = monsters.find(m=>m.isFieldBoss || m.isWorldBoss);
     const el = document.getElementById('boss-hp-bar');
     if(!boss){ el.classList.remove('show'); return; }
     el.classList.add('show');
-    document.getElementById('bhb-name').textContent = (boss.isWorldBoss?'🌍 ':boss.isFieldBoss?'👑 ':'👑 ')+boss.type.name+' Lv.'+boss.lvl;
+    document.getElementById('bhb-name').textContent = (boss.isWorldBoss?'🌍 ':'👑 ')+boss.type.name+' Lv.'+boss.lvl;
     document.getElementById('bhb-fill').style.width = Math.max(0,(boss.hp/boss.maxHp*100))+'%';
     document.getElementById('bhb-text').textContent = Math.max(0,Math.round(boss.hp))+' / '+boss.maxHp;
   }
@@ -5899,8 +5898,13 @@
       spawnBossNearPlayer();
     } else if(cmd==='worldboss'){
       forceWorldBoss();
+    } else if(cmd==='gm'){
+      const btn = document.getElementById('gm-float-btn');
+      btn.classList.toggle('unlocked');
+      if(!btn.classList.contains('unlocked')) document.getElementById('gm-panel').classList.remove('show');
+      pushChat('system','ระบบ', btn.classList.contains('unlocked') ? '🛠️ ปลดล็อกปุ่ม GM แล้ว' : '🛠️ ซ่อนปุ่ม GM แล้ว');
     } else if(cmd==='help'){
-      pushChat('system','ระบบ','คำสั่ง: /gold [±จำนวน] · /gem [±จำนวน] · /exprate [เท่า] · /droprate [เท่า] · /item [key] [จำนวน] · /mat [key] [จำนวน] · /boss · /worldboss');
+      pushChat('system','ระบบ','คำสั่ง: /gold [±จำนวน] · /gem [±จำนวน] · /exprate [เท่า] · /droprate [เท่า] · /item [key] [จำนวน] · /mat [key] [จำนวน] · /boss · /worldboss · /gm');
     } else {
       pushChat('system','ระบบ','ไม่รู้จักคำสั่ง พิมพ์ /help เพื่อดูคำสั่งทั้งหมด');
     }
