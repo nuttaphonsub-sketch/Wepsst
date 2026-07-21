@@ -148,10 +148,29 @@
   }
 
   .float-text {
-    position:absolute; font-weight:800; pointer-events:none;
-    text-shadow:0 2px 6px rgba(0,0,0,0.6);
-    animation: floatUp 0.9s ease-out forwards;
+    position:absolute; font-weight:900; pointer-events:none;
+    font-family:Arial, 'Helvetica Neue', sans-serif;
+    -webkit-text-stroke:1.6px rgba(0,0,0,0.75);
+    paint-order:stroke fill;
+    text-shadow:0 2px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.35);
     z-index:6; white-space:nowrap;
+    animation-timing-function: cubic-bezier(0.2,0.9,0.35,1);
+    animation-fill-mode: forwards;
+  }
+  .float-text.crit { -webkit-text-stroke:2px rgba(80,20,0,0.85); }
+  @keyframes dmgPopA {
+    0% { transform:translate(-50%,-50%) scale(0.4) translateY(0); opacity:0; }
+    12% { transform:translate(-50%,-50%) scale(1.25) translateY(-6px); opacity:1; }
+    22% { transform:translate(-50%,-50%) scale(1) translateY(-14px); opacity:1; }
+    75% { transform:translate(calc(-50% + var(--dx,10px)),-50%) scale(1) translateY(-46px); opacity:1; }
+    100% { transform:translate(calc(-50% + var(--dx,10px)),-50%) scale(0.92) translateY(-58px); opacity:0; }
+  }
+  @keyframes dmgPopB {
+    0% { transform:translate(-50%,-50%) scale(0.4) translateY(0); opacity:0; }
+    12% { transform:translate(-50%,-50%) scale(1.25) translateY(-6px); opacity:1; }
+    22% { transform:translate(-50%,-50%) scale(1) translateY(-14px); opacity:1; }
+    75% { transform:translate(calc(-50% + var(--dx,-10px)),-50%) scale(1) translateY(-46px); opacity:1; }
+    100% { transform:translate(calc(-50% + var(--dx,-10px)),-50%) scale(0.92) translateY(-58px); opacity:0; }
   }
   @keyframes floatUp { 0%{transform:translateY(0);opacity:1;} 100%{transform:translateY(-50px);opacity:0;} }
 
@@ -406,6 +425,16 @@
   .class-card .cc-icon { font-size:34px; width:50px; text-align:center; }
   .class-card .cc-name { font-weight:800; font-size:15px; }
   .class-card .cc-desc { font-size:11px; color:#94a3b8; margin-top:2px; }
+  .cc-stats { margin-top:7px; display:flex; flex-direction:column; gap:3px; }
+  .cc-stat-row { display:flex; align-items:center; gap:6px; font-size:9px; color:#94a3b8; }
+  .cc-stat-row .cc-stat-label { width:30px; flex-shrink:0; }
+  .cc-stat-track { flex:1; height:5px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden; }
+  .cc-stat-fill { height:100%; border-radius:3px; }
+  .cc-stat-fill.atk { background:linear-gradient(90deg,#f87171,#dc2626); }
+  .cc-stat-fill.def { background:linear-gradient(90deg,#60a5fa,#2563eb); }
+  .cc-stat-fill.hp { background:linear-gradient(90deg,#4ade80,#16a34a); }
+  .cc-stat-fill.spd { background:linear-gradient(90deg,#fbbf24,#d97706); }
+  .cc-stat-fill.crit { background:linear-gradient(90deg,#c084fc,#7c3aed); }
   .cs-confirm-btn {
     margin-top:8px; background:linear-gradient(135deg,#fbbf24,#d97706); color:#3a1e00;
     font-weight:900; font-size:15px; padding:12px 40px; border-radius:14px; border:none;
@@ -701,8 +730,8 @@
     warrior: {
       key:'warrior', name:'นักรบ', icon:'🗡️', color:'#f87171', weaponShape:'sword', weaponColor:'#cbd5e1',
       catFur:'#f9a8a8', catEar:'#f87171', accessory:'headband',
-      desc:'ดาเมจใกล้ตัวสูง HP หนา เหมาะมือใหม่',
-      statMul:{ atk:1.15, def:1.2, hp:1.25, spd:1 },
+      desc:'ตัวถัง HP/DEF สูงสุด แต่เดินช้า เหมาะมือใหม่',
+      statMul:{ atk:1.05, def:1.4, hp:1.4, spd:0.85 }, critBonus:0.02, cdrBonus:0,
       skillNames:{ ranged:{name:'ฟาดพลังคลื่น', icon:'💢'}, spin:{name:'ฟันหมุนสายเลือด', icon:'🌪️'}, heal:{name:'คำรามฮีล', icon:'❤️‍🔥'}, ult:{name:'จอมทัพพิโรธ', icon:'💥'} },
       branches:[
         { key:'power', name:'พลังโจมตี', icon:'⚔️', nodes:[
@@ -728,8 +757,8 @@
     archer: {
       key:'archer', name:'นักธนู', icon:'🏹', color:'#4ade80', weaponShape:'bow', weaponColor:'#a16207',
       catFur:'#86efac', catEar:'#4ade80', accessory:'hood',
-      desc:'ดาเมจระยะไกลแรง คริติคอลสูง',
-      statMul:{ atk:1.1, def:0.9, hp:0.95, spd:1.15 },
+      desc:'ดาเมจ+ความแม่นยำสูงสุด วิ่งไว แต่ป้องกันบางเหมือนกระดาษ',
+      statMul:{ atk:1.4, def:0.65, hp:0.8, spd:1.3 }, critBonus:0.08, cdrBonus:0,
       skillNames:{ ranged:{name:'สายฟ้าคำราม', icon:'🏹'}, spin:{name:'ห่าธนูรอบทิศ', icon:'🎯'}, heal:{name:'ลมหายใจป่า', icon:'🍃'}, ult:{name:'ธนูสิ้นโลก', icon:'☄️'} },
       branches:[
         { key:'precision', name:'ความแม่นยำ', icon:'🎯', nodes:[
@@ -755,8 +784,8 @@
     priest: {
       key:'priest', name:'หมอผี', icon:'🔮', color:'#a78bfa', weaponShape:'staff', weaponColor:'#c084fc',
       catFur:'#c4b5fd', catEar:'#a78bfa', accessory:'collar',
-      desc:'ฮีลแรง บัฟดี เอาตัวรอดเก่ง',
-      statMul:{ atk:0.9, def:1.05, hp:1.1, spd:1 },
+      desc:'ฮีลแรง คูลดาวน์ไว เอาตัวรอดดี แต่ดาเมจต่ำสุด',
+      statMul:{ atk:0.78, def:1.05, hp:1.15, spd:0.95 }, critBonus:0.02, cdrBonus:0.08,
       skillNames:{ ranged:{name:'ลูกไฟวิญญาณ', icon:'🔮'}, spin:{name:'วงเวทป้องปราณ', icon:'🌀'}, heal:{name:'พรสวรรค์', icon:'✨'}, ult:{name:'อวตารเทพเจ้า', icon:'🌟'} },
       branches:[
         { key:'holy', name:'พลังศักดิ์สิทธิ์', icon:'✨', nodes:[
@@ -782,8 +811,8 @@
     rogue: {
       key:'rogue', name:'โจร', icon:'🗡️', color:'#fbbf24', weaponShape:'daggers', weaponColor:'#fbbf24',
       catFur:'#4b5563', catEar:'#374151', accessory:'mask',
-      desc:'คริติคอลโหด คูลดาวน์ไว เก็บทองเก่ง',
-      statMul:{ atk:1.2, def:0.85, hp:0.9, spd:1.25 },
+      desc:'คริติคอล+ความเร็วสูงสุดในเกม แต่ HP/DEF ต่ำสุด ตายง่ายมาก',
+      statMul:{ atk:1.32, def:0.6, hp:0.7, spd:1.4 }, critBonus:0.12, cdrBonus:0.03,
       skillNames:{ ranged:{name:'มีดสังหาร', icon:'🔪'}, spin:{name:'พายุใบมีด', icon:'🌀'}, heal:{name:'พิษถอนพิษ', icon:'🧪'}, ult:{name:'ราตรีเพชฌฆาต', icon:'🌑'} },
       branches:[
         { key:'shadow', name:'เงามืด', icon:'🌑', nodes:[
@@ -921,9 +950,9 @@
   }
   function totalATK(){ return Math.round((6 + equipStat(equipment.weapon) + legendaryStat('atk')) * classData().statMul.atk * (1+player.passives.atkPct/100+activeBuffMult('atk')+bestiaryBonusPct()/100)); }
   function totalDEF(){ return Math.round((equipStat(equipment.armor) + player.passives.defFlat + legendaryStat('def')) * classData().statMul.def); }
-  function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100; }
+  function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100 + (classData().critBonus||0); }
   function totalGoldBonus(){ return equipStat(equipment.necklace)/100 + player.passives.goldPct/100 + activeBuffMult('gold') + legendaryStat('gold')/100 + (hasSetBonus('wanderingsage')?0.25:0); }
-  function totalCDR(){ return Math.min(0.5, player.passives.cdrPct/100); }
+  function totalCDR(){ return Math.min(0.5, player.passives.cdrPct/100 + (classData().cdrBonus||0)); }
   function computeMaxHp(){ return Math.round((100 + (player.level-1)*15 + Math.round(equipStat(equipment.armor)*4) + legendaryStat('hp')) * classData().statMul.hp * (1+player.passives.hpPct/100)); }
 
   // ---------- Legendary set items ----------
@@ -2449,13 +2478,18 @@
     const sx = worldX - camera.x, sy = worldY - camera.y;
     if(sx < -50 || sx > W+50 || sy < -50 || sy > H+50) return;
     const el = document.createElement('div');
-    el.className = 'float-text';
+    el.className = 'float-text' + (big ? ' crit' : '');
     el.style.left = sx+'px'; el.style.top = sy+'px';
     el.style.color = color;
-    el.style.fontSize = (big? '20px':'15px');
+    el.style.fontSize = (big? '23px':'16px');
+    const dir = Math.random()<0.5 ? 'A' : 'B';
+    const dx = (8+Math.random()*16) * (dir==='A'?1:-1);
+    el.style.setProperty('--dx', dx+'px');
+    const dur = big ? 1.05 : 0.85;
+    el.style.animation = (dir==='A'?'dmgPopA':'dmgPopB') + ' ' + dur + 's';
     el.textContent = text;
     container.appendChild(el);
-    setTimeout(()=> el.remove(), 950);
+    setTimeout(()=> el.remove(), dur*1000+80);
   }
   function showLevelUp(){
     const el = document.createElement('div');
@@ -2606,7 +2640,7 @@
 
   function damageMonster(m, dmg, crit){
     m.hp -= dmg; m.hitFlash = 200;
-    spawnFloatText(m.x, m.y-20, (crit?'CRIT ':'')+'-'+dmg, crit? '#f472b6':'#fde047', crit);
+    spawnFloatText(m.x, m.y-20, (crit?'CRIT ':'')+'-'+dmg, crit? '#ff9f1c':'#ffffff', crit);
     spawnHitSpark(m.x, m.y, crit);
     addShake(crit?4:1.5, crit?150:80);
     if(crit){
@@ -4667,14 +4701,22 @@
 
   // ---------- Class select ----------
   let selectedClassKey = null;
+  function statBarPct(val, lo, hi){ return Math.max(6, Math.min(100, Math.round((val-lo)/(hi-lo)*100))); }
   function renderClassSelect(){
     const list = document.getElementById('class-card-list');
     list.innerHTML = Object.values(CLASSES).map(c=>`
       <div class="class-card" data-class="${c.key}">
         <div class="cc-icon">${c.icon}</div>
-        <div>
+        <div style="flex:1;">
           <div class="cc-name">${c.name}</div>
           <div class="cc-desc">${c.desc}</div>
+          <div class="cc-stats">
+            <div class="cc-stat-row"><div class="cc-stat-label">ATK</div><div class="cc-stat-track"><div class="cc-stat-fill atk" style="width:${statBarPct(c.statMul.atk,0.6,1.5)}%"></div></div></div>
+            <div class="cc-stat-row"><div class="cc-stat-label">DEF</div><div class="cc-stat-track"><div class="cc-stat-fill def" style="width:${statBarPct(c.statMul.def,0.6,1.5)}%"></div></div></div>
+            <div class="cc-stat-row"><div class="cc-stat-label">HP</div><div class="cc-stat-track"><div class="cc-stat-fill hp" style="width:${statBarPct(c.statMul.hp,0.6,1.5)}%"></div></div></div>
+            <div class="cc-stat-row"><div class="cc-stat-label">SPD</div><div class="cc-stat-track"><div class="cc-stat-fill spd" style="width:${statBarPct(c.statMul.spd,0.6,1.5)}%"></div></div></div>
+            <div class="cc-stat-row"><div class="cc-stat-label">CRIT</div><div class="cc-stat-track"><div class="cc-stat-fill crit" style="width:${statBarPct(c.critBonus||0,0,0.15)}%"></div></div></div>
+          </div>
         </div>
       </div>
     `).join('');
