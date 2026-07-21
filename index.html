@@ -514,6 +514,8 @@
       <button id="gm-heal-btn">ฟื้นเต็ม</button>
       <button id="gm-mats-btn">วัสดุ x10</button>
       <button id="gm-clear-btn">ล้างมอนใกล้ตัว</button>
+      <button id="gm-boss-btn">👑 เสกบอส</button>
+      <button id="gm-worldboss-btn">🌍 เสกเวิลด์บอส</button>
     </div>
   </div>
 
@@ -4628,6 +4630,8 @@
       monsters = monsters.filter(m=>Math.hypot(m.x-player.x,m.y-player.y) > 600);
       showToast('ล้างมอนสเตอร์ '+(n-monsters.length)+' ตัว');
     });
+    document.getElementById('gm-boss-btn').addEventListener('click', ()=>{ spawnBossNearPlayer(); });
+    document.getElementById('gm-worldboss-btn').addEventListener('click', ()=>{ forceWorldBoss(); });
   })();
 
   // ---------- Chat panel ----------
@@ -4644,6 +4648,16 @@
       renderChat();
     });
   });
+  function spawnBossNearPlayer(){
+    if(MAPS[currentMapId].safe){ pushChat('system','ระบบ','อยู่ในหมู่บ้าน เสกบอสไม่ได้ ต้องออกไปแมพอื่นก่อน'); return; }
+    spawnMonster({ force:true, isBoss:true, x:player.x, y:Math.max(40,player.y-160), scaleMul:1.5 });
+    pushChat('system','ระบบ','👑 เสกบอสสำเร็จ!');
+  }
+  function forceWorldBoss(){
+    if(MAPS[currentMapId].safe){ pushChat('system','ระบบ','อยู่ในหมู่บ้าน เสกเวิลด์บอสไม่ได้ ต้องออกไปแมพอื่นก่อน'); return; }
+    worldBossState.nextSpawnAt = Date.now();
+    pushChat('system','ระบบ','🌍 เวิลด์บอสจะปรากฏตัวในไม่ช้า...');
+  }
   function tryParseCommand(text){
     if(!text.startsWith('/')) return false;
     const parts = text.slice(1).trim().split(/\s+/);
@@ -4672,8 +4686,12 @@
       const key = parts[1]; const qty = parseInt(parts[2])||1;
       if(Object.prototype.hasOwnProperty.call(player.materials,key)){ player.materials[key]+=qty; updateHud(); pushChat('system','ระบบ','ได้วัสดุ '+key+' x'+qty); }
       else pushChat('system','ระบบ','ไม่รู้จักวัสดุ (ใช้: shard, core, crystal, fang, ore)');
+    } else if(cmd==='boss'){
+      spawnBossNearPlayer();
+    } else if(cmd==='worldboss'){
+      forceWorldBoss();
     } else if(cmd==='help'){
-      pushChat('system','ระบบ','คำสั่ง: /gold [±จำนวน] · /gem [±จำนวน] · /exprate [เท่า] · /droprate [เท่า] · /item [key] [จำนวน] · /mat [key] [จำนวน]');
+      pushChat('system','ระบบ','คำสั่ง: /gold [±จำนวน] · /gem [±จำนวน] · /exprate [เท่า] · /droprate [เท่า] · /item [key] [จำนวน] · /mat [key] [จำนวน] · /boss · /worldboss');
     } else {
       pushChat('system','ระบบ','ไม่รู้จักคำสั่ง พิมพ์ /help เพื่อดูคำสั่งทั้งหมด');
     }
