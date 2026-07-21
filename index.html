@@ -72,6 +72,28 @@
     padding-left:100%; animation: tickerScroll 9s linear;
   }
   @keyframes tickerScroll { from{ transform:translateX(0); } to{ transform:translateX(-100%); } }
+
+  /* ---------- GM floating panel ---------- */
+  .gm-float-btn {
+    position:fixed; width:42px; height:42px; border-radius:50%;
+    background:linear-gradient(135deg,#dc2626,#7f1d1d); color:#fff; font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    z-index:60; box-shadow:0 4px 14px rgba(0,0,0,0.5); touch-action:none;
+    top:90px; left:8px; border:2px solid rgba(255,255,255,0.25);
+  }
+  .gm-panel {
+    position:fixed; width:210px; max-height:64vh; overflow-y:auto;
+    background:rgba(15,13,28,0.96); border:1px solid rgba(239,68,68,0.5); border-radius:14px;
+    z-index:59; padding:10px; display:none; top:138px; left:8px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.6);
+  }
+  .gm-panel.show { display:block; }
+  .gm-panel .gm-title { font-size:11px; font-weight:800; color:#f87171; margin:8px 0 5px; text-transform:uppercase; letter-spacing:0.5px; }
+  .gm-panel .gm-title:first-child { margin-top:0; }
+  .gm-panel .gm-row { display:flex; gap:4px; flex-wrap:wrap; }
+  .gm-panel button { font-size:10px; padding:5px 7px; border-radius:7px; border:none; background:rgba(255,255,255,0.1); color:#fff; }
+  .gm-panel button.rate-active { background:#dc2626; font-weight:800; }
+  .gm-panel .gm-close { position:absolute; top:6px; right:8px; background:none; color:#94a3b8; font-size:14px; padding:0; }
   .hud-top {
     position:absolute; top:0; left:0; right:0;
     display:flex; justify-content:space-between; align-items:flex-start;
@@ -429,6 +451,42 @@
   <div class="rotate-hint">🔄 หมุนจอเป็นแนวนอนเพื่อประสบการณ์ที่ดีที่สุด</div>
   <div class="rate-indicator" id="rate-indicator">EXP x1 · Drop x1</div>
   <div class="server-ticker" id="server-ticker"><div class="server-ticker-text" id="server-ticker-text"></div></div>
+
+  <div class="gm-float-btn" id="gm-float-btn">🛠️</div>
+  <div class="gm-panel" id="gm-panel">
+    <button class="gm-close" id="gm-close-btn">✕</button>
+    <div class="gm-title">🪙 ทอง</div>
+    <div class="gm-row">
+      <button data-gm-gold="100">+100</button>
+      <button data-gm-gold="1000">+1000</button>
+      <button data-gm-gold="10000">+10000</button>
+    </div>
+    <div class="gm-title">💎 เพชร</div>
+    <div class="gm-row">
+      <button data-gm-gem="10">+10</button>
+      <button data-gm-gem="100">+100</button>
+    </div>
+    <div class="gm-title">⚡ อัตรา EXP</div>
+    <div class="gm-row" id="gm-exprate-row">
+      <button data-gm-exprate="1">x1</button>
+      <button data-gm-exprate="2">x2</button>
+      <button data-gm-exprate="5">x5</button>
+      <button data-gm-exprate="10">x10</button>
+    </div>
+    <div class="gm-title">🎁 อัตราดรอป</div>
+    <div class="gm-row" id="gm-droprate-row">
+      <button data-gm-droprate="1">x1</button>
+      <button data-gm-droprate="2">x2</button>
+      <button data-gm-droprate="5">x5</button>
+      <button data-gm-droprate="10">x10</button>
+    </div>
+    <div class="gm-title">🧰 อื่น ๆ</div>
+    <div class="gm-row">
+      <button id="gm-heal-btn">ฟื้นเต็ม</button>
+      <button id="gm-mats-btn">วัสดุ x10</button>
+      <button id="gm-clear-btn">ล้างมอนใกล้ตัว</button>
+    </div>
+  </div>
 
   <div class="hud-top">
     <div class="hud-left-col">
@@ -1702,51 +1760,68 @@
   function exitDungeon(){ finishDungeon(false); showToast('ออกจากดันเจี้ยนแล้ว'); }
 
   // ---------- Infinite Tower ----------
-  const towerState = { active:false, floor:0, bestFloor:0 };
+  const towerState = { active:false, floor:0, bestFloor:0, prevMapId:'village' };
   function enterTower(){
     if(towerState.active || dungeonState.active) return;
-    if(MAPS[currentMapId].safe){ showToast('ต้องออกจากหมู่บ้านก่อนถึงจะเข้าหอคอยได้'); return; }
+    if(MAPS[currentMapId].safe && currentMapId!=='village'){ showToast('ต้องออกจากหมู่บ้านก่อนถึงจะเข้าหอคอยได้'); return; }
+    towerState.prevMapId = currentMapId==='tower' ? 'village' : currentMapId;
     towerState.active = true;
     towerState.floor = 0;
-    monsters = monsters.filter(m=>!m.isWorldBoss);
     closeModal();
-    showToast('🗼 เข้าสู่หอคอยไร้ที่สิ้นสุด!');
+    switchMap('tower');
+    showToast('🗼 เข้าสู่หอคอยไร้ที่สิ้นสุด! (สูงสุด 60 ชั้น)');
     spawnTowerFloor();
   }
   function spawnTowerFloor(){
     towerState.floor++;
-    const n = 3+(towerState.floor%5);
-    const scaleMul = 1 + towerState.floor*0.15;
-    for(let i=0;i<n;i++){
-      const ang=(i/n)*Math.PI*2;
-      spawnMonster({ force:true, isTower:true, x:player.x+Math.cos(ang)*180, y:player.y+Math.sin(ang)*180, scaleMul, isBoss: towerState.floor%5===0 });
+    const floor = towerState.floor;
+    const isBossFloor = floor % 5 === 0;
+    const scaleMul = 1 + floor*0.14;
+    if(isBossFloor){
+      spawnMonster({ force:true, isTower:true, isBoss:true, x:MAPS.tower.spawn.x, y:MAPS.tower.spawn.y-140, scaleMul: scaleMul*2.6 });
+      showToast('👑 ชั้นที่ '+floor+' — บอสประจำชั้น!');
+    } else {
+      const n = 3+Math.min(3, Math.floor(floor/10));
+      for(let i=0;i<n;i++){
+        const ang=(i/n)*Math.PI*2;
+        spawnMonster({ force:true, isTower:true, isBoss:false, x:MAPS.tower.spawn.x+Math.cos(ang)*150, y:MAPS.tower.spawn.y+Math.sin(ang)*150, scaleMul });
+      }
+      showToast('🗼 ชั้นที่ '+floor);
     }
-    showToast('🗼 ชั้นที่ '+towerState.floor);
   }
   function onTowerMonsterCleared(){
     const remaining = monsters.filter(m=>m.isTower).length;
     if(remaining>0) return;
-    const reward = towerState.floor*12;
+    const floor = towerState.floor;
+    const reward = floor*14;
     player.gold += reward;
-    gainExp(towerState.floor*8);
-    towerState.bestFloor = Math.max(towerState.bestFloor, towerState.floor);
-    if(towerState.floor % 10 === 0){
+    gainExp(floor*9);
+    towerState.bestFloor = Math.max(towerState.bestFloor, floor);
+    if(floor % 10 === 0){
       player.hp = player.maxHp;
-      const bonusGold = towerState.floor*20;
+      const bonusGold = floor*22;
       player.gold += bonusGold;
-      showToast('🎁 ชั้น '+towerState.floor+': ฟื้น HP เต็ม + โบนัส 🪙'+bonusGold+'!');
+      gainGems(2);
+      showToast('🎁 ชั้น '+floor+': ฟื้น HP เต็ม + โบนัส 🪙'+bonusGold+' + 💎2!');
       flashScreen('#fbbf24',0.3,400);
     }
-    spawnTowerFloor();
+    if(floor >= 60){
+      showToast('🏆 พิชิตหอคอยไร้ที่สิ้นสุดสำเร็จ! (ชั้นสูงสุด 60)');
+      announceServer('🗼 '+(player.name||'นักผจญภัย')+' พิชิตหอคอยไร้ที่สิ้นสุดครบ 60 ชั้นแล้ว!');
+      player.gold += 1000; gainGems(30);
+      exitTower();
+      return;
+    }
     updateHud();
     checkAchievements();
+    spawnTowerFloor();
   }
   function exitTower(){
     if(!towerState.active) return;
     towerState.active = false;
-    monsters = monsters.filter(m=>!m.isTower);
     showToast('ออกจากหอคอย ชั้นสูงสุดที่ทำได้: '+towerState.bestFloor);
     checkAchievements();
+    switchMap(towerState.prevMapId||'village');
   }
 
   // ---------- World Boss ----------
@@ -2023,7 +2098,7 @@
       ...genTier('legendary','🌟',()=>Object.keys(player.legendaryOwned).length,[1,4,8,12], t=>'สะสมไอเทมตำนาน '+t+' ชิ้น'),
       ...genTier('fusion','⚗️',()=>player.stats.fusions,[1,10,30], t=>'หลอมวัสดุ '+t+' ครั้ง'),
       ...genTier('bestiary','📖',()=>Object.keys(player.bestiary).filter(k=>player.bestiary[k]>=10).length,[3,5,7], t=>'บันทึกมอนสเตอร์ครบ '+t+' ชนิด'),
-      ...genTier('tower','🗼',()=>towerState.bestFloor,[5,10,25,50,100], t=>'ขึ้นหอคอยถึงชั้น '+t)
+      ...genTier('tower','🗼',()=>towerState.bestFloor,[5,10,20,35,50,60], t=>'ขึ้นหอคอยถึงชั้น '+t)
     ];
   }
   function checkAchievements(){
@@ -2040,31 +2115,31 @@
 
   // ---------- Monsters ----------
   const MONSTER_TYPES = [
-    { name:'ผีปอบ', color:'#4ade80', hp:20, r:16, exp:12, gold:3, speed:0.6 },
-    { name:'ผีกระสือ', color:'#a78bfa', hp:18, r:14, exp:11, gold:2, speed:1.15 },
-    { name:'ผีกระหัง', color:'#f87171', hp:24, r:16, exp:14, gold:4, speed:1.2 },
-    { name:'ผีอำ', color:'#818cf8', hp:16, r:13, exp:10, gold:2, speed:0.9 },
-    { name:'กุมารทอง', color:'#fbbf24', hp:28, r:15, exp:18, gold:6, speed:0.8 },
-    { name:'แม่นาคพระโขนง', color:'#f9a8d4', hp:45, r:21, exp:30, gold:9, speed:0.5 },
-    { name:'ผีเปรต', color:'#fb923c', hp:60, r:27, exp:42, gold:13, speed:0.42 },
-    { name:'ผีตายทั้งกลม', color:'#c084fc', hp:38, r:19, exp:26, gold:7, speed:0.65 },
-    { name:'ผีหัวขาด', color:'#94a3b8', hp:26, r:17, exp:16, gold:4, speed:1.1 }
+    { name:'ผีปอบ', color:'#4ade80', hp:20, r:16, exp:12, gold:3, speed:0.6, shape:'blob' },
+    { name:'ผีกระสือ', color:'#a78bfa', hp:18, r:14, exp:11, gold:2, speed:1.15, shape:'floatinghead' },
+    { name:'ผีกระหัง', color:'#f87171', hp:24, r:16, exp:14, gold:4, speed:1.2, shape:'winged' },
+    { name:'ผีอำ', color:'#818cf8', hp:16, r:13, exp:10, gold:2, speed:0.9, shape:'crouched' },
+    { name:'กุมารทอง', color:'#fbbf24', hp:28, r:15, exp:18, gold:6, speed:0.8, shape:'child' },
+    { name:'แม่นาคพระโขนง', color:'#f9a8d4', hp:45, r:21, exp:30, gold:9, speed:0.5, shape:'elegant' },
+    { name:'ผีเปรต', color:'#fb923c', hp:60, r:27, exp:42, gold:13, speed:0.42, shape:'tall' },
+    { name:'ผีตายทั้งกลม', color:'#c084fc', hp:38, r:19, exp:26, gold:7, speed:0.65, shape:'shrouded' },
+    { name:'ผีหัวขาด', color:'#94a3b8', hp:26, r:17, exp:16, gold:4, speed:1.1, shape:'headless' }
   ];
   const DESERT_MONSTER_TYPES = [
-    { name:'ผีเปรตทราย', color:'#fbbf24', hp:34, r:17, exp:24, gold:7, speed:0.75 },
-    { name:'ผีปอบทะเลทราย', color:'#f97316', hp:30, r:16, exp:22, gold:6, speed:1.1 },
-    { name:'ผีกระสือเพลิง', color:'#ef4444', hp:32, r:16, exp:23, gold:6, speed:1.3 },
-    { name:'ผีจอมปลวกร้าง', color:'#a3730a', hp:44, r:20, exp:32, gold:9, speed:0.55 },
-    { name:'ยักษ์ทรายเพลิง', color:'#fb923c', hp:80, r:28, exp:52, gold:16, speed:0.4 },
-    { name:'กุมารทรายแดง', color:'#dc2626', hp:36, r:17, exp:26, gold:8, speed:0.85 }
+    { name:'ผีเปรตทราย', color:'#fbbf24', hp:34, r:17, exp:24, gold:7, speed:0.75, shape:'tall' },
+    { name:'ผีปอบทะเลทราย', color:'#f97316', hp:30, r:16, exp:22, gold:6, speed:1.1, shape:'blob' },
+    { name:'ผีกระสือเพลิง', color:'#ef4444', hp:32, r:16, exp:23, gold:6, speed:1.3, shape:'floatinghead' },
+    { name:'ผีจอมปลวกร้าง', color:'#a3730a', hp:44, r:20, exp:32, gold:9, speed:0.55, shape:'mound' },
+    { name:'ยักษ์ทรายเพลิง', color:'#fb923c', hp:80, r:28, exp:52, gold:16, speed:0.4, shape:'giant' },
+    { name:'กุมารทรายแดง', color:'#dc2626', hp:36, r:17, exp:26, gold:8, speed:0.85, shape:'child' }
   ];
   const SNOW_MONSTER_TYPES = [
-    { name:'ผีอำน้ำแข็ง', color:'#93c5fd', hp:40, r:18, exp:30, gold:9, speed:0.7 },
-    { name:'แม่นาคน้ำแข็ง', color:'#e2e8f0', hp:65, r:24, exp:42, gold:13, speed:0.55 },
-    { name:'กุมารน้ำแข็ง', color:'#67e8f9', hp:36, r:17, exp:28, gold:8, speed:1.1 },
-    { name:'มังกรน้ำแข็ง (นาคี)', color:'#60a5fa', hp:95, r:29, exp:60, gold:18, speed:0.42 },
-    { name:'ผีกระหังหิมะ', color:'#cbd5e1', hp:32, r:16, exp:24, gold:7, speed:1.35 },
-    { name:'ผีเปรตน้ำแข็ง', color:'#38bdf8', hp:70, r:26, exp:48, gold:14, speed:0.5 }
+    { name:'ผีอำน้ำแข็ง', color:'#93c5fd', hp:40, r:18, exp:30, gold:9, speed:0.7, shape:'crouched' },
+    { name:'แม่นาคน้ำแข็ง', color:'#e2e8f0', hp:65, r:24, exp:42, gold:13, speed:0.55, shape:'elegant' },
+    { name:'กุมารน้ำแข็ง', color:'#67e8f9', hp:36, r:17, exp:28, gold:8, speed:1.1, shape:'child' },
+    { name:'มังกรน้ำแข็ง (นาคี)', color:'#60a5fa', hp:95, r:29, exp:60, gold:18, speed:0.42, shape:'dragon' },
+    { name:'ผีกระหังหิมะ', color:'#cbd5e1', hp:32, r:16, exp:24, gold:7, speed:1.35, shape:'winged' },
+    { name:'ผีเปรตน้ำแข็ง', color:'#38bdf8', hp:70, r:26, exp:48, gold:14, speed:0.5, shape:'tall' }
   ];
 
   // ---------- Maps & portals ----------
@@ -2097,6 +2172,13 @@
       zones:[{ name:'ดินแดนน้ำแข็งนิรันดร์', color:'rgba(147,197,253,0.13)', xMin:0, xMax:4200, yMin:0, yMax:2600, diff:3.2 }],
       monsterPool: SNOW_MONSTER_TYPES,
       sceneryIcons:['❄️','🌲','🧊','⛄'], returnPortal:{x:2100, y:150}
+    },
+    tower: {
+      name:'หอคอยไร้ที่สิ้นสุด', w:520, h:520, safe:false, lvlRange:[1,60],
+      spawn:{x:260, y:260},
+      zones:[{ name:'หอคอยไร้ที่สิ้นสุด', color:'rgba(139,92,246,0.16)', xMin:0, xMax:520, yMin:0, yMax:520, diff:1 }],
+      monsterPool: MONSTER_TYPES,
+      sceneryIcons:['🗼','🕯️','⛓️','💀']
     }
   };
   let currentMapId = 'village';
@@ -3059,6 +3141,103 @@
     return `rgb(${r},${g},${b})`;
   }
 
+  function drawGhostBody(shape, r, wobble){
+    ctx.beginPath();
+    if(shape==='floatinghead'){
+      ctx.arc(0, -r*0.15, r*0.75, 0, Math.PI*2);
+      ctx.closePath(); ctx.fill();
+      for(let i=0;i<4;i++){
+        const tx = -r*0.5 + i*(r/1.5);
+        ctx.beginPath();
+        ctx.moveTo(tx, r*0.4);
+        ctx.quadraticCurveTo(tx+Math.sin(wobble/150+i)*4, r*1.1, tx+2, r*1.4);
+        ctx.lineWidth = r*0.14; ctx.strokeStyle = ctx.fillStyle; ctx.lineCap='round'; ctx.stroke();
+      }
+      return;
+    }
+    if(shape==='tall'){
+      ctx.moveTo(-r*0.35,-r*0.9);
+      ctx.quadraticCurveTo(-r*0.55,r*0.2,-r*0.4,r*0.9);
+      ctx.quadraticCurveTo(0,r*1.1,r*0.4,r*0.9);
+      ctx.quadraticCurveTo(r*0.55,r*0.2,r*0.35,-r*0.9);
+      ctx.quadraticCurveTo(0,-r*1.15,-r*0.35,-r*0.9);
+      ctx.closePath(); ctx.fill();
+      return;
+    }
+    if(shape==='winged'){
+      ctx.arc(0,0,r*0.7,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-r*0.6,-r*0.1); ctx.lineTo(-r*1.35,-r*0.5+Math.sin(wobble/180)*3); ctx.lineTo(-r*0.55,r*0.5); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(r*0.6,-r*0.1); ctx.lineTo(r*1.35,-r*0.5+Math.sin(wobble/180)*3); ctx.lineTo(r*0.55,r*0.5); ctx.closePath(); ctx.fill();
+      return;
+    }
+    if(shape==='child'){
+      ctx.arc(0,r*0.12,r*0.68,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.arc(0,-r*0.42,r*0.62,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      return;
+    }
+    if(shape==='elegant'){
+      ctx.moveTo(-r*0.42,-r*0.95);
+      ctx.quadraticCurveTo(-r*0.6,r*0.3,-r*0.3,r*1.0);
+      ctx.lineTo(r*0.3,r*1.0);
+      ctx.quadraticCurveTo(r*0.6,r*0.3,r*0.42,-r*0.95);
+      ctx.quadraticCurveTo(0,-r*1.2,-r*0.42,-r*0.95);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-r*0.15,-r*0.9);
+      ctx.quadraticCurveTo(-r*0.9+Math.sin(wobble/200)*6, r*0.6, -r*0.5, r*1.5);
+      ctx.lineWidth = r*0.1; ctx.strokeStyle = ctx.fillStyle; ctx.lineCap='round'; ctx.stroke();
+      return;
+    }
+    if(shape==='shrouded'){
+      ctx.moveTo(-r*0.6,-r*0.6);
+      ctx.quadraticCurveTo(-r*0.75,r*0.6,-r*0.3,r*0.95);
+      ctx.lineTo(r*0.3,r*0.95);
+      ctx.quadraticCurveTo(r*0.75,r*0.6,r*0.6,-r*0.6);
+      ctx.quadraticCurveTo(0,-r*0.95,-r*0.6,-r*0.6);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=1.5;
+      for(const dy of [-0.15,0.15,0.45]){ ctx.beginPath(); ctx.moveTo(-r*0.5,r*dy); ctx.lineTo(r*0.5,r*dy); ctx.stroke(); }
+      return;
+    }
+    if(shape==='headless'){
+      ctx.arc(0,r*0.15,r*0.72,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#ef4444'; ctx.globalAlpha=0.7+Math.sin(wobble/150)*0.2;
+      ctx.beginPath(); ctx.ellipse(0,-r*0.4,r*0.3,r*0.14,0,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+      return;
+    }
+    if(shape==='dragon'){
+      ctx.ellipse(0,0,r*1.15,r*0.55,0,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(-r*1.1,0,r*0.35,r*0.28,0,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      return;
+    }
+    if(shape==='giant'){
+      ctx.arc(0,r*0.1,r*0.92,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      return;
+    }
+    if(shape==='mound'){
+      ctx.ellipse(0,r*0.2,r*0.95,r*0.7,0,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      return;
+    }
+    if(shape==='crouched'){
+      ctx.ellipse(0,r*0.3,r*0.85,r*0.6,0,0,Math.PI*2); ctx.closePath(); ctx.fill();
+      return;
+    }
+    // default 'blob' — rounded top + wavy bottom trail
+    ctx.moveTo(-r, r*0.5);
+    ctx.arc(0, -r*0.1, r, Math.PI, 0, false);
+    ctx.lineTo(r, r*0.5);
+    const waves = 4;
+    for(let i=0;i<waves;i++){
+      const wx = r - (i+0.5)*(2*r/waves);
+      const wy = r*0.5 + (i%2===0 ? r*0.35 : r*0.55) + Math.sin(wobble/150+i)*2;
+      ctx.quadraticCurveTo(wx + (r/waves)*0.5, wy, wx - (r/waves)*0.5, r*0.5);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+
   function drawMonster(m){
     const sx = m.x-camera.x, sy = m.y-camera.y;
     if(sx<-50||sx>W+50||sy<-50||sy>H+50) return;
@@ -3076,23 +3255,12 @@
       ctx.strokeStyle='#fbbf24'; ctx.lineWidth=3; ctx.shadowColor='#fbbf24'; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0;
     }
 
-    // ghost body: rounded top + wavy bottom trail
+    // shape-specific body silhouette
     ctx.globalAlpha = 0.92;
-    ctx.beginPath();
     const r = m.r;
-    ctx.moveTo(-r, r*0.5);
-    ctx.arc(0, -r*0.1, r, Math.PI, 0, false); // rounded dome top
-    ctx.lineTo(r, r*0.5);
-    const waves = 4;
-    for(let i=0;i<waves;i++){
-      const wx = r - (i+0.5)*(2*r/waves);
-      const wy = r*0.5 + (i%2===0 ? r*0.35 : r*0.55) + Math.sin(m.wobble/150+i)*2;
-      ctx.quadraticCurveTo(wx + (r/waves)*0.5, wy, wx - (r/waves)*0.5, r*0.5);
-    }
-    ctx.closePath();
     ctx.fillStyle = m.hitFlash>0 ? '#ffffff' : pal.body;
     ctx.shadowColor = m.isBoss ? '#ef4444' : pal.eye; ctx.shadowBlur = m.isBoss?18:10;
-    ctx.fill();
+    drawGhostBody(m.type.shape, r, m.wobble);
     ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
 
@@ -3858,7 +4026,7 @@
       <div class="sys-section">
         <div class="sys-title">🗼 หอคอยไร้ที่สิ้นสุด</div>
         <div class="card">
-          <div class="card-desc">${towerState.active? 'กำลังอยู่ชั้นที่ '+towerState.floor : 'ชั้นสูงสุดที่เคยทำได้: '+towerState.bestFloor}</div>
+          <div class="card-desc">${towerState.active? 'กำลังอยู่ชั้นที่ '+towerState.floor+'/60' : 'ชั้นสูงสุดที่เคยทำได้: '+towerState.bestFloor+'/60'}</div>
           <div class="card-desc">ทุก 10 ชั้นได้โบนัสฟื้นพลัง+ทองก้อนใหญ่ ยิ่งสูงยิ่งยาก</div>
           ${towerState.active?
             `<button class="btn-sm danger" id="exit-tower-btn">ออกจากหอคอย</button>` :
@@ -4351,6 +4519,82 @@
     switchMap('village');
   });
   document.getElementById('open-save').addEventListener('click', ()=> openModal('บันทึก / ชื่อตัวละคร', renderSaveModal));
+
+  // ---------- GM floating panel (draggable) ----------
+  (function(){
+    const btn = document.getElementById('gm-float-btn');
+    const panel = document.getElementById('gm-panel');
+    let dragging = false, moved = false, startX=0, startY=0, origX=0, origY=0;
+
+    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+    function positionPanelNearBtn(){
+      const r = btn.getBoundingClientRect();
+      let px = r.left, py = r.bottom+6;
+      if(py + 300 > window.innerHeight) py = Math.max(6, r.top-6-panel.offsetHeight);
+      if(px + 210 > window.innerWidth) px = window.innerWidth-218;
+      panel.style.left = px+'px'; panel.style.top = py+'px';
+    }
+
+    function onDown(clientX, clientY){
+      dragging = true; moved = false;
+      startX = clientX; startY = clientY;
+      const r = btn.getBoundingClientRect();
+      origX = r.left; origY = r.top;
+    }
+    function onMove(clientX, clientY){
+      if(!dragging) return;
+      const dx = clientX-startX, dy = clientY-startY;
+      if(Math.abs(dx)>5 || Math.abs(dy)>5) moved = true;
+      const nx = clamp(origX+dx, 0, window.innerWidth-46);
+      const ny = clamp(origY+dy, 0, window.innerHeight-46);
+      btn.style.left = nx+'px'; btn.style.top = ny+'px';
+      if(panel.classList.contains('show')) positionPanelNearBtn();
+    }
+    function onUp(){
+      if(!dragging) return;
+      dragging = false;
+      if(!moved){
+        panel.classList.toggle('show');
+        if(panel.classList.contains('show')) positionPanelNearBtn();
+      }
+    }
+    btn.addEventListener('touchstart', e=>{ e.preventDefault(); const t=e.touches[0]; onDown(t.clientX,t.clientY); }, {passive:false});
+    btn.addEventListener('touchmove', e=>{ e.preventDefault(); const t=e.touches[0]; onMove(t.clientX,t.clientY); }, {passive:false});
+    btn.addEventListener('touchend', onUp);
+    btn.addEventListener('mousedown', e=>{ onDown(e.clientX,e.clientY); });
+    window.addEventListener('mousemove', e=>{ if(dragging) onMove(e.clientX,e.clientY); });
+    window.addEventListener('mouseup', onUp);
+
+    document.getElementById('gm-close-btn').addEventListener('click', ()=> panel.classList.remove('show'));
+
+    panel.querySelectorAll('button[data-gm-gold]').forEach(b=>{
+      b.addEventListener('click', ()=>{ player.gold += parseInt(b.dataset.gmGold); updateHud(); showToast('🪙 +'+b.dataset.gmGold); });
+    });
+    panel.querySelectorAll('button[data-gm-gem]').forEach(b=>{
+      b.addEventListener('click', ()=>{ player.gems += parseInt(b.dataset.gmGem); updateHud(); showToast('💎 +'+b.dataset.gmGem); });
+    });
+    function refreshRateButtons(){
+      panel.querySelectorAll('#gm-exprate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmExprate)===expRateMult));
+      panel.querySelectorAll('#gm-droprate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmDroprate)===dropRateMult));
+    }
+    panel.querySelectorAll('button[data-gm-exprate]').forEach(b=>{
+      b.addEventListener('click', ()=>{ expRateMult = parseFloat(b.dataset.gmExprate); updateHud(); refreshRateButtons(); showToast('อัตรา EXP x'+expRateMult); });
+    });
+    panel.querySelectorAll('button[data-gm-droprate]').forEach(b=>{
+      b.addEventListener('click', ()=>{ dropRateMult = parseFloat(b.dataset.gmDroprate); updateHud(); refreshRateButtons(); showToast('อัตราดรอป x'+dropRateMult); });
+    });
+    refreshRateButtons();
+    document.getElementById('gm-heal-btn').addEventListener('click', ()=>{ player.hp = player.maxHp; player.shield=0; updateHud(); showToast('ฟื้นฟูเต็มแล้ว'); });
+    document.getElementById('gm-mats-btn').addEventListener('click', ()=>{
+      MATERIALS.forEach(m=> player.materials[m.key] = (player.materials[m.key]||0)+10);
+      updateHud(); showToast('ได้วัสดุทุกชนิด x10');
+    });
+    document.getElementById('gm-clear-btn').addEventListener('click', ()=>{
+      const n = monsters.length;
+      monsters = monsters.filter(m=>Math.hypot(m.x-player.x,m.y-player.y) > 600);
+      showToast('ล้างมอนสเตอร์ '+(n-monsters.length)+' ตัว');
+    });
+  })();
 
   // ---------- Chat panel ----------
   const chatPanel = document.getElementById('chat-panel');
