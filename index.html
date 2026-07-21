@@ -55,6 +55,24 @@
     .combo-badge { bottom:auto !important; top:56px !important; }
     .chat-panel { bottom:56px !important; max-height:130px !important; }
   }
+
+  /* ---------- Small portrait phones ---------- */
+  @media (max-width: 380px) {
+    .minimap { width:88px !important; height:88px !important; }
+    .level-panel { min-width:104px !important; padding:6px 8px !important; }
+    .topnav-icons { max-width:200px !important; }
+    .icon-btn.small { width:24px !important; height:24px !important; font-size:11px !important; }
+    .joystick-zone { width:96px !important; height:96px !important; }
+    .attack-btn { width:70px !important; height:70px !important; font-size:22px !important; }
+    .skill-btn { width:44px !important; height:44px !important; font-size:17px !important; }
+    .gm-panel { width:180px !important; }
+  }
+  @media (max-width: 340px) {
+    .minimap { width:74px !important; height:74px !important; }
+    .level-panel { min-width:92px !important; }
+    .bar-label { font-size:7px !important; }
+    .topnav-icons { max-width:172px !important; }
+  }
   .rate-indicator {
     position:absolute; left:50%; transform:translateX(-50%); top:2px;
     font-size:9px; color:#94a3b8; background:rgba(10,9,20,0.6); padding:2px 8px; border-radius:8px;
@@ -72,6 +90,42 @@
     padding-left:100%; animation: tickerScroll 9s linear;
   }
   @keyframes tickerScroll { from{ transform:translateX(0); } to{ transform:translateX(-100%); } }
+
+  .reward-stack {
+    position:absolute; top:64px; left:50%; transform:translateX(-50%); z-index:20;
+    display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;
+    max-width:80vw;
+  }
+  .reward-card {
+    background:rgba(15,13,28,0.95); border:1px solid rgba(74,222,128,0.5);
+    border-radius:12px; padding:8px 12px; min-width:190px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.5);
+    animation: rewardIn 0.25s ease-out, rewardOut 0.4s ease-in 2.1s forwards;
+  }
+  .reward-card.legendary { border-color:rgba(253,224,71,0.7); box-shadow:0 4px 20px rgba(253,224,71,0.35); }
+  @keyframes rewardIn { from{opacity:0; transform:translateY(-12px) scale(0.9);} to{opacity:1; transform:translateY(0) scale(1);} }
+  @keyframes rewardOut { from{opacity:1;} to{opacity:0; transform:translateY(-8px);} }
+  .reward-card .rc-title { font-size:12px; font-weight:800; color:#4ade80; display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+  .reward-card.legendary .rc-title { color:#fde047; }
+  .reward-card .rc-stars { color:#fbbf24; font-size:10px; letter-spacing:1px; }
+  .reward-card .rc-row { display:flex; align-items:center; gap:6px; font-size:11px; color:#e2e8f0; padding:1px 0; }
+
+  .portal-confirm {
+    position:absolute; inset:0; background:rgba(5,8,16,0.75); z-index:25;
+    display:none; align-items:center; justify-content:center;
+  }
+  .portal-confirm.show { display:flex; }
+  .portal-confirm .pc-box {
+    background:rgba(20,18,40,0.97); border:1px solid rgba(167,139,250,0.5); border-radius:16px;
+    padding:20px; text-align:center; max-width:260px;
+  }
+  .portal-confirm .pc-text { font-size:14px; font-weight:700; margin-bottom:14px; color:#e2e8f0; }
+  .portal-confirm .pc-btns { display:flex; gap:10px; justify-content:center; }
+  .portal-confirm button {
+    padding:9px 20px; border-radius:10px; border:none; font-weight:800; font-size:13px;
+  }
+  .portal-confirm #pc-yes { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
+  .portal-confirm #pc-no { background:rgba(255,255,255,0.1); color:#94a3b8; }
 
   /* ---------- GM floating panel ---------- */
   .gm-float-btn {
@@ -480,20 +534,59 @@
   <div class="rotate-hint">🔄 หมุนจอเป็นแนวนอนเพื่อประสบการณ์ที่ดีที่สุด</div>
   <div class="rate-indicator" id="rate-indicator">EXP x1 · Drop x1</div>
   <div class="server-ticker" id="server-ticker"><div class="server-ticker-text" id="server-ticker-text"></div></div>
+  <div class="reward-stack" id="reward-stack"></div>
+  <div class="portal-confirm" id="portal-confirm">
+    <div class="pc-box">
+      <div class="pc-text" id="pc-text">ต้องการเข้าหรือไม่?</div>
+      <div class="pc-btns">
+        <button id="pc-yes">เข้า</button>
+        <button id="pc-no">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
 
   <div class="gm-float-btn" id="gm-float-btn">🛠️</div>
   <div class="gm-panel" id="gm-panel">
     <button class="gm-close" id="gm-close-btn">✕</button>
+    <div class="gm-title" style="color:#fca5a5; font-size:13px;">🛠️ ปุ่ม GM</div>
+    <div class="gm-title">💪 ความแข็งแกร่งมอนสเตอร์</div>
+    <div class="gm-row" id="gm-monpower-row">
+      <button data-gm-monpower="1">x1</button>
+      <button data-gm-monpower="1.6">x1.6</button>
+      <button data-gm-monpower="2.5">x2.5</button>
+      <button data-gm-monpower="4">x4</button>
+      <button data-gm-monpower="6">x6</button>
+    </div>
+    <div class="gm-title">👑 ความแรง/เลือดบอสเท่านั้น</div>
+    <div class="gm-row" id="gm-bosspower-row">
+      <button data-gm-bosspower="1">x1</button>
+      <button data-gm-bosspower="2">x2</button>
+      <button data-gm-bosspower="3">x3</button>
+      <button data-gm-bosspower="5">x5</button>
+    </div>
     <div class="gm-title">🪙 ทอง</div>
     <div class="gm-row">
       <button data-gm-gold="100">+100</button>
       <button data-gm-gold="1000">+1000</button>
       <button data-gm-gold="10000">+10000</button>
     </div>
+    <div class="gm-title">🪙 อัตราทอง</div>
+    <div class="gm-row" id="gm-goldrate-row">
+      <button data-gm-goldrate="1">x1</button>
+      <button data-gm-goldrate="2">x2</button>
+      <button data-gm-goldrate="5">x5</button>
+      <button data-gm-goldrate="10">x10</button>
+    </div>
     <div class="gm-title">💎 เพชร</div>
     <div class="gm-row">
       <button data-gm-gem="10">+10</button>
       <button data-gm-gem="100">+100</button>
+    </div>
+    <div class="gm-title">💎 อัตราเพชร</div>
+    <div class="gm-row" id="gm-gemrate-row">
+      <button data-gm-gemrate="1">x1</button>
+      <button data-gm-gemrate="2">x2</button>
+      <button data-gm-gemrate="5">x5</button>
     </div>
     <div class="gm-title">⚡ อัตรา EXP</div>
     <div class="gm-row" id="gm-exprate-row">
@@ -725,7 +818,7 @@
     return ZONES[ZONES.length-1];
   }
   let currentZoneName = null;
-  let expRateMult = 1, dropRateMult = 1;
+  let expRateMult = 1, dropRateMult = 1, monsterPowerMult = 1.6, goldRateMult = 1, gemRateMult = 1, bossPowerMult = 1;
 
   // ---------- Classes ----------
   const CLASSES = {
@@ -1267,15 +1360,18 @@
     const qty = 2+Math.floor(Math.random()*3);
     player.materials[mk] += qty;
     player.stats.chestsOpened++;
-    spawnFloatText(c.x, c.y-20, '+'+goldAmt+' 🪙', '#fbbf24', true);
-    spawnFloatText(c.x, c.y-42, '+'+qty+' '+MATERIALS.find(m=>m.key===mk).icon, '#a78bfa');
-    if(Math.random()<0.1) gainGems(1+Math.floor(Math.random()*3));
+    const gotGem = Math.random()<0.1;
+    let gemAmt = 0;
+    if(gotGem){ gemAmt = 1+Math.floor(Math.random()*3); gainGems(gemAmt); }
     spawnParticle({ type:'ring', x:c.x, y:c.y, life:500, startRadius:8, endRadius:60, color:'#fbbf24', lineWidth:3 });
     for(let i=0;i<12;i++){
       const ang=(i/12)*Math.PI*2;
       spawnParticle({ type:'spark', x:c.x, y:c.y, vx:Math.cos(ang)*2, vy:Math.sin(ang)*2, life:500, size:3, color:'#fde047', drag:0.94, glow:10 });
     }
-    showToast('🎁 พบสมบัติ! +'+goldAmt+'🪙');
+    const matDef = MATERIALS.find(m=>m.key===mk);
+    const rows = [ {icon:'🪙', text:'+'+goldAmt+' ทอง'}, {icon:matDef.icon, text:'+'+qty+' '+matDef.name} ];
+    if(gotGem) rows.push({icon:'💎', text:'+'+gemAmt+' เพชร'});
+    showRewardCard({ icon:'🎁', title:'พบหีบสมบัติ!', stars:2, rows });
     sfxChest();
     updateHud();
     checkAchievements();
@@ -2008,6 +2104,18 @@
     announceServer._t = setTimeout(()=> el.classList.remove('show'), 9000);
     pushChat('system', 'เซิร์ฟเวอร์', text);
   }
+  function showRewardCard(opts){
+    const stack = document.getElementById('reward-stack');
+    if(stack.children.length >= 4) stack.removeChild(stack.firstChild);
+    const card = document.createElement('div');
+    card.className = 'reward-card' + (opts.legendary ? ' legendary' : '');
+    const stars = opts.stars ? '<span class="rc-stars">'+('★'.repeat(opts.stars))+'</span>' : '';
+    let html = `<div class="rc-title">${opts.icon||'🎁'} ${opts.title} ${stars}</div>`;
+    (opts.rows||[]).forEach(r=>{ html += `<div class="rc-row">${r.icon||''} ${r.text}</div>`; });
+    card.innerHTML = html;
+    stack.appendChild(card);
+    setTimeout(()=>{ if(card.parentNode) card.parentNode.removeChild(card); }, 2550);
+  }
   function renderChat(){
     const box = document.getElementById('chat-messages');
     box.innerHTML = chatMessages[activeChatTab].map(m=>
@@ -2227,16 +2335,38 @@
     zoneNameEl.textContent = m.name;
     updateHud();
   }
+  let portalConfirmShownFor = null;
   function tryEnterPortal(){
     const m = MAPS[currentMapId];
+    let nearPortal = null;
     if(m.portals){
       for(const p of m.portals){
-        if(Math.hypot(player.x-p.x, player.y-p.y) < 40){ switchMap(p.toMap); return; }
+        if(Math.hypot(player.x-p.x, player.y-p.y) < 42){ nearPortal = p; break; }
       }
     }
-    if(m.returnPortal && Math.hypot(player.x-m.returnPortal.x, player.y-m.returnPortal.y) < 40){
-      switchMap('village');
+    if(!nearPortal && m.returnPortal && Math.hypot(player.x-m.returnPortal.x, player.y-m.returnPortal.y) < 42){
+      nearPortal = { toMap:'village', label:'🏠 กลับหมู่บ้าน' };
     }
+    if(nearPortal){
+      if(portalConfirmShownFor !== nearPortal.toMap){
+        portalConfirmShownFor = nearPortal.toMap;
+        showPortalConfirm(nearPortal);
+      }
+    } else {
+      portalConfirmShownFor = null;
+    }
+  }
+  function showPortalConfirm(portal){
+    document.getElementById('pc-text').textContent = 'ต้องการเข้า '+(portal.label||MAPS[portal.toMap].name)+' หรือไม่?';
+    document.getElementById('portal-confirm').classList.add('show');
+    document.getElementById('pc-yes').onclick = ()=>{
+      document.getElementById('portal-confirm').classList.remove('show');
+      switchMap(portal.toMap);
+      portalConfirmShownFor = null;
+    };
+    document.getElementById('pc-no').onclick = ()=>{
+      document.getElementById('portal-confirm').classList.remove('show');
+    };
   }
   function drawPortals(){
     const m = MAPS[currentMapId];
@@ -2257,6 +2387,30 @@
     });
   }
 
+  const MAP_NPCS = {
+    village: [ {x:350,y:520,icon:'🧙',name:'จอมเวทเฒ่า'}, {x:650,y:520,icon:'⚒️',name:'ช่างตีเหล็ก'}, {x:500,y:760,icon:'🐱',name:'แมวเร่ร่อน'} ],
+    forest:  [ {x:2100,y:600,icon:'🧝',name:'พรานป่า'}, {x:1600,y:1200,icon:'👵',name:'ยายขายยา'} ],
+    desert:  [ {x:2100,y:600,icon:'🐫',name:'พ่อค้าเร่'} ],
+    snow:    [ {x:2100,y:600,icon:'⛄',name:'ชาวเขา'} ]
+  };
+  function drawNPCs(){
+    const list = MAP_NPCS[currentMapId] || [];
+    list.forEach(n=>{
+      const sx = n.x-camera.x, sy = n.y-camera.y;
+      if(sx<-40||sx>W+40||sy<-40||sy>H+40) return;
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(sx, sy+16, 14, 5, 0, 0, Math.PI*2);
+      ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.fill();
+      ctx.font='26px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowColor='#22d3ee'; ctx.shadowBlur=10;
+      ctx.fillText(n.icon, sx, sy);
+      ctx.shadowBlur=0;
+      ctx.font='9px sans-serif'; ctx.fillStyle='#e2e8f0';
+      ctx.fillText(n.name, sx, sy+22);
+      ctx.restore();
+    });
+  }
+
   let monsters = [];
   let monsterIdCounter = 0;
   let projectiles = [];
@@ -2271,13 +2425,14 @@
     if(!opts.force && monsters.length >= MAX_MONSTERS) return null;
     // spawn somewhere in world near player's general area but not too close
     let x, y, tries=0;
+    const spawnPt = mapDef.spawn;
     if(opts.x !== undefined){ x = opts.x; y = opts.y; }
     else {
       do {
         x = Math.random()*WORLD_W;
         y = Math.random()*WORLD_H;
         tries++;
-      } while(Math.hypot(x-player.x,y-player.y) < 220 && tries < 10);
+      } while((Math.hypot(x-player.x,y-player.y) < 220 || (spawnPt && Math.hypot(x-spawnPt.x,y-spawnPt.y) < 260)) && tries < 12);
     }
 
     const zone = zoneAt(y);
@@ -2296,7 +2451,7 @@
     }
     if(isWorldBoss) lvl = Math.max(lvl, 60);
 
-    let scale = (1 + (lvl-1)*0.16) * (isBoss?3.2:1);
+    let scale = (1 + (lvl-1)*0.16) * (isBoss?3.2:1) * monsterPowerMult * (isBoss?bossPowerMult:1);
     if(opts.scaleMul) scale *= opts.scaleMul;
     if(isWorldBoss) scale *= 10;
 
@@ -2591,11 +2746,11 @@
   }
 
   function gainGold(amount){
-    player.gold += Math.round(amount * (1+totalGoldBonus()));
+    player.gold += Math.round(amount * (1+totalGoldBonus()) * goldRateMult);
   }
   function gainGems(amount){
     if(amount<=0) return;
-    player.gems += amount;
+    player.gems += Math.round(amount * gemRateMult);
     spawnFloatText(player.x, player.y-96, '+'+amount+' 💎', '#67e8f9', true);
     updateHud();
   }
@@ -2626,6 +2781,24 @@
   window.addEventListener('mouseup', ()=>{ if(mouseDown){ mouseDown=false; joyEnd(); } });
 
   // ---------- Combat ----------
+  const WEAPON_RARITY_TIERS = [
+    {min:1, max:5, name:'ขาว', color:'#e5e7eb', star:1, goldValue:8},
+    {min:6, max:10, name:'เขียว', color:'#4ade80', star:2, goldValue:20},
+    {min:11, max:20, name:'ฟ้า', color:'#60a5fa', star:3, goldValue:45},
+    {min:21, max:40, name:'ม่วง', color:'#c084fc', star:4, goldValue:90},
+    {min:41, max:55, name:'ทอง', color:'#fbbf24', star:5, goldValue:180},
+    {min:56, max:999, name:'แดง', color:'#f87171', star:6, goldValue:350}
+  ];
+  function weaponRarityForLevel(lvl){
+    return WEAPON_RARITY_TIERS.find(t=>lvl>=t.min && lvl<=t.max) || WEAPON_RARITY_TIERS[0];
+  }
+  function rollWeaponFind(m){
+    if(Math.random() > 0.09*dropRateMult) return null;
+    const tier = weaponRarityForLevel(m.isWorldBoss ? 60 : m.lvl);
+    const goldGain = Math.round(tier.goldValue * (1+totalGoldBonus()) * goldRateMult * (m.isBoss?2:1));
+    player.gold += goldGain;
+    return {tier, goldGain};
+  }
   function rollMaterialDrop(m){
     let dropChance = (m.isBoss ? 0.95 : 0.35) * dropRateMult;
     if(Date.now() < meteorShowerUntil) dropChance += 0.3;
@@ -2662,21 +2835,36 @@
       player.kills++;
       player.bestiary[m.type.name] = (player.bestiary[m.type.name]||0)+1;
       const bossMult = m.isBoss ? 4 : 1;
+      const expGain = m.type.exp*bossMult*(m.isWorldBoss?10:1);
+      const goldGain = Math.round(m.type.gold*bossMult*(m.isWorldBoss?8:1)*(1+totalGoldBonus()));
       gainGold(m.type.gold*bossMult*(m.isWorldBoss?8:1));
-      gainExp(m.type.exp*bossMult*(m.isWorldBoss?10:1));
+      gainExp(expGain);
       gainBattlepassExp(m.isWorldBoss?200:(m.isBoss?15:3));
-      spawnFloatText(m.x, m.y-42, '+'+(m.type.exp*bossMult*(m.isWorldBoss?10:1))+' EXP', '#38bdf8');
-      spawnFloatText(m.x, m.y-60, '+'+Math.round(m.type.gold*bossMult*(m.isWorldBoss?8:1)*(1+totalGoldBonus()))+' 🪙', '#fbbf24');
       const drop = rollMaterialDrop(m);
-      if(drop){
-        const matDef = MATERIALS.find(mm=>mm.key===drop.key);
-        spawnFloatText(m.x, m.y-78, '+'+drop.qty+' '+matDef.icon, '#a78bfa');
-      }
       const legDrop = rollLegendaryDrop(m);
-      if(legDrop){
-        spawnFloatText(m.x, m.y-96, '✨ '+legDrop.name+'!', '#fde047', true);
-        showToast('🌟 ได้ไอเทมตำนาน: '+legDrop.name+'! ไปใส่ที่กระเป๋า 🎒');
-        announceServer('🌟 '+(player.name||'นักผจญภัย')+' ได้รับไอเทมตำนาน '+legDrop.name+'!');
+      const wepFind = rollWeaponFind(m);
+
+      if(m.isBoss || m.isWorldBoss || m.isFieldBoss || legDrop || (wepFind && wepFind.tier.star>=4)){
+        const rows = [ {icon:'✨', text:'+'+expGain+' EXP'}, {icon:'🪙', text:'+'+goldGain+' ทอง'} ];
+        if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); rows.push({icon:matDef.icon, text:'+'+drop.qty+' '+matDef.name}); }
+        if(wepFind) rows.push({icon:'🗡️', text:'อาวุธเกรด'+wepFind.tier.name+' (+'+wepFind.goldGain+'🪙)'});
+        if(legDrop) rows.push({icon:'🌟', text:legDrop.name});
+        showRewardCard({
+          icon: legDrop?'🌟':'👑',
+          title: legDrop ? 'ไอเทมตำนาน!' : m.type.name+' พ่ายแพ้!',
+          stars: legDrop?3:(m.isWorldBoss?5:(m.isFieldBoss?4:3)),
+          legendary: !!legDrop,
+          rows
+        });
+        if(legDrop){
+          showToast('🌟 ได้ไอเทมตำนาน: '+legDrop.name+'! ไปใส่ที่กระเป๋า 🎒');
+          announceServer('🌟 '+(player.name||'นักผจญภัย')+' ได้รับไอเทมตำนาน '+legDrop.name+'!');
+        }
+      } else {
+        spawnFloatText(m.x, m.y-42, '+'+expGain+' EXP', '#38bdf8');
+        spawnFloatText(m.x, m.y-60, '+'+goldGain+' 🪙', '#fbbf24');
+        if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); spawnFloatText(m.x, m.y-78, '+'+drop.qty+' '+matDef.icon, '#a78bfa'); }
+        if(wepFind) spawnFloatText(m.x, m.y-96, 'อาวุธ'+wepFind.tier.name+' +'+wepFind.goldGain+'🪙', wepFind.tier.color, wepFind.tier.star>=3);
       }
       spawnDeathPoof(m);
       sfxDeath(m.r/18);
@@ -2685,12 +2873,11 @@
         const st = fieldBossState[currentMapId];
         if(st){ st.active=false; st.nextSpawnAt = Date.now()+FIELD_BOSS_INTERVAL; }
         player.bossKills++;
-        showToast('👑 พิชิตบอสประจำแมพสำเร็จ! +💎');
         pushChat('system','ระบบ',(player.name||'นักผจญภัย')+' พิชิตบอสประจำแมพ '+MAPS[currentMapId].name+' สำเร็จ!');
         addShake(7,240);
       } else if(m.isBoss && !m.isWorldBoss){
         gainGems(1+Math.floor(Math.random()*2));
-        player.bossKills++; showToast('👑 พิชิตบอสสำเร็จ!'); addShake(6,220);
+        player.bossKills++; addShake(6,220);
       }
       if(m.isWorldBoss){
         gainGems(20+Math.floor(Math.random()*11));
@@ -2699,7 +2886,6 @@
         worldBossState.nextSpawnAt = Date.now() + WORLD_BOSS_INTERVAL;
         flashScreen('#fde047', 0.6, 500);
         addShake(10,400);
-        showToast('🌍 ปราบเวิลด์บอสสำเร็จ! รางวัลมหาศาล + 💎!');
         pushChat('system', 'ระบบ', 'ผู้เล่นในเซิร์ฟเวอร์ร่วมกันปราบเวิลด์บอสสำเร็จ!');
       }
       if(guild.joined){
@@ -2910,7 +3096,7 @@
       }
       if(m.hitFlash > 0) m.hitFlash -= dt;
       if(dist < m.r+player.r+4 && playerDamageCooldown <= 0 && player.invulTimer<=0){
-        const rawDmg = 4+Math.floor(Math.random()*5);
+        const rawDmg = (4+Math.floor(Math.random()*5) + m.lvl*0.8) * monsterPowerMult * (m.isBoss?1.6:1);
         let dmg = Math.max(1, Math.round(rawDmg - totalDEF()*0.3));
         playerDamageCooldown = 500;
         if(player.shield > 0){
@@ -3030,15 +3216,39 @@
   }
 
   // ---------- Rendering ----------
+  const MAP_GROUND_COLOR = { village:'#5d7f42', forest:'#3f7a3a', desert:'#c9a05c', snow:'#dbe8f5', tower:'#241a35' };
+  function drawDirtPatches(){
+    const cell = 130;
+    const startWX = Math.floor(camera.x/cell)*cell;
+    const startWY = Math.floor(camera.y/cell)*cell;
+    ctx.fillStyle = currentMapId==='snow' ? 'rgba(148,163,184,0.35)' : currentMapId==='desert' ? 'rgba(120,72,20,0.25)' : 'rgba(120,72,20,0.28)';
+    for(let wx=startWX; wx<camera.x+W+cell; wx+=cell){
+      for(let wy=startWY; wy<camera.y+H+cell; wy+=cell){
+        const seed = Math.sin(wx*7.13+wy*3.71)*7654.321;
+        const frac = seed-Math.floor(seed);
+        if(frac > 0.22) continue;
+        const sx = wx-camera.x, sy = wy-camera.y;
+        if(sx<-100||sx>W+100||sy<-100||sy>H+100) continue;
+        const sizeSeed = Math.sin(wx*2.1+wy*4.7)*999.123;
+        const sizeFrac = sizeSeed-Math.floor(sizeSeed);
+        ctx.beginPath();
+        ctx.ellipse(sx, sy, 46+sizeFrac*30, 30+sizeFrac*20, sizeFrac*Math.PI, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
   function drawBackground(){
+    ctx.fillStyle = MAP_GROUND_COLOR[currentMapId] || '#3f7a3a';
+    ctx.fillRect(0,0,W,H);
     for(const z of ZONES){
       const sy1 = z.yMin-camera.y, sy2 = z.yMax-camera.y;
       if(sy2 < 0 || sy1 > H) continue;
-      ctx.fillStyle = z.color.replace('0.07','0.18').replace('0.08','0.2');
+      ctx.fillStyle = z.color.replace('0.07','0.14').replace('0.08','0.16');
       ctx.fillRect(0, Math.max(0,sy1), W, Math.min(H,sy2)-Math.max(0,sy1));
     }
+    drawDirtPatches();
     // starfield dots (deterministic based on world coords)
-    ctx.fillStyle = 'rgba(251,191,36,0.35)';
+    ctx.fillStyle = 'rgba(251,191,36,0.22)';
     const dotStep = 70;
     const startWX = Math.floor(camera.x/dotStep)*dotStep;
     const startWY = Math.floor(camera.y/dotStep)*dotStep;
@@ -3053,7 +3263,7 @@
         }
       }
     }
-    ctx.strokeStyle = 'rgba(139,92,246,0.06)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
     ctx.lineWidth = 1;
     const step = 60;
     const offX = -camera.x % step, offY = -camera.y % step;
@@ -3069,8 +3279,8 @@
   }
 
   const SCENERY = {
-    'ป่าเริ่มต้น': ['🌲','🌳','🍄','🌿'],
-    'ทุ่งกลาง': ['🌾','🌸','🪨','🦋'],
+    'ป่าเริ่มต้น': ['🌲','🌳','🍄','🌿','🫐','🪨','🪵'],
+    'ทุ่งกลาง': ['🌾','🌸','🪨','🦋','🌻'],
     'ถ้ำโหด': ['🦴','💀','🔮','💎']
   };
   const GROUND_TEXTURE = {
@@ -3559,10 +3769,21 @@
       mmCtx.fillStyle = z.name==='ป่าเริ่มต้น' ? 'rgba(74,222,128,0.25)' : (z.name==='ทุ่งกลาง' ? 'rgba(56,189,248,0.25)' : 'rgba(248,113,113,0.25)');
       mmCtx.fillRect(z.xMin*sx, z.yMin*sy, (z.xMax-z.xMin)*sx, (z.yMax-z.yMin)*sy);
     }
-    mmCtx.fillStyle = '#f87171';
-    for(const m of monsters){ mmCtx.beginPath(); mmCtx.arc(m.x*sx, m.y*sy, 1.6, 0, Math.PI*2); mmCtx.fill(); }
+    for(const m of monsters){
+      if(m.isBoss){
+        mmCtx.fillStyle = '#fbbf24';
+        mmCtx.beginPath(); mmCtx.arc(m.x*sx, m.y*sy, 3.2, 0, Math.PI*2); mmCtx.fill();
+        mmCtx.strokeStyle = '#f87171'; mmCtx.lineWidth = 1;
+        mmCtx.beginPath(); mmCtx.arc(m.x*sx, m.y*sy, 4.6, 0, Math.PI*2); mmCtx.stroke();
+      } else {
+        mmCtx.fillStyle = '#f87171';
+        mmCtx.beginPath(); mmCtx.arc(m.x*sx, m.y*sy, 1.6, 0, Math.PI*2); mmCtx.fill();
+      }
+    }
     mmCtx.fillStyle = '#fbbf24';
     for(const c of chests){ mmCtx.beginPath(); mmCtx.arc(c.x*sx, c.y*sy, 2.4, 0, Math.PI*2); mmCtx.fill(); }
+    mmCtx.fillStyle = '#22d3ee';
+    (MAP_NPCS[currentMapId]||[]).forEach(n=>{ mmCtx.beginPath(); mmCtx.arc(n.x*sx, n.y*sy, 2.2, 0, Math.PI*2); mmCtx.fill(); });
     mmCtx.fillStyle = '#a78bfa';
     mmCtx.beginPath(); mmCtx.arc(player.x*sx, player.y*sy, 3, 0, Math.PI*2); mmCtx.fill();
     // viewport rect
@@ -3613,6 +3834,7 @@
       }
       drawBackground();
       drawPortals();
+      drawNPCs();
       drawChests();
       monsters.forEach(drawMonster);
       drawProjectiles();
@@ -4549,11 +4771,32 @@
     e.target.textContent = audioMuted ? '🔇' : '🔊';
     if(!audioMuted){ ensureAudio(); sfxClick(); }
   });
-  document.getElementById('return-village-btn').addEventListener('click', ()=>{
-    if(currentMapId==='village'){ showToast('อยู่ที่หมู่บ้านแล้ว'); return; }
-    if(dungeonState.active || towerState.active || raidState.active){ showToast('ออกจากดันเจี้ยน/หอคอย/ไรด์ก่อนถึงจะกลับหมู่บ้านได้'); return; }
-    switchMap('village');
-  });
+  function renderTravelModal(){
+    sysModalBody.innerHTML = `
+      <div class="card-desc" style="margin-bottom:8px;">พอร์ทัลเดินชนถูกปิดชั่วคราว — เดินทางผ่านเมนูนี้แทน</div>
+      ${Object.keys(MAPS).filter(k=>k!=='tower').map(k=>{
+        const m = MAPS[k];
+        const here = currentMapId===k;
+        const lvl = m.lvlRange ? 'Lv.'+m.lvlRange[0]+'-'+m.lvlRange[1] : '';
+        return `<div class="card card-row">
+          <div class="card-icon">${k==='village'?'🏠':k==='forest'?'🌲':k==='desert'?'🏜️':'❄️'}</div>
+          <div style="flex:1;">
+            <div class="card-title">${m.name}</div>
+            <div class="card-desc">${m.safe?'โซนปลอดภัย':'มีมอนสเตอร์ '+lvl}</div>
+          </div>
+          <button class="btn-sm ${here?'gold':'alt'}" data-travel="${k}" ${here?'disabled':''}>${here?'อยู่ที่นี่':'เดินทาง'}</button>
+        </div>`;
+      }).join('')}
+    `;
+    sysModalBody.querySelectorAll('button[data-travel]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(dungeonState.active || towerState.active || raidState.active){ showToast('ออกจากดันเจี้ยน/หอคอย/ไรด์ก่อน'); return; }
+        switchMap(btn.dataset.travel);
+        closeModal();
+      });
+    });
+  }
+  document.getElementById('return-village-btn').addEventListener('click', ()=> openModal('🗺️ เดินทาง', renderTravelModal));
   document.getElementById('open-save').addEventListener('click', ()=> openModal('บันทึก / ชื่อตัวละคร', renderSaveModal));
 
   // ---------- GM floating panel (draggable) ----------
@@ -4612,7 +4855,23 @@
     function refreshRateButtons(){
       panel.querySelectorAll('#gm-exprate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmExprate)===expRateMult));
       panel.querySelectorAll('#gm-droprate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmDroprate)===dropRateMult));
+      panel.querySelectorAll('#gm-monpower-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmMonpower)===monsterPowerMult));
+      panel.querySelectorAll('#gm-bosspower-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmBosspower)===bossPowerMult));
+      panel.querySelectorAll('#gm-goldrate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmGoldrate)===goldRateMult));
+      panel.querySelectorAll('#gm-gemrate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmGemrate)===gemRateMult));
     }
+    panel.querySelectorAll('button[data-gm-monpower]').forEach(b=>{
+      b.addEventListener('click', ()=>{ monsterPowerMult = parseFloat(b.dataset.gmMonpower); refreshRateButtons(); showToast('ความแข็งแกร่งมอนสเตอร์ x'+monsterPowerMult); });
+    });
+    panel.querySelectorAll('button[data-gm-bosspower]').forEach(b=>{
+      b.addEventListener('click', ()=>{ bossPowerMult = parseFloat(b.dataset.gmBosspower); refreshRateButtons(); showToast('ความแรง/เลือดบอส x'+bossPowerMult); });
+    });
+    panel.querySelectorAll('button[data-gm-goldrate]').forEach(b=>{
+      b.addEventListener('click', ()=>{ goldRateMult = parseFloat(b.dataset.gmGoldrate); refreshRateButtons(); showToast('อัตราทอง x'+goldRateMult); });
+    });
+    panel.querySelectorAll('button[data-gm-gemrate]').forEach(b=>{
+      b.addEventListener('click', ()=>{ gemRateMult = parseFloat(b.dataset.gmGemrate); refreshRateButtons(); showToast('อัตราเพชร x'+gemRateMult); });
+    });
     panel.querySelectorAll('button[data-gm-exprate]').forEach(b=>{
       b.addEventListener('click', ()=>{ expRateMult = parseFloat(b.dataset.gmExprate); updateHud(); refreshRateButtons(); showToast('อัตรา EXP x'+expRateMult); });
     });
