@@ -32,9 +32,9 @@
     .top-right-col { gap:2px !important; }
     .gold-panel, .zone-panel { padding:2px 6px !important; font-size:9px !important; }
     .rate-indicator { display:none !important; }
-    .boss-hp-bar { top:2px !important; width:min(50vw,190px) !important; padding:3px 8px !important; }
-    .boss-hp-bar .bhb-name { font-size:8px !important; }
-    .boss-hp-bar .bhb-track { height:5px !important; }
+    .boss-hp-bar { padding:3px 8px !important; }
+    .boss-hp-bar .bhb-name { font-size:7px !important; }
+    .boss-hp-bar .bhb-track { height:4px !important; }
 
     .joystick-zone { width:60px !important; height:60px !important; left:6px !important; bottom:6px !important; right:auto !important; top:auto !important; }
     .joystick-thumb { width:26px !important; height:26px !important; top:17px !important; left:17px !important; }
@@ -59,6 +59,7 @@
   @media (max-width: 380px) {
     .minimap { width:88px !important; height:88px !important; }
     .level-panel { min-width:104px !important; padding:6px 8px !important; }
+    .lp-avatar { width:26px !important; height:26px !important; font-size:14px !important; }
     .topnav-icons { max-width:200px !important; }
     .icon-btn.small { width:24px !important; height:24px !important; font-size:11px !important; }
     .joystick-zone { width:96px !important; height:96px !important; }
@@ -78,18 +79,17 @@
     z-index:5; pointer-events:none; white-space:nowrap;
   }
   .boss-hp-bar {
-    position:absolute; top:108px; left:50%; transform:translateX(-50%); z-index:8;
     background:rgba(15,13,28,0.9); border:1px solid rgba(239,68,68,0.55); border-radius:10px;
-    padding:5px 10px; width:min(66vw,240px); display:none; pointer-events:none;
+    padding:5px 10px; width:100%; box-sizing:border-box; margin-top:6px; display:none; pointer-events:none;
   }
   .boss-hp-bar.show { display:block; }
-  .boss-hp-bar .bhb-name { font-size:10px; font-weight:800; color:#fca5a5; margin-bottom:3px; text-align:center; }
-  .boss-hp-bar .bhb-track { height:8px; border-radius:5px; background:rgba(255,255,255,0.1); overflow:hidden; }
+  .boss-hp-bar .bhb-name { font-size:9px; font-weight:800; color:#fca5a5; margin-bottom:3px; text-align:center; }
+  .boss-hp-bar .bhb-track { height:6px; border-radius:5px; background:rgba(255,255,255,0.1); overflow:hidden; }
   .boss-hp-bar .bhb-fill { height:100%; background:linear-gradient(90deg,#f87171,#dc2626); transition:width 0.2s; }
-  .boss-hp-bar .bhb-text { font-size:8px; color:#94a3b8; text-align:center; margin-top:2px; }
+  .boss-hp-bar .bhb-text { font-size:7px; color:#94a3b8; text-align:center; margin-top:2px; }
 
   .quest-tracker {
-    position:absolute; left:6px; top:220px; z-index:7; width:118px;
+    position:absolute; left:6px; top:270px; z-index:7; width:118px;
     background:rgba(15,13,28,0.85); border:1px solid rgba(139,92,246,0.4); border-radius:10px;
     padding:7px; pointer-events:auto;
   }
@@ -100,11 +100,17 @@
   .quest-tracker .qt-progress-fill { height:100%; background:linear-gradient(90deg,#38bdf8,#818cf8); }
   .quest-tracker button { width:100%; font-size:8.5px; padding:5px 0; border-radius:7px; border:none; font-weight:800; background:linear-gradient(135deg,#4ade80,#16a34a); color:#04150a; }
   .quest-tracker button.on { background:linear-gradient(135deg,#fbbf24,#d97706); }
-  .quest-tracker .qt-toggle {
-    position:absolute; left:6px; top:190px; z-index:7; width:24px; height:24px; border-radius:7px;
+  .qt-toggle {
+    position:absolute; left:6px; top:238px; z-index:7; width:24px; height:24px; border-radius:7px;
     background:rgba(20,18,40,0.8); border:1px solid rgba(139,92,246,0.4); color:#c4b5fd;
     font-size:12px; display:flex; align-items:center; justify-content:center; pointer-events:auto;
   }
+  .npc-talk-btn {
+    position:absolute; left:50%; bottom:220px; transform:translateX(-50%); z-index:9;
+    background:linear-gradient(135deg,#22d3ee,#0e7490); color:#04252b; font-weight:800; font-size:11px;
+    padding:8px 16px; border-radius:20px; display:none; pointer-events:auto; box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  }
+  .npc-talk-btn.show { display:block; }
   .server-ticker {
     position:absolute; top:0; left:0; right:0; height:20px; z-index:15;
     background:linear-gradient(90deg, rgba(251,191,36,0.25), rgba(239,68,68,0.25));
@@ -112,6 +118,8 @@
     overflow:hidden; display:none; pointer-events:none;
   }
   .server-ticker.show { display:block; }
+  .server-ticker.red { background:linear-gradient(90deg, rgba(239,68,68,0.5), rgba(127,29,29,0.5)); border-bottom-color:rgba(248,113,113,0.6); }
+  .server-ticker.red .server-ticker-text { color:#fecaca; }
   .server-ticker-text {
     display:inline-block; white-space:nowrap; font-size:11px; font-weight:700; color:#fde68a;
     padding-left:100%; animation: tickerScroll 9s linear;
@@ -119,23 +127,36 @@
   @keyframes tickerScroll { from{ transform:translateX(0); } to{ transform:translateX(-100%); } }
 
   .reward-stack {
-    position:absolute; top:64px; left:50%; transform:translateX(-50%); z-index:20;
-    display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;
-    max-width:80vw;
+    position:absolute; top:100px; right:4px; left:auto; transform:none; z-index:20;
+    display:flex; flex-direction:column; align-items:flex-end; gap:5px; pointer-events:none;
+    max-width:50vw;
   }
   .reward-card {
-    background:rgba(15,13,28,0.95); border:1px solid rgba(74,222,128,0.5);
-    border-radius:12px; padding:8px 12px; min-width:190px;
-    box-shadow:0 4px 16px rgba(0,0,0,0.5);
+    background:rgba(15,13,28,0.55); border:1px solid rgba(74,222,128,0.35);
+    border-radius:9px; padding:5px 8px; min-width:0; max-width:150px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.3);
     animation: rewardIn 0.25s ease-out, rewardOut 0.4s ease-in 2.1s forwards;
   }
-  .reward-card.legendary { border-color:rgba(253,224,71,0.7); box-shadow:0 4px 20px rgba(253,224,71,0.35); }
-  @keyframes rewardIn { from{opacity:0; transform:translateY(-12px) scale(0.9);} to{opacity:1; transform:translateY(0) scale(1);} }
-  @keyframes rewardOut { from{opacity:1;} to{opacity:0; transform:translateY(-8px);} }
-  .reward-card .rc-title { font-size:12px; font-weight:800; color:#4ade80; display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+  .reward-card.legendary { border-color:rgba(253,224,71,0.5); box-shadow:0 2px 10px rgba(253,224,71,0.2); }
+  @keyframes rewardIn { from{opacity:0; transform:translateY(-8px) scale(0.92);} to{opacity:1; transform:translateY(0) scale(1);} }
+  @keyframes rewardOut { from{opacity:1;} to{opacity:0; transform:translateY(-6px);} }
+  .reward-card .rc-title { font-size:9.5px; font-weight:800; color:#4ade80; display:flex; align-items:center; gap:4px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .reward-card.legendary .rc-title { color:#fde047; }
-  .reward-card .rc-stars { color:#fbbf24; font-size:10px; letter-spacing:1px; }
-  .reward-card .rc-row { display:flex; align-items:center; gap:6px; font-size:11px; color:#e2e8f0; padding:1px 0; }
+  .reward-card .rc-stars { color:#fbbf24; font-size:8px; letter-spacing:0.5px; }
+  .reward-card .rc-row { display:flex; align-items:center; gap:4px; font-size:8.5px; color:#e2e8f0; padding:0.5px 0; white-space:nowrap; }
+
+  .item-popup {
+    position:fixed; z-index:80; background:rgba(15,13,28,0.98); border:1px solid rgba(139,92,246,0.5);
+    border-radius:12px; padding:10px 12px; width:200px; box-shadow:0 8px 24px rgba(0,0,0,0.6);
+  }
+  .item-popup .ip-title { font-size:12px; font-weight:800; margin-bottom:5px; }
+  .item-popup .ip-stat { font-size:10.5px; color:#e2e8f0; padding:1px 0; }
+  .item-popup .ip-btns { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
+  .item-popup button { font-size:10px; padding:5px 9px; border-radius:7px; border:none; font-weight:800; }
+  .item-popup .ip-equip { background:linear-gradient(135deg,#4ade80,#16a34a); color:#04150a; }
+  .item-popup .ip-sell { background:linear-gradient(135deg,#fbbf24,#d97706); color:#3a1e00; }
+  .item-popup .ip-enhance { background:linear-gradient(135deg,#818cf8,#4f46e5); color:#fff; }
+  .item-popup .ip-close { background:rgba(255,255,255,0.1); color:#94a3b8; }
 
   .portal-confirm {
     position:absolute; inset:0; background:rgba(5,8,16,0.75); z-index:25;
@@ -160,7 +181,7 @@
     background:linear-gradient(135deg,#dc2626,#7f1d1d); color:#fff; font-size:17px;
     display:flex; align-items:center; justify-content:center;
     z-index:60; box-shadow:0 4px 14px rgba(0,0,0,0.5); touch-action:none;
-    top:90px; left:8px; border:2px solid rgba(255,255,255,0.25);
+    top:410px; left:8px; border:2px solid rgba(255,255,255,0.25);
   }
   .gm-panel {
     position:fixed; width:210px; max-height:64vh; overflow-y:auto;
@@ -189,7 +210,14 @@
     box-shadow:0 4px 20px rgba(0,0,0,0.4);
     pointer-events:auto;
   }
-  .level-panel { min-width:112px; padding:5px 8px; }
+  .level-panel { min-width:140px; padding:5px 8px; }
+  .lp-flex { display:flex; gap:7px; align-items:stretch; }
+  .lp-avatar {
+    width:36px; height:36px; border-radius:9px; flex-shrink:0;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .lp-stats { flex:1; min-width:0; }
   .level-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
   .level-badge {
     background:linear-gradient(135deg,#f59e0b,#d97706);
@@ -357,28 +385,36 @@
 
   /* ---------- Slot-grid inventory ---------- */
   .inv-grid-title { font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin:12px 0 6px; font-weight:700; }
-  .inv-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:8px; }
+  .inv-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:7px; background:rgba(0,0,0,0.15); padding:8px; border-radius:12px; }
   .inv-slot {
-    aspect-ratio:1; border-radius:12px; display:flex; align-items:center; justify-content:center;
-    font-size:22px; position:relative; border:2px solid rgba(255,255,255,0.15);
-    background:rgba(255,255,255,0.04);
+    aspect-ratio:1; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:22px; position:relative; border:2px solid rgba(255,255,255,0.14);
+    background:linear-gradient(160deg, rgba(255,255,255,0.09), rgba(0,0,0,0.25));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,0.08), inset 0 -3px 5px rgba(0,0,0,0.35), 0 2px 4px rgba(0,0,0,0.3);
+    transition:transform 0.1s;
   }
-  .inv-slot.selected { outline:2px solid #fde047; outline-offset:1px; }
+  .inv-slot:active { transform:scale(0.93); }
+  .inv-slot.selected { outline:2px solid #fde047; outline-offset:1px; box-shadow:0 0 10px rgba(253,224,71,0.5); }
   .inv-slot .qty-badge {
     position:absolute; bottom:1px; right:3px; font-size:9px; font-weight:800;
-    background:rgba(0,0,0,0.65); padding:1px 4px; border-radius:6px; color:#fff;
+    background:rgba(0,0,0,0.75); padding:1px 4px; border-radius:6px; color:#fff;
+    border:1px solid rgba(255,255,255,0.2);
   }
   .inv-slot .slot-label {
     position:absolute; top:-7px; left:50%; transform:translateX(-50%);
     font-size:8px; color:#94a3b8; background:#12101f; padding:0 3px; white-space:nowrap;
   }
-  .inv-slot.tier1 { background:rgba(156,163,175,0.22); border-color:#9ca3af; }
-  .inv-slot.tier2 { background:rgba(74,222,128,0.22); border-color:#4ade80; }
-  .inv-slot.tier3 { background:rgba(96,165,250,0.22); border-color:#60a5fa; }
-  .inv-slot.tier4 { background:rgba(192,132,252,0.22); border-color:#c084fc; }
-  .inv-slot.tier5 { background:rgba(251,191,36,0.22); border-color:#fbbf24; }
-  .inv-slot.legendary-slot { background:rgba(253,224,71,0.28); border-color:#fde047; box-shadow:0 0 10px rgba(253,224,71,0.45); }
-  .inv-slot.empty-slot { opacity:0.35; }
+  .inv-slot.tier1 { background:linear-gradient(160deg, rgba(156,163,175,0.32), rgba(0,0,0,0.25)); border-color:#9ca3af; }
+  .inv-slot.tier2 { background:linear-gradient(160deg, rgba(74,222,128,0.32), rgba(0,0,0,0.25)); border-color:#4ade80; }
+  .inv-slot.tier3 { background:linear-gradient(160deg, rgba(96,165,250,0.32), rgba(0,0,0,0.25)); border-color:#60a5fa; }
+  .inv-slot.tier4 { background:linear-gradient(160deg, rgba(192,132,252,0.32), rgba(0,0,0,0.25)); border-color:#c084fc; }
+  .inv-slot.tier5 { background:linear-gradient(160deg, rgba(251,191,36,0.32), rgba(0,0,0,0.25)); border-color:#fbbf24; }
+  .inv-slot.legendary-slot { background:linear-gradient(160deg, rgba(253,224,71,0.4), rgba(0,0,0,0.25)); border-color:#fde047; box-shadow:0 0 12px rgba(253,224,71,0.5), inset 0 2px 3px rgba(255,255,255,0.15); }
+  .inv-slot.empty-slot { opacity:0.32; box-shadow:none; }
+  .market-grid-price {
+    position:absolute; top:-6px; left:50%; transform:translateX(-50%); font-size:7.5px; font-weight:800;
+    background:#0f0d1c; color:#fbbf24; padding:0 4px; border-radius:5px; white-space:nowrap; border:1px solid rgba(251,191,36,0.4);
+  }
   .inv-detail {
     background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
     border-radius:14px; padding:14px; margin-top:10px;
@@ -566,11 +602,6 @@
 <div id="game-container">
   <canvas id="game"></canvas>
   <div class="rate-indicator" id="rate-indicator">EXP x1 · Drop x1</div>
-  <div class="boss-hp-bar" id="boss-hp-bar">
-    <div class="bhb-name" id="bhb-name"></div>
-    <div class="bhb-track"><div class="bhb-fill" id="bhb-fill"></div></div>
-    <div class="bhb-text" id="bhb-text"></div>
-  </div>
   <div class="server-ticker" id="server-ticker"><div class="server-ticker-text" id="server-ticker-text"></div></div>
   <div class="reward-stack" id="reward-stack"></div>
   <div class="portal-confirm" id="portal-confirm">
@@ -587,6 +618,20 @@
   <div class="gm-panel" id="gm-panel">
     <button class="gm-close" id="gm-close-btn">✕</button>
     <div class="gm-title" style="color:#fca5a5; font-size:13px;">🛠️ ปุ่ม GM</div>
+    <div class="gm-title">🔢 ตั้งค่าตัวเลขเอง (พิมพ์ได้ทุกจำนวน)</div>
+    <div class="gm-row" style="flex-wrap:nowrap; align-items:center; gap:4px;">
+      <select id="gm-custom-select" style="font-size:9px; padding:5px 3px; border-radius:6px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.15); flex:1; min-width:0;">
+        <option value="monsterPowerMult">ความแข็งแกร่งมอนสเตอร์</option>
+        <option value="bossHpMult">เลือดบอส</option>
+        <option value="bossAtkMult">ดาเมจบอส</option>
+        <option value="goldRateMult">อัตราทอง</option>
+        <option value="gemRateMult">อัตราเพชร</option>
+        <option value="expRateMult">อัตรา EXP</option>
+        <option value="dropRateMult">อัตราดรอป</option>
+      </select>
+      <input type="number" id="gm-custom-value" placeholder="ค่า" step="0.1" style="width:52px; font-size:10px; padding:5px 3px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:#fff; flex-shrink:0;">
+      <button id="gm-custom-apply" style="flex-shrink:0;">ตั้งค่า</button>
+    </div>
     <div class="gm-title">💪 ความแข็งแกร่งมอนสเตอร์</div>
     <div class="gm-row" id="gm-monpower-row">
       <button data-gm-monpower="1">x1</button>
@@ -595,12 +640,19 @@
       <button data-gm-monpower="4">x4</button>
       <button data-gm-monpower="6">x6</button>
     </div>
-    <div class="gm-title">👑 ความแรง/เลือดบอสเท่านั้น</div>
-    <div class="gm-row" id="gm-bosspower-row">
-      <button data-gm-bosspower="1">x1</button>
-      <button data-gm-bosspower="2">x2</button>
-      <button data-gm-bosspower="3">x3</button>
-      <button data-gm-bosspower="5">x5</button>
+    <div class="gm-title">👑 เลือดบอสเท่านั้น</div>
+    <div class="gm-row" id="gm-bosshp-row">
+      <button data-gm-bosshp="1">x1</button>
+      <button data-gm-bosshp="2">x2</button>
+      <button data-gm-bosshp="3">x3</button>
+      <button data-gm-bosshp="5">x5</button>
+    </div>
+    <div class="gm-title">⚔️ ดาเมจบอสเท่านั้น</div>
+    <div class="gm-row" id="gm-bossatk-row">
+      <button data-gm-bossatk="1">x1</button>
+      <button data-gm-bossatk="2">x2</button>
+      <button data-gm-bossatk="3">x3</button>
+      <button data-gm-bossatk="5">x5</button>
     </div>
     <div class="gm-title">🪙 ทอง</div>
     <div class="gm-row">
@@ -652,29 +704,39 @@
 
   <div class="hud-top">
     <div class="hud-left-col">
-      <canvas id="minimap" class="minimap"></canvas>
-      <div class="panel level-panel">
-        <div class="level-row">
-          <div class="level-badge" id="lvl-badge">Lv 1</div>
-          <div class="bar-label" id="hp-label">HP 100/100</div>
+      <div style="position:relative;">
+        <canvas id="minimap" class="minimap"></canvas>
+        <div id="minimap-name" style="position:absolute; top:1px; left:50%; transform:translateX(-50%); font-size:7px; color:#e2e8f0; background:rgba(0,0,0,0.55); padding:1px 5px; border-radius:5px; white-space:nowrap; pointer-events:none; max-width:94%; overflow:hidden; text-overflow:ellipsis;"></div>
+      </div>
+      <div class="panel level-panel" id="level-panel-btn" style="cursor:pointer;">
+        <div class="lp-flex">
+          <div class="lp-avatar" id="lp-avatar">🐱</div>
+          <div class="lp-stats">
+            <div class="level-row">
+              <div class="level-badge" id="lvl-badge">Lv 1</div>
+              <div class="bar-label" id="hp-label">HP 100/100</div>
+            </div>
+            <div class="bar-label" id="title-label" style="color:#fbbf24; font-weight:700; margin-bottom:3px;"></div>
+            <div class="bar-track"><div class="bar-fill hp-fill" id="hp-bar" style="width:100%"></div></div>
+            <div class="bar-label" id="shield-label" style="color:#93c5fd;"></div>
+            <div class="bar-track"><div class="bar-fill exp-fill" id="exp-bar" style="width:0%"></div></div>
+            <div class="bar-label" id="exp-label">EXP 0/100</div>
+          </div>
         </div>
-        <div class="bar-label" id="title-label" style="color:#fbbf24; font-weight:700; margin-bottom:3px;"></div>
-        <div class="bar-track"><div class="bar-fill hp-fill" id="hp-bar" style="width:100%"></div></div>
-        <div class="bar-label" id="shield-label" style="color:#93c5fd;"></div>
-        <div class="bar-track"><div class="bar-fill exp-fill" id="exp-bar" style="width:0%"></div></div>
-        <div class="bar-label" id="exp-label">EXP 0/100</div>
+      </div>
+      <div class="boss-hp-bar" id="boss-hp-bar">
+        <div class="bhb-name" id="bhb-name"></div>
+        <div class="bhb-track"><div class="bhb-fill" id="bhb-fill"></div></div>
+        <div class="bhb-text" id="bhb-text"></div>
       </div>
     </div>
     <div class="top-right-col">
       <div class="menu-btn-row topnav-icons">
-        <div class="icon-btn small" id="open-character" data-label="ตัวละคร">👤</div>
         <div class="icon-btn small" id="open-skills" data-label="สกิล">🌳</div>
         <div class="icon-btn small" id="open-quests" data-label="เควส">📜<span class="ping" id="ping-quests"></span></div>
-        <div class="icon-btn small" id="open-guild" data-label="กิลด์">🏯</div>
         <div class="icon-btn small" id="open-dungeon" data-label="ดันเจี้ยน">🗺️<span class="ping" id="ping-dungeon"></span></div>
         <div class="icon-btn small" id="open-market" data-label="ร้านค้า">💰</div>
         <div class="icon-btn small" id="open-pet" data-label="สัตว์เลี้ยง">🐣</div>
-        <div class="icon-btn small" id="open-pvp" data-label="ประลอง">⚔️</div>
         <div class="icon-btn small" id="open-battlepass" data-label="แบทเทิลพาส">🎫</div>
         <div class="icon-btn small" id="open-achievements" data-label="ความสำเร็จ">🏆</div>
         <div class="icon-btn small" id="open-inventory" data-label="กระเป๋า">🎒</div>
@@ -693,6 +755,7 @@
   <div class="toast" id="toast"></div>
   <div class="worldboss-banner" id="worldboss-banner"></div>
   <div class="qt-toggle" id="qt-toggle">📜</div>
+  <div class="npc-talk-btn" id="npc-talk-btn">💬 คุย</div>
   <div class="quest-tracker" id="quest-tracker">
     <div class="qt-title" id="qt-title">เควสหลัก</div>
     <div class="qt-desc" id="qt-desc"></div>
@@ -863,14 +926,14 @@
     return ZONES[ZONES.length-1];
   }
   let currentZoneName = null;
-  let expRateMult = 1, dropRateMult = 1, monsterPowerMult = 1.6, goldRateMult = 1, gemRateMult = 1, bossPowerMult = 1;
+  let expRateMult = 1, dropRateMult = 1, monsterPowerMult = 1.6, goldRateMult = 1, gemRateMult = 1, bossHpMult = 1, bossAtkMult = 1;
 
   // ---------- Classes ----------
   const CLASSES = {
     warrior: {
-      key:'warrior', name:'นักรบ', icon:'🗡️', color:'#f87171', weaponShape:'sword', weaponColor:'#cbd5e1',
-      catFur:'#f9a8a8', catEar:'#f87171', accessory:'headband', rangeMult:0.95,
-      desc:'ตัวถัง HP/DEF สูงสุด แต่เดินช้า เหมาะมือใหม่',
+      key:'warrior', name:'เหมียวสมิง', icon:'🗡️', color:'#f97316', weaponShape:'sword', weaponColor:'#cbd5e1',
+      catFur:'#fb923c', catEar:'#ea580c', accessory:'headband', rangeMult:0.95,
+      desc:'นักดาบเสือส้ม ตัวถัง HP/DEF สูงสุด ถือดาบใหญ่+โล่ แต่เดินช้า เหมาะมือใหม่',
       statMul:{ atk:1.05, def:1.4, hp:1.4, spd:0.85 }, critBonus:0.02, cdrBonus:0,
       skillNames:{ ranged:{name:'ฟาดพลังคลื่น', icon:'💢'}, spin:{name:'ฟันหมุนสายเลือด', icon:'🌪️'}, heal:{name:'คำรามฮีล', icon:'❤️‍🔥'}, ult:{name:'จอมทัพพิโรธ', icon:'💥'} },
       branches:[
@@ -895,9 +958,9 @@
       ]
     },
     archer: {
-      key:'archer', name:'นักธนู', icon:'🏹', color:'#4ade80', weaponShape:'bow', weaponColor:'#a16207',
-      catFur:'#86efac', catEar:'#4ade80', accessory:'hood', rangeMult:1.75,
-      desc:'ดาเมจ+ความแม่นยำสูงสุด วิ่งไว แต่ป้องกันบางเหมือนกระดาษ',
+      key:'archer', name:'เหมียวศร', icon:'🏹', color:'#d4b896', weaponShape:'bow', weaponColor:'#a16207',
+      catFur:'#f0dcb8', catEar:'#4b3621', accessory:'hood', rangeMult:1.75,
+      desc:'นักธนูวิเชียรมาศ ถือธนูใหญ่ ดาเมจ+ความแม่นยำสูงสุด วิ่งไว แต่ป้องกันบางเหมือนกระดาษ',
       statMul:{ atk:1.4, def:0.65, hp:0.8, spd:1.3 }, critBonus:0.08, cdrBonus:0,
       skillNames:{ ranged:{name:'สายฟ้าคำราม', icon:'🏹'}, spin:{name:'ห่าธนูรอบทิศ', icon:'🎯'}, heal:{name:'ลมหายใจป่า', icon:'🍃'}, ult:{name:'ธนูสิ้นโลก', icon:'☄️'} },
       branches:[
@@ -922,9 +985,9 @@
       ]
     },
     priest: {
-      key:'priest', name:'หมอผี', icon:'🔮', color:'#a78bfa', weaponShape:'staff', weaponColor:'#c084fc',
-      catFur:'#c4b5fd', catEar:'#a78bfa', accessory:'collar', rangeMult:1.55,
-      desc:'ฮีลแรง คูลดาวน์ไว เอาตัวรอดดี แต่ดาเมจต่ำสุด',
+      key:'priest', name:'เหมียวขมัง', icon:'🔮', color:'#7c3aed', weaponShape:'staff', weaponColor:'#c084fc',
+      catFur:'#3f3f46', catEar:'#18181b', accessory:'collar', rangeMult:1.55,
+      desc:'แมวดำนักเวทย์ ใส่หมวกถือไม้เท้ายาว ฮีลแรง คูลดาวน์ไว เอาตัวรอดดี แต่ดาเมจต่ำสุด',
       statMul:{ atk:0.78, def:1.05, hp:1.15, spd:0.95 }, critBonus:0.02, cdrBonus:0.08,
       skillNames:{ ranged:{name:'ลูกไฟวิญญาณ', icon:'🔮'}, spin:{name:'วงเวทป้องปราณ', icon:'🌀'}, heal:{name:'พรสวรรค์', icon:'✨'}, ult:{name:'อวตารเทพเจ้า', icon:'🌟'} },
       branches:[
@@ -949,9 +1012,9 @@
       ]
     },
     rogue: {
-      key:'rogue', name:'โจร', icon:'🗡️', color:'#fbbf24', weaponShape:'daggers', weaponColor:'#fbbf24',
-      catFur:'#4b5563', catEar:'#374151', accessory:'mask', rangeMult:0.85,
-      desc:'คริติคอล+ความเร็วสูงสุดในเกม แต่ HP/DEF ต่ำสุด ตายง่ายมาก',
+      key:'rogue', name:'เหมียวเงา', icon:'🗡️', color:'#94a3b8', weaponShape:'daggers', weaponColor:'#e2e8f0',
+      catFur:'#64748b', catEar:'#334155', accessory:'mask', rangeMult:0.85,
+      desc:'โจรสลิดเทา ใส่ผ้าคลุมถือกริชคู่ คริติคอล+ความเร็วสูงสุดในเกม แต่ HP/DEF ต่ำสุด ตายง่ายมาก',
       statMul:{ atk:1.32, def:0.6, hp:0.7, spd:1.4 }, critBonus:0.12, cdrBonus:0.03,
       skillNames:{ ranged:{name:'มีดสังหาร', icon:'🔪'}, spin:{name:'พายุใบมีด', icon:'🌀'}, heal:{name:'พิษถอนพิษ', icon:'🧪'}, ult:{name:'ราตรีเพชฌฆาต', icon:'🌑'} },
       branches:[
@@ -1088,13 +1151,17 @@
     });
     return bonus;
   }
-  function totalATK(){ return Math.round((6 + equipStat(equipment.weapon) + legendaryStat('atk')) * classData().statMul.atk * (1+player.passives.atkPct/100+activeBuffMult('atk')+bestiaryBonusPct()/100)); }
-  function totalDEF(){ return Math.round((equipStat(equipment.armor) + player.passives.defFlat + legendaryStat('def')) * classData().statMul.def); }
-  function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100 + (classData().critBonus||0); }
-  function totalGoldBonus(){ return equipStat(equipment.necklace)/100 + player.passives.goldPct/100 + activeBuffMult('gold') + legendaryStat('gold')/100 + (hasSetBonus('wanderingsage')?0.25:0); }
+  function totalATK(){ return Math.round((60 + (player.level-1)*4 + equipStat(equipment.weapon) + legendaryStat('atk') + equippedGearBonus('atk')*8) * classData().statMul.atk * (1+player.passives.atkPct/100+activeBuffMult('atk')+bestiaryBonusPct()/100)); }
+  function totalDEF(){ return Math.round((10 + (player.level-1)*2 + equipStat(equipment.armor) + player.passives.defFlat + legendaryStat('def') + equippedGearBonus('def')*8) * classData().statMul.def); }
+  function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100 + (classData().critBonus||0) + equippedGearBonus('critPct')/100; }
+  function totalGoldBonus(){ return equipStat(equipment.necklace)/100 + player.passives.goldPct/100 + activeBuffMult('gold') + legendaryStat('gold')/100 + (hasSetBonus('wanderingsage')?0.25:0) + equippedGearBonus('goldPct')/100; }
+  function totalExpBonus(){ return equippedGearBonus('expPct')/100; }
+  function totalDodge(){ return Math.min(0.6, equippedGearBonus('dodge')/100); }
+  function totalAccuracy(){ return equippedGearBonus('accuracy')/100; }
+  function totalAtkSpeedBonus(){ return equippedGearBonus('atkSpeed')/100; }
   function totalCDR(){ return Math.min(0.5, player.passives.cdrPct/100 + (classData().cdrBonus||0)); }
   function getAttackRange(){ return player.attackRange * (classData().rangeMult||1); }
-  function computeMaxHp(){ return Math.round((100 + (player.level-1)*15 + Math.round(equipStat(equipment.armor)*4) + legendaryStat('hp')) * classData().statMul.hp * (1+player.passives.hpPct/100)); }
+  function computeMaxHp(){ return Math.round((300 + (player.level-1)*45 + Math.round(equipStat(equipment.armor)*4) + legendaryStat('hp') + equippedGearBonus('hp')*8) * classData().statMul.hp * (1+player.passives.hpPct/100)); }
 
   // ---------- Legendary set items ----------
   const LEGENDARY_SETS = {
@@ -1306,7 +1373,20 @@
     {name:'แก่นผีมัดใหญ่', icon:'🟣', price:45, mat:'core', qty:5},
     {name:'ผลึกเงามัดใหญ่', icon:'💠', price:70, mat:'crystal', qty:4},
     {name:'เขี้ยวมังกรมัดใหญ่', icon:'🦷', price:110, mat:'fang', qty:3},
-    {name:'แร่ลึกลับมัดใหญ่', icon:'⛏️', price:150, mat:'ore', qty:2}
+    {name:'แร่ลึกลับมัดใหญ่', icon:'⛏️', price:150, mat:'ore', qty:2},
+    {name:'หินตีบวก T1 (อาวุธ)', icon:'🪨', price:15*3, stoneCat:'weapon', stoneTier:'t1', qty:3},
+    {name:'หินตีบวก T2 (อาวุธ)', icon:'💠', price:40*3, stoneCat:'weapon', stoneTier:'t2', qty:3},
+    {name:'หินตีบวก T3 (อาวุธ)', icon:'🔷', price:90*3, stoneCat:'weapon', stoneTier:'t3', qty:3},
+    {name:'หินตีบวก T4 (อาวุธ)', icon:'💎', price:180*3, stoneCat:'weapon', stoneTier:'t4', qty:3},
+    {name:'หินตีบวก T1 (ชุด)', icon:'🪨', price:15*3, stoneCat:'armor', stoneTier:'t1', qty:3},
+    {name:'หินตีบวก T2 (ชุด)', icon:'💠', price:40*3, stoneCat:'armor', stoneTier:'t2', qty:3},
+    {name:'หินตีบวก T3 (ชุด)', icon:'🔷', price:90*3, stoneCat:'armor', stoneTier:'t3', qty:3},
+    {name:'หินตีบวก T4 (ชุด)', icon:'💎', price:180*3, stoneCat:'armor', stoneTier:'t4', qty:3},
+    {name:'หินตีบวก T1 (แหวน/สร้อย)', icon:'🪨', price:15*3, stoneCat:'jewelry', stoneTier:'t1', qty:3},
+    {name:'หินตีบวก T2 (แหวน/สร้อย)', icon:'💠', price:40*3, stoneCat:'jewelry', stoneTier:'t2', qty:3},
+    {name:'หินตีบวก T3 (แหวน/สร้อย)', icon:'🔷', price:90*3, stoneCat:'jewelry', stoneTier:'t3', qty:3},
+    {name:'หินตีบวก T4 (แหวน/สร้อย)', icon:'💎', price:180*3, stoneCat:'jewelry', stoneTier:'t4', qty:3},
+    {name:'ยันต์เสริมพลัง (+15% สำเร็จ)', icon:'🧿', price:250, amulet:true, qty:1}
   ];
   const MATERIAL_SELL_PRICE = { shard:4, core:7, crystal:12, fang:18, ore:26 };
 
@@ -1743,7 +1823,7 @@
     const result = hatchPetOnce(isPremium);
     if(!result){ showToast(isPremium?'เพชรไม่พอ':'ทองไม่พอ'); return false; }
     showToast('🥚 ได้ '+RARITY_INFO[result.rarity].name+'★ '+result.type.name+' '+result.type.icon+'!');
-    if(result.rarity>=4) announceServer('🥚 '+(player.name||'นักผจญภัย')+' สุ่มได้ '+RARITY_INFO[result.rarity].name+'★ '+result.type.name+' '+result.type.icon+'!');
+    if(result.rarity>=4) announceServer('🥚 '+(player.name||'นักผจญภัย')+' สุ่มได้ '+RARITY_INFO[result.rarity].name+'★ '+result.type.name+' '+result.type.icon+'!', result.rarity>=5);
     updateHud();
     checkAchievements();
     return true;
@@ -1758,7 +1838,7 @@
     if(results.length===0){ showToast(isPremium?'เพชรไม่พอ':'ทองไม่พอ'); return []; }
     showToast('🥚 สุ่ม x5 ได้ '+results.length+' ตัว!');
     results.filter(r=>r.rarity>=4).forEach(r=>{
-      announceServer('🥚 '+(player.name||'นักผจญภัย')+' สุ่มได้ '+RARITY_INFO[r.rarity].name+'★ '+r.type.name+' '+r.type.icon+'!');
+      announceServer('🥚 '+(player.name||'นักผจญภัย')+' สุ่มได้ '+RARITY_INFO[r.rarity].name+'★ '+r.type.name+' '+r.type.icon+'!', r.rarity>=5);
     });
     updateHud();
     checkAchievements();
@@ -1778,6 +1858,33 @@
     applyPetPassive();
     updateHud();
     showToast('สลับไปใช้ '+incoming.type.name+' แล้ว');
+  }
+  function petSellValue(p){ return 20 + (p.rarity||1)*35 + p.level*4; }
+  function sellPetFromCollection(id){
+    if(!player.petCollection) player.petCollection=[];
+    const idx = player.petCollection.findIndex(p=>p.id===id);
+    if(idx<0) return 0;
+    const val = Math.round(petSellValue(player.petCollection[idx])*(1+totalGoldBonus())*goldRateMult);
+    player.petCollection.splice(idx,1);
+    player.gold += val;
+    updateHud();
+    return val;
+  }
+  function sellActivePet(){
+    if(!pet.owned) return 0;
+    const val = Math.round(petSellValue(pet)*(1+totalGoldBonus())*goldRateMult);
+    player.gold += val;
+    if(player.petCollection && player.petCollection.length){
+      const next = player.petCollection.shift();
+      pet.owned=true; pet.id=next.id; pet.type=next.type; pet.level=next.level; pet.exp=next.exp; pet.expToNext=next.expToNext; pet.rarity=next.rarity;
+      applyPetPassive();
+    } else {
+      pet.owned=false; pet.id=null; pet.type=null;
+      player.petBonus = { atkPct:0, goldPct:0, critPct:0, hpPct:0 };
+      recomputePassives();
+    }
+    updateHud();
+    return val;
   }
   function applyPetPassive(){
     // reset pet-derived passive then reapply (petPct tracked separately to avoid double counting with skill tree)
@@ -1856,6 +1963,8 @@
       showToast('ได้รับ '+CONSUMABLE_ITEMS[item.itemKey].name+' ในกระเป๋าแล้ว ไปใช้ได้ที่เมนูกระเป๋า 🎒');
     }
     if(item.egg){ player.materials.shard = (player.materials.shard||0) + 8; showToast('ได้เศษวิญญาณจากกล่องไข่ ลองไปฟักที่เมนูสัตว์เลี้ยง'); }
+    if(item.stoneCat){ enhanceStones()[item.stoneCat][item.stoneTier] += (item.qty||1); showToast('ได้ '+STONE_TIERS.find(t=>t.key===item.stoneTier).name+' ('+STONE_CATEGORIES[item.stoneCat].name+') x'+(item.qty||1)); }
+    if(item.amulet){ player.amulets = (player.amulets||0)+(item.qty||1); showToast('ได้ยันต์เสริมพลัง x'+(item.qty||1)); }
     player.stats.marketBuys++;
     updateHud();
     checkAchievements();
@@ -1874,20 +1983,8 @@
   }
 
   // ---------- Gem shop ----------
-  const GEM_GACHA_COST = 50;
   const GEM_REROLL_COST = 15;
   const GEM_REVIVE_COST = 10;
-  function gemGachaLegendary(){
-    if(player.gems < GEM_GACHA_COST){ showToast('เพชรไม่พอ'); return false; }
-    player.gems -= GEM_GACHA_COST;
-    const item = LEGENDARY_ITEMS[Math.floor(Math.random()*LEGENDARY_ITEMS.length)];
-    player.legendaryOwned[item.key] = true;
-    flashScreen('#67e8f9', 0.4, 400);
-    showToast('💎 กาชาสำเร็จ! ได้ '+item.name+'!');
-    updateHud();
-    checkAchievements();
-    return true;
-  }
   function gemRerollDailies(){
     if(player.gems < GEM_REROLL_COST){ showToast('เพชรไม่พอ'); return false; }
     player.gems -= GEM_REROLL_COST;
@@ -2165,7 +2262,7 @@
     if(chatMessages[tab].length > 40) chatMessages[tab].shift();
     if(tab === activeChatTab) renderChat();
   }
-  function announceServer(text){
+  function announceServer(text, isRed){
     const el = document.getElementById('server-ticker');
     const textEl = document.getElementById('server-ticker-text');
     textEl.textContent = text;
@@ -2173,6 +2270,7 @@
     void textEl.offsetWidth;
     textEl.style.animation = 'tickerScroll 9s linear';
     el.classList.add('show');
+    el.classList.toggle('red', !!isRed);
     clearTimeout(announceServer._t);
     announceServer._t = setTimeout(()=> el.classList.remove('show'), 9000);
     pushChat('system', 'เซิร์ฟเวอร์', text);
@@ -2412,6 +2510,8 @@
     currentZoneName = null;
     showZoneBanner(m.name, m.safe? '#4ade80' : '#fbbf24');
     zoneNameEl.textContent = m.name;
+    const mmName = document.getElementById('minimap-name');
+    if(mmName) mmName.textContent = m.name;
     updateHud();
   }
   let portalConfirmShownFor = null;
@@ -2468,9 +2568,9 @@
 
   const MAP_NPCS = {
     village: [ {x:350,y:520,icon:'🧙',name:'จอมเวทเฒ่า'}, {x:650,y:520,icon:'⚒️',name:'ช่างตีเหล็ก'}, {x:500,y:760,icon:'🐱',name:'แมวเร่ร่อน'} ],
-    forest:  [ {x:2100,y:600,icon:'🧝',name:'พรานป่า'}, {x:1600,y:1200,icon:'👵',name:'ยายขายยา'} ],
-    desert:  [ {x:2100,y:600,icon:'🐫',name:'พ่อค้าเร่'} ],
-    snow:    [ {x:2100,y:600,icon:'⛄',name:'ชาวเขา'} ]
+    forest:  [ {x:1980,y:180,icon:'🧝',name:'พรานป่า'}, {x:2220,y:180,icon:'👵',name:'ยายขายยา'} ],
+    desert:  [ {x:1980,y:180,icon:'🐫',name:'พ่อค้าเร่'} ],
+    snow:    [ {x:1980,y:180,icon:'⛄',name:'ชาวเขา'} ]
   };
   function drawNPCs(){
     const list = MAP_NPCS[currentMapId] || [];
@@ -2525,19 +2625,15 @@
     return Math.min(state.qDef.count, Math.max(0, cur - state.startCount));
   }
   let npcDialogShownFor = null;
+  let nearbyNpc = null;
   function checkNpcProximity(){
     const list = MAP_NPCS[currentMapId] || [];
     let near = null;
     for(const n of list){ if(Math.hypot(player.x-n.x, player.y-n.y) < 50){ near = n; break; } }
-    if(near){
-      const key = currentMapId+'_'+near.name;
-      if(npcDialogShownFor !== key){
-        npcDialogShownFor = key;
-        openModal(near.icon+' '+near.name, ()=>renderNpcDialog(near, key));
-      }
-    } else {
-      npcDialogShownFor = null;
-    }
+    nearbyNpc = near;
+    const btn = document.getElementById('npc-talk-btn');
+    if(near){ btn.classList.add('show'); btn.textContent = '💬 คุยกับ '+near.name; }
+    else { btn.classList.remove('show'); }
   }
   function renderNpcDialog(npc, key){
     const state = ensureNpcQuestState(key);
@@ -2615,7 +2711,7 @@
     }
     if(isWorldBoss) lvl = Math.max(lvl, 60);
 
-    let scale = (1 + (lvl-1)*0.16) * (isBoss?3.2:1) * monsterPowerMult * (isBoss?bossPowerMult:1);
+    let scale = (1 + (lvl-1)*0.16) * (isBoss?4.5:1) * 8 * monsterPowerMult * (isBoss?bossHpMult:1);
     if(opts.scaleMul) scale *= opts.scaleMul;
     if(isWorldBoss) scale *= 10;
 
@@ -2864,10 +2960,20 @@
     lvlBadge.textContent = 'Lv ' + player.level;
     goldEl.textContent = player.gold;
     gemsEl.textContent = player.gems;
+    const mGold = document.getElementById('market-gold-display'); if(mGold) mGold.textContent = player.gold;
+    const mGem = document.getElementById('market-gem-display'); if(mGem) mGem.textContent = player.gems;
     titleLabel.textContent = player.activeTitle ? '「'+player.activeTitle+'」' : '';
     shieldLabel.textContent = player.shield>0 ? '🛡️ โล่ '+Math.round(player.shield) : '';
     const rateEl = document.getElementById('rate-indicator');
     if(rateEl) rateEl.textContent = 'EXP x'+expRateMult+' · Drop x'+dropRateMult;
+    const avatarEl = document.getElementById('lp-avatar');
+    if(avatarEl && player.classKey){
+      const cd = classData();
+      avatarEl.textContent = cd.icon;
+      avatarEl.style.background = (cd.catFur||'#334155')+'33';
+      avatarEl.style.borderColor = cd.catEar||cd.color||'#475569';
+      avatarEl.style.color = cd.color||'#e2e8f0';
+    }
   }
 
   function checkSkillUnlocks(){
@@ -2924,8 +3030,17 @@
   const joyZone = document.getElementById('joystick-zone');
   const joyThumb = document.getElementById('joystick-thumb');
   let joyActive=false, joyDX=0, joyDY=0, joyTouchId=null;
+  let moveTarget = null;
+  function setMoveTargetFromScreen(clientX, clientY){
+    const canvas = document.getElementById('game');
+    const rect = canvas.getBoundingClientRect();
+    const sx = (clientX-rect.left), sy = (clientY-rect.top);
+    const wx = sx + camera.x, wy = sy + camera.y;
+    moveTarget = { x: Math.max(0,Math.min(WORLD_W,wx)), y: Math.max(0,Math.min(WORLD_H,wy)) };
+    spawnParticle({ type:'ring', x:moveTarget.x, y:moveTarget.y, life:450, startRadius:4, endRadius:34, color:'#a78bfa', lineWidth:2.5 });
+  }
   const JOY_MAX = 32;
-  function joyStart(id,cx,cy){ joyActive=true; joyTouchId=id; updateJoy(cx,cy); }
+  function joyStart(id,cx,cy){ joyActive=true; joyTouchId=id; moveTarget=null; updateJoy(cx,cy); }
   function updateJoy(clientX, clientY){
     const rect = joyZone.getBoundingClientRect();
     const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
@@ -2945,6 +3060,25 @@
   window.addEventListener('mousemove', e=>{ if(mouseDown) updateJoy(e.clientX,e.clientY); });
   window.addEventListener('mouseup', ()=>{ if(mouseDown){ mouseDown=false; joyEnd(); } });
 
+  // ---------- Tap-to-move ----------
+  (function(){
+    const canvas = document.getElementById('game');
+    let tapStartX=0, tapStartY=0, tapMoved=false;
+    function tapDown(x,y){ tapStartX=x; tapStartY=y; tapMoved=false; }
+    function tapMove(x,y){ if(Math.hypot(x-tapStartX,y-tapStartY)>10) tapMoved=true; }
+    function tapUp(x,y){
+      if(tapMoved || !gameStarted || sysModal.classList.contains('show')) return;
+      if(joyActive || autoBattle) return;
+      setMoveTargetFromScreen(x,y);
+    }
+    canvas.addEventListener('touchstart', e=>{ const t=e.touches[0]; tapDown(t.clientX,t.clientY); }, {passive:true});
+    canvas.addEventListener('touchmove', e=>{ const t=e.touches[0]; tapMove(t.clientX,t.clientY); }, {passive:true});
+    canvas.addEventListener('touchend', e=>{ const t=e.changedTouches[0]; tapUp(t.clientX,t.clientY); }, {passive:true});
+    canvas.addEventListener('mousedown', e=>{ tapDown(e.clientX,e.clientY); });
+    canvas.addEventListener('mousemove', e=>{ tapMove(e.clientX,e.clientY); });
+    canvas.addEventListener('mouseup', e=>{ tapUp(e.clientX,e.clientY); });
+  })();
+
   // ---------- Combat ----------
   const WEAPON_RARITY_TIERS = [
     {key:'white', min:1, max:5, name:'ขาว', color:'#e5e7eb', star:1, goldValue:8},
@@ -2957,23 +3091,225 @@
   function weaponRarityForLevel(lvl){
     return WEAPON_RARITY_TIERS.find(t=>lvl>=t.min && lvl<=t.max) || WEAPON_RARITY_TIERS[0];
   }
-  function foundGear(){ return player.foundGear || (player.foundGear = {white:0,green:0,blue:0,purple:0,gold:0,red:0}); }
-  function rollWeaponFind(m){
-    if(Math.random() > 0.09*dropRateMult) return null;
-    const tier = weaponRarityForLevel(m.isWorldBoss ? 60 : m.lvl);
-    foundGear()[tier.key] = (foundGear()[tier.key]||0) + 1;
-    return {tier};
+  function tierIdxOf(key){ return WEAPON_RARITY_TIERS.findIndex(t=>t.key===key); }
+
+  // ---------- Enhance stones & amulets ----------
+  const STONE_CATEGORIES = { weapon:{name:'อาวุธ',icon:'🗡️'}, armor:{name:'ชุด',icon:'🛡️'}, jewelry:{name:'แหวน/สร้อย',icon:'💍'} };
+  const STONE_TIERS = [
+    {key:'t1', name:'หินตีบวก T1', icon:'🪨', maxLevel:6, price:15},
+    {key:'t2', name:'หินตีบวก T2', icon:'💠', maxLevel:8, price:40},
+    {key:'t3', name:'หินตีบวก T3', icon:'🔷', maxLevel:10, price:90},
+    {key:'t4', name:'หินตีบวก T4', icon:'💎', maxLevel:15, price:180}
+  ];
+  function slotCategory(slot){ return slot==='weapon' ? 'weapon' : (slot==='ring'||slot==='necklace') ? 'jewelry' : 'armor'; }
+  function requiredStoneTier(targetLevel){
+    if(targetLevel<=6) return 't1';
+    if(targetLevel<=8) return 't2';
+    if(targetLevel<=10) return 't3';
+    return 't4';
   }
-  function sellFoundGear(tierKey){
-    const tier = WEAPON_RARITY_TIERS.find(t=>t.key===tierKey);
-    const qty = foundGear()[tierKey]||0;
-    if(qty<=0) return 0;
-    const total = Math.round(qty*tier.goldValue*(1+totalGoldBonus())*goldRateMult);
-    player.gold += total;
-    foundGear()[tierKey] = 0;
+  function stoneQtyNeeded(enhLevel){ return Math.min(enhLevel+1, 10); }
+  function enhanceStones(){
+    if(!player.enhanceStones) player.enhanceStones = {weapon:{t1:0,t2:0,t3:0,t4:0}, armor:{t1:0,t2:0,t3:0,t4:0}, jewelry:{t1:0,t2:0,t3:0,t4:0}};
+    return player.enhanceStones;
+  }
+  function rollStoneDrop(m){
+    if(m.isBoss) return null;
+    if(Math.random() > 0.08*dropRateMult) return null;
+    const cats = Object.keys(STONE_CATEGORIES);
+    const cat = cats[Math.floor(Math.random()*cats.length)];
+    let tier;
+    if(m.lvl<=15) tier='t1'; else if(m.lvl<=30) tier='t2'; else if(m.lvl<=45) tier='t3'; else tier='t4';
+    const qty = 1+Math.floor(Math.random()*3);
+    enhanceStones()[cat][tier] += qty;
+    return { cat, tier, qty };
+  }
+  function rollAmuletDrop(m){
+    if(!m.isBoss) return null;
+    if(Math.random() > 0.25*dropRateMult) return null;
+    player.amulets = (player.amulets||0)+1;
+    return true;
+  }
+
+  // ---------- Real equipment system (slot / color-tier / class-locked) ----------
+  const EQUIP_SLOTS_INFO = {
+    weapon:   {label:'อาวุธ', icon:null, primary:'atk'},
+    helmet:   {label:'หมวก', icon:'🪖', primary:'def'},
+    armor:    {label:'เกราะ', icon:'🥋', primary:'hp'},
+    boots:    {label:'รองเท้า', icon:'👢', primary:'atkSpeed'},
+    ring:     {label:'แหวน', icon:'💍', primary:'critPct'},
+    necklace: {label:'สร้อยคอ', icon:'📿', primary:'expPct'}
+  };
+  const EQUIP_STAT_POOL = ['atk','def','hp','critPct','goldPct','expPct','dodge','accuracy','atkSpeed'];
+  const EQUIP_STAT_LABEL = {atk:'โจมตี',def:'ป้องกัน',hp:'พลังชีวิต',critPct:'คริติคอล',goldPct:'ทอง',expPct:'EXP',dodge:'หลบหลีก',accuracy:'แม่นยำ',atkSpeed:'ความเร็วตี'};
+  const EQUIP_STAT_BASE = {atk:4,def:3,hp:22,critPct:0.6,goldPct:1.1,expPct:1.1,dodge:0.5,accuracy:0.8,atkSpeed:0.8};
+  function classWeaponIcon(classKey){ return (CLASSES[classKey]||CLASSES.warrior).icon; }
+  function equipSlotIcon(item){ return item.slot==='weapon' ? classWeaponIcon(item.classKey) : EQUIP_SLOTS_INFO[item.slot].icon; }
+  function rollEquipStat(key, tIdx){ return Math.round(EQUIP_STAT_BASE[key]*(1+tIdx*0.85)*(0.8+Math.random()*0.5)*10)/10; }
+  function equipItemName(item){
+    const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+    return tier.name+EQUIP_SLOTS_INFO[item.slot].label+' ('+(CLASSES[item.classKey]||CLASSES.warrior).name+')';
+  }
+  function generateEquipItem(slot, tierKey, classKey){
+    const tIdx = tierIdxOf(tierKey);
+    const info = EQUIP_SLOTS_INFO[slot];
+    const stats = {};
+    stats[info.primary] = rollEquipStat(info.primary, tIdx);
+    const secondaryPool = EQUIP_STAT_POOL.filter(s=>s!==info.primary);
+    const secCount = 1+Math.floor(Math.random()*2);
+    for(let i=0;i<secCount;i++){
+      const k = secondaryPool[Math.floor(Math.random()*secondaryPool.length)];
+      if(!stats[k]) stats[k] = rollEquipStat(k, tIdx);
+    }
+    return { id:'eq'+Date.now()+Math.floor(Math.random()*1000000), slot, tier:tierKey, classKey, stats, enhance:0 };
+  }
+  function equipInventory(){ return player.equipInventory || (player.equipInventory=[]); }
+  function equippedGear(){ return player.equippedGear || (player.equippedGear={weapon:null,helmet:null,armor:null,boots:null,ring:null,necklace:null}); }
+  function rollEquipDrop(m){
+    if(Math.random() > 0.07*dropRateMult) return null;
+    const tier = weaponRarityForLevel(m.isWorldBoss ? 60 : m.lvl);
+    const slots = Object.keys(EQUIP_SLOTS_INFO);
+    const slot = slots[Math.floor(Math.random()*slots.length)];
+    const item = generateEquipItem(slot, tier.key, player.classKey);
+    equipInventory().push(item);
+    if(equipInventory().length > 60) equipInventory().shift();
+    return item;
+  }
+
+  // ---------- Gear gacha (weapon pool + gear pool, mirrors pet gacha) ----------
+  const WEAPON_SLOT_POOL = ['weapon'];
+  const GEAR_SLOT_POOL = ['helmet','armor','boots','ring','necklace'];
+  function totalGearOwned(){ return equipInventory().length; }
+  function gearGachaCost(isPremium){
+    const n = totalGearOwned();
+    return isPremium ? (25+Math.min(n,40)*3) : (120+Math.min(n,40)*60);
+  }
+  function rollGearTier(isPremium){
+    const r = Math.random();
+    if(isPremium){
+      if(r<0.45) return 'blue'; else if(r<0.8) return 'purple'; else if(r<0.96) return 'gold'; else return 'red';
+    } else {
+      if(r<0.55) return 'white'; else if(r<0.88) return 'green'; else return 'blue';
+    }
+  }
+  function gearGachaOnce(isPremium, slotPool){
+    const cost = gearGachaCost(isPremium);
+    if(isPremium){ if(player.gems<cost) return null; player.gems-=cost; }
+    else { if(player.gold<cost) return null; player.gold-=cost; }
+    const slot = slotPool[Math.floor(Math.random()*slotPool.length)];
+    const tierKey = rollGearTier(isPremium);
+    const item = generateEquipItem(slot, tierKey, player.classKey);
+    equipInventory().push(item);
+    if(equipInventory().length > 60) equipInventory().shift();
+    return item;
+  }
+  function gearGacha(isPremium, slotPool){
+    const item = gearGachaOnce(isPremium, slotPool);
+    if(!item){ showToast(isPremium?'เพชรไม่พอ':'ทองไม่พอ'); return false; }
+    const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+    showRewardCard({
+      icon: equipSlotIcon(item), title:'สุ่มกาชาได้!', stars: tier.star, legendary: tier.star>=5,
+      rows:[{icon:'', text:equipItemName(item)}]
+    });
+    if(tier.star>=5) announceServer('🎰 '+(player.name||'นักผจญภัย')+' สุ่มกาชาได้ '+equipItemName(item)+'!', tier.star>=6);
     updateHud();
+    return true;
+  }
+  function gearGachaX5(isPremium, slotPool){
+    const results = [];
+    for(let i=0;i<5;i++){
+      const item = gearGachaOnce(isPremium, slotPool);
+      if(!item) break;
+      results.push(item);
+    }
+    if(results.length===0){ showToast(isPremium?'เพชรไม่พอ':'ทองไม่พอ'); return []; }
+    showRewardCard({
+      icon: equipSlotIcon(results[results.length-1]), title:'สุ่ม x5 ได้ '+results.length+' ชิ้น!',
+      stars: Math.max(...results.map(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star)),
+      legendary: results.some(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=5),
+      rows: results.map(it=>({icon:equipSlotIcon(it), text:equipItemName(it)}))
+    });
+    results.filter(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=5).forEach(it=>{
+      announceServer('🎰 '+(player.name||'นักผจญภัย')+' สุ่มกาชาได้ '+equipItemName(it)+'!', WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=6);
+    });
+    updateHud();
+    return results;
+  }
+  function equipItem(id){
+    const item = equipInventory().find(i=>i.id===id);
+    if(!item) return;
+    if(item.classKey !== player.classKey){ showToast('อุปกรณ์นี้ใช้ได้เฉพาะ '+CLASSES[item.classKey].name); return; }
+    equippedGear()[item.slot] = id;
+    updateHud();
+    showToast('สวมใส่ '+equipItemName(item)+' แล้ว');
+  }
+  function unequipSlot(slot){ equippedGear()[slot] = null; updateHud(); }
+  function sellEquipItem(id){
+    const item = equipInventory().find(i=>i.id===id);
+    if(!item) return 0;
+    const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+    const value = Math.round(tier.goldValue*(1+item.enhance*0.5)*(1+totalGoldBonus())*goldRateMult);
+    player.gold += value;
+    Object.keys(equippedGear()).forEach(s=>{ if(equippedGear()[s]===id) equippedGear()[s]=null; });
+    player.equipInventory = equipInventory().filter(i=>i.id!==id);
+    updateHud();
+    return value;
+  }
+  function enhanceCost(lvl){ return 60 + lvl*lvl*35; }
+  function enhanceBreakChance(lvl){ return lvl>=10 ? Math.min(0.35,(lvl-9)*0.05) : 0; }
+  function enhanceSuccessRate(lvl){ return lvl<10 ? 0.9 : Math.max(0.3, 0.9-(lvl-9)*0.12); }
+  function enhanceEquipItem(id){
+    const item = equipInventory().find(i=>i.id===id);
+    if(!item) return 'none';
+    if(item.enhance>=15){ showToast('เสริมสูงสุดแล้ว (+15)'); return 'max'; }
+    const cost = enhanceCost(item.enhance);
+    if(player.gold<cost){ showToast('ทองไม่พอ (ต้องการ 🪙'+cost+')'); return 'nogold'; }
+    const cat = slotCategory(item.slot);
+    const targetLvl = item.enhance+1;
+    const stoneTier = requiredStoneTier(targetLvl);
+    const stoneQty = stoneQtyNeeded(item.enhance);
+    if((enhanceStones()[cat][stoneTier]||0) < stoneQty){
+      showToast('ต้องการ '+STONE_TIERS.find(t=>t.key===stoneTier).name+' x'+stoneQty+' ('+STONE_CATEGORIES[cat].name+') — ไปซื้อที่ตลาด');
+      return 'nostone';
+    }
+    player.gold -= cost;
+    enhanceStones()[cat][stoneTier] -= stoneQty;
+    const useAmulet = (player.amulets||0) > 0;
+    if(useAmulet) player.amulets--;
+    const brk = enhanceBreakChance(item.enhance);
+    if(brk>0 && Math.random()<brk){
+      Object.keys(equippedGear()).forEach(s=>{ if(equippedGear()[s]===id) equippedGear()[s]=null; });
+      player.equipInventory = equipInventory().filter(i=>i.id!==id);
+      updateHud();
+      playTone(120, 0.3, 'sawtooth', 0.12); playTone(80, 0.35, 'sawtooth', 0.1, 0.08);
+      showToast('💥 อุปกรณ์แตกละเอียดระหว่างเสริม!');
+      return 'broken';
+    }
+    const succRate = Math.min(0.98, enhanceSuccessRate(item.enhance) + (useAmulet?0.15:0));
+    if(Math.random()<succRate){
+      item.enhance++;
+      updateHud();
+      [523,659,784].forEach((f,i)=> playTone(f, 0.1, 'triangle', 0.08, i*0.06));
+      showToast('✨ เสริมสำเร็จ! +'+item.enhance+(useAmulet?' (ใช้ยันต์ช่วย)':''));
+      if(item.enhance>=6) announceServer('⚒️ '+(player.name||'นักผจญภัย')+' เสริมพลัง '+equipItemName(item)+' สำเร็จถึง +'+item.enhance+'!', item.enhance>=11);
+      return 'success';
+    }
+    playTone(180, 0.15, 'square', 0.1); playTone(140, 0.15, 'square', 0.08, 0.1);
+    showToast('เสริมล้มเหลว (ของยังอยู่)');
+    return 'fail';
+  }
+  function equippedGearBonus(key){
+    let total = 0;
+    const eg = equippedGear();
+    Object.values(eg).forEach(itemId=>{
+      if(!itemId) return;
+      const item = equipInventory().find(i=>i.id===itemId);
+      if(item && item.stats[key]) total += item.stats[key]*(1+item.enhance*0.08);
+    });
     return total;
   }
+
+  function foundGear(){ return player.foundGear || (player.foundGear = {white:0,green:0,blue:0,purple:0,gold:0,red:0}); }
   function rollMaterialDrop(m){
     let dropChance = (m.isBoss ? 0.95 : 0.35) * dropRateMult;
     if(Date.now() < meteorShowerUntil) dropChance += 0.3;
@@ -2989,7 +3325,7 @@
   }
 
   function damageMonster(m, dmg, crit){
-    m.hp -= dmg; m.hitFlash = 200;
+    m.hp -= dmg; m.hitFlash = 200; m.provoked = true;
     spawnFloatText(m.x, m.y-20, (crit?'CRIT ':'')+'-'+dmg, crit? '#ff9f1c':'#ffffff', crit);
     spawnHitSpark(m.x, m.y, crit);
     addShake(crit?4:1.5, crit?150:80);
@@ -3017,22 +3353,30 @@
       gainBattlepassExp(m.isWorldBoss?200:(m.isBoss?15:3));
       const drop = rollMaterialDrop(m);
       const legDrop = rollLegendaryDrop(m);
-      const wepFind = rollWeaponFind(m);
+      const eqDrop = rollEquipDrop(m);
+      const stoneDrop = rollStoneDrop(m);
+      const amuletDrop = rollAmuletDrop(m);
 
       const rows = [ {icon:'✨', text:'+'+expGain+' EXP'}, {icon:'🪙', text:'+'+goldGain+' ทอง'} ];
       if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); rows.push({icon:matDef.icon, text:'+'+drop.qty+' '+matDef.name}); }
-      if(wepFind) rows.push({icon:'🗡️', text:'พบอุปกรณ์เกรด'+wepFind.tier.name+' (ในกระเป๋า)'});
+      if(eqDrop) rows.push({icon:equipSlotIcon(eqDrop), text:equipItemName(eqDrop)+' (ในกระเป๋า)'});
+      if(stoneDrop) rows.push({icon:STONE_TIERS.find(t=>t.key===stoneDrop.tier).icon, text:'+'+stoneDrop.qty+' '+STONE_TIERS.find(t=>t.key===stoneDrop.tier).name+' ('+STONE_CATEGORIES[stoneDrop.cat].name+')'});
+      if(amuletDrop) rows.push({icon:'🧿', text:'+1 ยันต์เสริมพลัง'});
       if(legDrop) rows.push({icon:'🌟', text:legDrop.name});
       showRewardCard({
         icon: legDrop?'🌟':(m.isBoss?'👑':'💀'),
         title: legDrop ? 'ไอเทมตำนาน!' : m.type.name+' พ่ายแพ้!',
-        stars: legDrop?3:(m.isWorldBoss?5:(m.isFieldBoss?4:(m.isBoss?3:(wepFind?wepFind.tier.star:0)))),
+        stars: legDrop?3:(m.isWorldBoss?5:(m.isFieldBoss?4:(m.isBoss?3:(eqDrop?WEAPON_RARITY_TIERS.find(t=>t.key===eqDrop.tier).star:0)))),
         legendary: !!legDrop,
         rows
       });
       if(legDrop){
         showToast('🌟 ได้ไอเทมตำนาน: '+legDrop.name+'! ไปใส่ที่กระเป๋า 🎒');
         announceServer('🌟 '+(player.name||'นักผจญภัย')+' ได้รับไอเทมตำนาน '+legDrop.name+'!');
+      }
+      if(eqDrop){
+        const eqTier = WEAPON_RARITY_TIERS.find(t=>t.key===eqDrop.tier);
+        if(eqTier.star>=5) announceServer('🎁 '+(player.name||'นักผจญภัย')+' ได้รับ '+equipItemName(eqDrop)+' จากการล่ามอน!', eqTier.star>=6);
       }
       spawnDeathPoof(m);
       sfxDeath(m.r/18);
@@ -3078,6 +3422,7 @@
 
   function doAttack(){
     if(player.attackCooldown > 0) return;
+    if(isInSafeZone()) return;
     player.attackCooldown = 350;
     player.hitFlash = 150;
     let hitAny = false;
@@ -3099,9 +3444,14 @@
     priest:  { pShape:'fireball', color:'#c084fc', trail:'#e9d5ff' },
     rogue:   { pShape:'dagger', color:'#fbbf24', trail:'#fde68a' }
   };
+  function isInSafeZone(){
+    const sp = MAPS[currentMapId].spawn;
+    return sp && Math.hypot(player.x-sp.x, player.y-sp.y) < SAFE_ZONE_RADIUS;
+  }
   function fireRanged(){
     const s = skills.ranged;
     if(player.level < s.unlockLv || s.cd > 0) return;
+    if(isInSafeZone()){ showToast('อยู่ในเขตปลอดภัย ใช้สกิลระยะไกลไม่ได้'); return; }
     s.cd = s.cooldown * (1-totalCDR());
     s.useCount++;
     const vis = CLASS_SKILL_VISUAL[player.classKey] || CLASS_SKILL_VISUAL.warrior;
@@ -3127,6 +3477,7 @@
   function castSpin(){
     const s = skills.spin;
     if(player.level < s.unlockLv || s.cd > 0) return;
+    if(isInSafeZone()){ showToast('อยู่ในเขตปลอดภัย ใช้สกิลไม่ได้'); return; }
     s.cd = s.cooldown * (1-totalCDR());
     s.useCount++;
     player.hitFlash = 200;
@@ -3187,6 +3538,7 @@
   function castUlt(){
     const s = skills.ult;
     if(player.level < s.unlockLv || s.cd > 0) return;
+    if(isInSafeZone()){ showToast('อยู่ในเขตปลอดภัย ใช้สกิลไม่ได้'); return; }
     s.cd = s.cooldown * (1-totalCDR());
     s.useCount++;
     player.hitFlash = 300;
@@ -3251,13 +3603,31 @@
   }
 
   // ---------- Monster AI / collision ----------
+  const SAFE_ZONE_RADIUS = 260;
   let playerDamageCooldown = 0;
+  function monsterThreatTier(m){
+    const diff = m.lvl - player.level;
+    if(m.isBoss) return { color:'#dc2626', passive:false, capped:false };
+    if(diff <= -5) return { color:'#9ca3af', passive:true, capped:false };
+    if(diff <= -1) return { color:'#4ade80', passive:true, capped:false };
+    if(diff <= 5) return { color:'#fde047', passive:false, capped:true };
+    if(diff <= 10) return { color:'#c2410c', passive:false, capped:false };
+    return { color:'#dc2626', passive:false, capped:false };
+  }
   function updateMonsters(dt){
+    const spawnPt = MAPS[currentMapId].spawn;
+    const cappedNearby = monsters.filter(m=>{
+      const tier = monsterThreatTier(m);
+      return tier.capped && Math.hypot(m.x-player.x,m.y-player.y) < 500;
+    }).sort((a,b)=> Math.hypot(a.x-player.x,a.y-player.y) - Math.hypot(b.x-player.x,b.y-player.y));
+    const allowedChaseIds = new Set(cappedNearby.slice(0,5).map(m=>m.id));
     for(const m of monsters){
       m.wobble += dt;
       const dx = player.x-m.x, dy = player.y-m.y;
       const dist = Math.hypot(dx,dy) || 1;
-      if(dist < 500){
+      const tier = monsterThreatTier(m);
+      const shouldChase = tier.passive ? (m.provoked && dist<500) : (tier.capped ? allowedChaseIds.has(m.id) : dist<500);
+      if(shouldChase){
         const spd = m.type.speed;
         m.x += (dx/dist)*spd*(dt/16);
         m.y += (dy/dist)*spd*(dt/16);
@@ -3266,10 +3636,24 @@
         m.x = Math.max(m.zoneBounds.xMin+22, Math.min(m.zoneBounds.xMax-22, m.x));
         m.y = Math.max(m.zoneBounds.yMin+22, Math.min(m.zoneBounds.yMax-22, m.y));
       }
+      if(spawnPt){
+        const sdx = m.x-spawnPt.x, sdy = m.y-spawnPt.y;
+        const sdist = Math.hypot(sdx,sdy) || 1;
+        if(sdist < SAFE_ZONE_RADIUS+m.r){
+          const push = SAFE_ZONE_RADIUS+m.r;
+          m.x = spawnPt.x + (sdx/sdist)*push;
+          m.y = spawnPt.y + (sdy/sdist)*push;
+        }
+      }
       if(m.hitFlash > 0) m.hitFlash -= dt;
-      if(dist < m.r+player.r+4 && playerDamageCooldown <= 0 && player.invulTimer<=0){
-        const rawDmg = (4+Math.floor(Math.random()*5) + m.lvl*0.8) * monsterPowerMult * (m.isBoss?1.6:1);
-        let dmg = Math.max(1, Math.round(rawDmg - totalDEF()*0.3));
+      const playerInSafeZone = spawnPt && Math.hypot(player.x-spawnPt.x, player.y-spawnPt.y) < SAFE_ZONE_RADIUS;
+      if(!playerInSafeZone && shouldChase && dist < m.r+player.r+4 && playerDamageCooldown <= 0 && player.invulTimer<=0){
+        if(Math.random() < totalDodge()){
+          playerDamageCooldown = 350;
+          spawnFloatText(player.x, player.y-46, 'DODGE', '#93c5fd', false);
+        } else {
+        const rawDmg = (4+Math.floor(Math.random()*5) + m.lvl*0.8) * monsterPowerMult * (m.isBoss?1.6*bossAtkMult:1);
+        let dmg = Math.max(1, Math.round((rawDmg - totalDEF()*0.3)*10));
         playerDamageCooldown = 500;
         if(player.shield > 0){
           const absorbed = Math.min(player.shield, dmg);
@@ -3284,6 +3668,7 @@
         }
         if(player.hp <= 0) respawnPlayer();
         updateHud();
+        }
       }
     }
     if(playerDamageCooldown > 0) playerDamageCooldown -= dt;
@@ -3367,6 +3752,17 @@
         else if(conf.useUlt && skills.ult.cd<=0 && monsters.length>=2) castUlt();
         else if(conf.useSpin && monsters.length>=conf.spinThreshold && skills.spin.cd<=0) castSpin();
         else if(conf.useRanged && skills.ranged.cd<=0) fireRanged();
+      }
+    } else if(moveTarget){
+      const mdx = moveTarget.x-player.x, mdy = moveTarget.y-player.y;
+      const mdist = Math.hypot(mdx,mdy);
+      if(mdist < 14){
+        moveTarget = null;
+      } else {
+        const spd = player.speedBase*1.15*classData().statMul.spd*mountSpeedMult();
+        player.x += (mdx/mdist)*spd*(dt/16);
+        player.y += (mdy/mdist)*spd*(dt/16);
+        player.facing = mdx>0?1:-1;
       }
     }
     player.x = Math.max(player.r, Math.min(WORLD_W-player.r, player.x));
@@ -3523,6 +3919,71 @@
     {x:1750, y:500, size:1.2}, {x:2450, y:480, size:1.0}, {x:1900, y:1000, size:1.4},
     {x:2600, y:1050, size:0.9}, {x:2100, y:900, size:1.1}
   ];
+  function drawSafeZoneFence(){
+    const spawnPt = MAPS[currentMapId].spawn;
+    if(!spawnPt) return;
+    const postCount = 40;
+    for(let i=0;i<postCount;i++){
+      const ang = (i/postCount)*Math.PI*2;
+      const wx = spawnPt.x + Math.cos(ang)*SAFE_ZONE_RADIUS;
+      const wy = spawnPt.y + Math.sin(ang)*SAFE_ZONE_RADIUS;
+      const sx = wx-camera.x, sy = wy-camera.y;
+      if(sx<-30||sx>W+30||sy<-30||sy>H+30) continue;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(0,10,7,3,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#6b4423'; ctx.fillRect(-3,-16,6,26);
+      ctx.fillStyle='#8b5e34'; ctx.beginPath(); ctx.moveTo(-3,-16); ctx.lineTo(0,-22); ctx.lineTo(3,-16); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    // connecting rail segments (light, just a hint of a fence line)
+    ctx.save();
+    ctx.strokeStyle='rgba(139,92,246,0.18)';
+    ctx.lineWidth=3;
+    ctx.setLineDash([10,8]);
+    ctx.beginPath();
+    ctx.arc(spawnPt.x-camera.x, spawnPt.y-camera.y, SAFE_ZONE_RADIUS, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawSafeZoneCampfire(){
+    const spawnPt = MAPS[currentMapId].spawn;
+    if(!spawnPt) return;
+    const sx = spawnPt.x-camera.x, sy = spawnPt.y-camera.y+60;
+    if(sx<-100||sx>W+100||sy<-100||sy>H+100) return;
+    const t = Date.now()/120;
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.beginPath(); ctx.ellipse(0, 46, 70, 20, 0, 0, Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fill();
+    // log ring
+    ctx.fillStyle='#5b3a1e';
+    for(let i=0;i<6;i++){
+      const ang=(i/6)*Math.PI*2;
+      ctx.save(); ctx.translate(Math.cos(ang)*38, Math.sin(ang)*14); ctx.rotate(ang);
+      ctx.fillRect(-16,-4,32,8);
+      ctx.restore();
+    }
+    // flame (big, layered, flickering)
+    for(let i=0;i<3;i++){
+      const flick = Math.sin(t+i)*4;
+      ctx.beginPath();
+      ctx.moveTo(0, 30);
+      ctx.quadraticCurveTo(-26+flick, 0, 0, -58-i*10+flick);
+      ctx.quadraticCurveTo(26-flick, 0, 0, 30);
+      ctx.closePath();
+      ctx.fillStyle = i===0?'rgba(251,146,60,0.9)':(i===1?'rgba(252,211,77,0.85)':'rgba(254,240,138,0.8)');
+      ctx.shadowColor='#fb923c'; ctx.shadowBlur=24;
+      ctx.fill();
+    }
+    ctx.shadowBlur=0;
+    ctx.font='13px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#4ade80';
+    ctx.lineWidth=2.5; ctx.strokeStyle='rgba(0,0,0,0.8)';
+    ctx.strokeText('🛡️ เขตปลอดภัย', 0, 62);
+    ctx.fillText('🛡️ เขตปลอดภัย', 0, 62);
+    ctx.restore();
+  }
+
   function drawDesertRuins(){
     DESERT_RUINS.forEach(r=>{
       const sx = r.x-camera.x, sy = r.y-camera.y;
@@ -3736,7 +4197,7 @@
     ctx.font=(m.isBoss?'bold 9px':'8px')+' sans-serif'; ctx.textAlign='center';
     ctx.lineWidth=2; ctx.strokeStyle='rgba(0,0,0,0.85)';
     ctx.strokeText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-3);
-    ctx.fillStyle= m.isBoss? '#fbbf24' : '#f1f5f9';
+    ctx.fillStyle = monsterThreatTier(m).color;
     ctx.fillText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-3);
   }
 
@@ -3756,9 +4217,9 @@
     const mnt = currentMount();
     if(mnt && mnt.icon){
       ctx.save();
-      ctx.font = (player.r*1.7)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.globalAlpha = 0.9;
-      ctx.fillText(mnt.icon, player.facing<0?6:-6, player.r*0.55);
+      ctx.font = (player.r*3.1)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.globalAlpha = 0.95;
+      ctx.fillText(mnt.icon, player.facing<0?10:-10, player.r*0.85);
       ctx.restore();
     }
 
@@ -3977,6 +4438,13 @@
       mmCtx.fillStyle = z.name==='ป่าเริ่มต้น' ? 'rgba(74,222,128,0.25)' : (z.name==='ทุ่งกลาง' ? 'rgba(56,189,248,0.25)' : 'rgba(248,113,113,0.25)');
       mmCtx.fillRect(z.xMin*sx, z.yMin*sy, (z.xMax-z.xMin)*sx, (z.yMax-z.yMin)*sy);
     }
+    const spawnPt = MAPS[currentMapId].spawn;
+    if(spawnPt){
+      mmCtx.fillStyle = 'rgba(74,222,128,0.35)';
+      mmCtx.beginPath(); mmCtx.arc(spawnPt.x*sx, spawnPt.y*sy, 260*sx, 0, Math.PI*2); mmCtx.fill();
+      mmCtx.strokeStyle = '#4ade80'; mmCtx.lineWidth = 1;
+      mmCtx.beginPath(); mmCtx.arc(spawnPt.x*sx, spawnPt.y*sy, 260*sx, 0, Math.PI*2); mmCtx.stroke();
+    }
     for(const m of monsters){
       if(m.isBoss){
         mmCtx.fillStyle = '#fbbf24';
@@ -4053,6 +4521,8 @@
         ctx.translate(sxo, syo);
       }
       drawBackground();
+      drawSafeZoneFence();
+      if(currentMapId!=='village') drawSafeZoneCampfire();
       drawPortals();
       drawNPCs();
       drawChests();
@@ -4137,24 +4607,149 @@
     updateHud(); renderEquipList();
     checkAchievements();
   }
-  let selectedInvSlot = {type:'equip', key:'weapon'};
+  let selectedInvSlot = {type:'none', key:null};
+  let invColorFilter = {white:false,green:false,blue:false,purple:false,gold:false,red:false};
+  let invSortAsc = false;
+  function sortEquipInventory(){
+    const order = {white:0,green:1,blue:2,purple:3,gold:4,red:5};
+    invSortAsc = !invSortAsc;
+    equipInventory().sort((a,b)=> invSortAsc ? (order[a.tier]-order[b.tier]) : (order[b.tier]-order[a.tier]) || b.enhance-a.enhance);
+  }
+  function bulkSellFilteredGear(){
+    const toSell = equipInventory().filter(it=>invColorFilter[it.tier] && equippedGear()[it.slot]!==it.id);
+    let total = 0, count = 0;
+    toSell.forEach(it=>{ total += sellEquipItem(it.id); count++; });
+    return {count, total};
+  }
+  function closeItemPopup(){ const p=document.getElementById('item-popup-el'); if(p) p.remove(); }
+  function showMaterialSellPopup(evt, mat){
+    closeItemPopup();
+    const qty = player.materials[mat.key]||0;
+    const rect = evt.currentTarget.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'item-popup';
+    pop.id = 'item-popup-el';
+    let html = `<div class="ip-title">${mat.icon} ${mat.name}</div>`;
+    html += `<div class="ip-stat">มีอยู่: ${qty} ชิ้น</div>`;
+    html += `<div class="ip-stat">ราคา/ชิ้น: 🪙 ${MATERIAL_SELL_PRICE[mat.key]}</div>`;
+    html += `<div class="ip-btns">`;
+    html += `<button class="ip-sell" id="ip-sellmat-btn" ${qty<=0?'disabled':''}>ขายทั้งหมด</button>`;
+    html += `<button class="ip-close" id="ip-close-btn">ปิด</button>`;
+    html += `</div>`;
+    pop.innerHTML = html;
+    document.body.appendChild(pop);
+    let px = rect.left, py = rect.bottom+6;
+    if(px+200 > window.innerWidth) px = window.innerWidth-206;
+    if(py+150 > window.innerHeight) py = Math.max(6, rect.top-156);
+    pop.style.left = px+'px'; pop.style.top = py+'px';
+    const startAutoClose = ()=>{ clearTimeout(showMaterialSellPopup._t); showMaterialSellPopup._t = setTimeout(closeItemPopup, 3000); };
+    document.addEventListener('touchend', startAutoClose, {once:true});
+    document.addEventListener('mouseup', startAutoClose, {once:true});
+    const sellBtn = document.getElementById('ip-sellmat-btn');
+    if(sellBtn) sellBtn.addEventListener('click', ()=>{
+      const total = Math.round(qty*MATERIAL_SELL_PRICE[mat.key]*(1+totalGoldBonus())*goldRateMult);
+      player.gold += total;
+      player.materials[mat.key] = 0;
+      updateHud();
+      showToast('ขาย'+mat.name+'ได้ 🪙'+total);
+      closeItemPopup();
+      renderMarketList('sell');
+    });
+    document.getElementById('ip-close-btn').addEventListener('click', closeItemPopup);
+  }
+  function showMarketBuyPopup(evt, idx){
+    closeItemPopup();
+    const item = MARKET_LISTINGS[idx];
+    if(!item) return;
+    const rect = evt.currentTarget.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'item-popup';
+    pop.id = 'item-popup-el';
+    let html = `<div class="ip-title">${item.icon} ${item.name}</div>`;
+    html += `<div class="ip-stat">ราคา: 🪙 ${item.price}</div>`;
+    html += `<div class="ip-stat">มี 🪙 ${player.gold}</div>`;
+    html += `<div class="ip-btns">`;
+    html += `<button class="ip-equip" id="ip-buy-btn" ${player.gold<item.price?'disabled':''}>ซื้อ</button>`;
+    html += `<button class="ip-close" id="ip-close-btn">ปิด</button>`;
+    html += `</div>`;
+    pop.innerHTML = html;
+    document.body.appendChild(pop);
+    let px = rect.left, py = rect.bottom+6;
+    if(px+200 > window.innerWidth) px = window.innerWidth-206;
+    if(py+150 > window.innerHeight) py = Math.max(6, rect.top-156);
+    pop.style.left = px+'px'; pop.style.top = py+'px';
+    const startAutoClose = ()=>{ clearTimeout(showMarketBuyPopup._t); showMarketBuyPopup._t = setTimeout(closeItemPopup, 3000); };
+    document.addEventListener('touchend', startAutoClose, {once:true});
+    document.addEventListener('mouseup', startAutoClose, {once:true});
+    document.getElementById('ip-buy-btn').addEventListener('click', ()=>{
+      marketBuy(item);
+      closeItemPopup();
+      renderMarketList('buy');
+    });
+    document.getElementById('ip-close-btn').addEventListener('click', closeItemPopup);
+  }
+  function showEquipItemPopup(evt, itemId, equippedSlot){
+    closeItemPopup();
+    if(!itemId) return;
+    const item = equipInventory().find(i=>i.id===itemId);
+    if(!item) return;
+    const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+    const isEquipped = !!equippedSlot;
+    const rect = evt.currentTarget.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'item-popup';
+    pop.id = 'item-popup-el';
+    let html = `<div class="ip-title" style="color:${tier.color};">${'★'.repeat(tier.star)} ${equipItemName(item)}</div>`;
+    html += `<div class="ip-stat">ระดับเสริม: +${item.enhance}/15</div>`;
+    Object.keys(item.stats).forEach(k=>{
+      html += `<div class="ip-stat" style="color:#fbbf24;font-weight:700;">${EQUIP_STAT_LABEL[k]}: +${item.stats[k]}${k.includes('Pct')||k==='dodge'||k==='accuracy'||k==='atkSpeed'?'%':''}</div>`;
+    });
+    html += `<div class="ip-btns">`;
+    if(item.classKey !== player.classKey){
+      html += `<div class="ip-stat" style="color:#f87171;">ใช้ได้เฉพาะ ${CLASSES[item.classKey].name}</div>`;
+    } else if(isEquipped){
+      html += `<button class="ip-equip" id="ip-unequip-btn">ถอด</button>`;
+    } else {
+      html += `<button class="ip-equip" id="ip-equip-btn">สวมใส่</button>`;
+    }
+    const succRate = Math.round(enhanceSuccessRate(item.enhance)*100);
+    const brkRate = Math.round(enhanceBreakChance(item.enhance)*100);
+    const cat = slotCategory(item.slot);
+    const stoneTier = requiredStoneTier(item.enhance+1);
+    const stoneQty = stoneQtyNeeded(item.enhance);
+    const haveStone = enhanceStones()[cat][stoneTier]||0;
+    const stoneDef = STONE_TIERS.find(t=>t.key===stoneTier);
+    html += `<div class="ip-stat" style="color:#94a3b8;">โอกาสสำเร็จ <span style="color:#4ade80;">${succRate}%</span>${(player.amulets||0)>0?' <span style="color:#67e8f9;">(+15% จากยันต์)</span>':''} · ล้มเหลว <span style="color:#fbbf24;">${100-succRate-brkRate}%</span>${brkRate>0?' · <span style=\"color:#f87171;\">แตก '+brkRate+'%</span>':''}</div>`;
+    html += `<div class="ip-stat" style="color:${haveStone<stoneQty?'#f87171':'#94a3b8'};">ใช้ ${stoneDef.icon} ${stoneDef.name} x${stoneQty} (มี ${haveStone}) · ยันต์ ${player.amulets||0} ชิ้น</div>`;
+    html += `<button class="ip-enhance" id="ip-enhance-btn">เสริม (🪙${enhanceCost(item.enhance)})</button>`;
+    html += `<button class="ip-sell" id="ip-sell-btn">ขาย</button>`;
+    html += `<button class="ip-close" id="ip-close-btn">ปิด</button>`;
+    html += `</div>`;
+    pop.innerHTML = html;
+    document.body.appendChild(pop);
+    let px = rect.left, py = rect.bottom+6;
+    if(px+200 > window.innerWidth) px = window.innerWidth-206;
+    if(py+220 > window.innerHeight) py = Math.max(6, rect.top-226);
+    pop.style.left = px+'px'; pop.style.top = py+'px';
+    const startAutoClose = ()=>{ clearTimeout(showEquipItemPopup._t); showEquipItemPopup._t = setTimeout(closeItemPopup, 3000); };
+    pop.addEventListener('mouseenter', ()=> clearTimeout(showEquipItemPopup._t));
+    pop.addEventListener('mouseleave', startAutoClose);
+    document.addEventListener('touchend', startAutoClose, {once:true});
+    document.addEventListener('mouseup', startAutoClose, {once:true});
+    const eqBtn = document.getElementById('ip-equip-btn');
+    if(eqBtn) eqBtn.addEventListener('click', ()=>{ equipItem(item.id); closeItemPopup(); renderEquipList(); });
+    const uneqBtn = document.getElementById('ip-unequip-btn');
+    if(uneqBtn) uneqBtn.addEventListener('click', ()=>{ unequipSlot(equippedSlot); closeItemPopup(); renderEquipList(); });
+    document.getElementById('ip-enhance-btn').addEventListener('click', ()=>{ enhanceEquipItem(item.id); closeItemPopup(); renderEquipList(); });
+    document.getElementById('ip-sell-btn').addEventListener('click', ()=>{
+      const val = sellEquipItem(item.id);
+      showToast('ขายได้ 🪙'+val);
+      closeItemPopup(); renderEquipList();
+    });
+    document.getElementById('ip-close-btn').addEventListener('click', closeItemPopup);
+  }
   function renderEquipList(){
     let html = '';
-
-    html += `<div class="inv-grid-title">อุปกรณ์สวมใส่</div><div class="inv-grid">`;
-    const slots = [
-      {key:'weapon', icon:equipment.weapon.icon, tier:equipment.weapon.tier},
-      {key:'armor', icon:equipment.armor.icon, tier:equipment.armor.tier},
-      {key:'ring', icon:equipment.ring.icon, tier:null},
-      {key:'necklace', icon:equipment.necklace.icon, tier:null}
-    ];
-    slots.forEach(s=>{
-      const legKey = player.legendary[s.key];
-      const cls = legKey ? 'legendary-slot' : (s.tier? 'tier'+s.tier : '');
-      const sel = (selectedInvSlot.type==='equip' && selectedInvSlot.key===s.key) ? 'selected' : '';
-      html += `<div class="inv-slot ${cls} ${sel}" data-sel-equip="${s.key}">${legKey? LEGENDARY_ITEMS.find(i=>i.key===legKey).icon : s.icon}</div>`;
-    });
-    html += `</div>`;
 
     const ownedLegKeys = Object.keys(player.legendaryOwned);
     if(ownedLegKeys.length){
@@ -4168,11 +4763,35 @@
       html += `</div>`;
     }
 
-    html += `<div class="inv-grid-title">🗡️ อุปกรณ์ที่พบ (ขายได้)</div><div class="inv-grid">`;
-    WEAPON_RARITY_TIERS.forEach(t=>{
-      const qty = foundGear()[t.key]||0;
-      const sel = (selectedInvSlot.type==='foundgear' && selectedInvSlot.key===t.key)?'selected':'';
-      html += `<div class="inv-slot ${qty===0?'empty-slot':''} ${sel}" data-sel-foundgear="${t.key}" style="background:${t.color}33; border-color:${t.color};">🗡️<div class="qty-badge">${qty}</div></div>`;
+    html += `<div class="inv-grid-title">🎽 สวมใส่อยู่ (ตามอาชีพ)</div><div class="inv-grid">`;
+    Object.keys(EQUIP_SLOTS_INFO).forEach(slot=>{
+      const itemId = equippedGear()[slot];
+      const item = itemId ? equipInventory().find(i=>i.id===itemId) : null;
+      const sel = (selectedInvSlot.type==='equipped' && selectedInvSlot.key===slot)?'selected':'';
+      const tierColor = item ? WEAPON_RARITY_TIERS.find(t=>t.key===item.tier).color : '#475569';
+      html += `<div class="inv-slot ${sel}" data-sel-equipped="${slot}" style="background:${tierColor}33; border-color:${tierColor};">${item?equipSlotIcon(item):EQUIP_SLOTS_INFO[slot].icon||'❔'}${item?'<div class="qty-badge">+'+item.enhance+'</div>':''}</div>`;
+    });
+    html += `</div>`;
+
+    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0 6px;">
+      <div class="inv-grid-title" style="margin:0;">🎒 อุปกรณ์ในกระเป๋า (${equipInventory().length})</div>
+      <button class="btn-sm alt" id="inv-sort-btn" style="padding:4px 9px; font-size:10px;">⇅ จัดเรียง</button>
+    </div>
+    <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:8px; align-items:center;">
+      ${WEAPON_RARITY_TIERS.map(t=>`
+        <label style="display:flex; align-items:center; gap:3px; font-size:10px; color:${t.color}; font-weight:700;">
+          <input type="checkbox" data-color-filter="${t.key}" ${invColorFilter[t.key]?'checked':''} style="accent-color:${t.color};">${t.name}
+        </label>
+      `).join('')}
+      <button class="btn-sm gold" id="inv-bulk-sell-btn" style="padding:4px 10px; font-size:10px;">💰 ขายที่ติ๊ก</button>
+    </div>
+    <div class="inv-grid">`;
+    if(equipInventory().length===0) html += `<div class="card-desc">ยังไม่มีอุปกรณ์ ไปฆ่ามอนเพื่อเก็บของ!</div>`;
+    equipInventory().forEach(item=>{
+      const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+      const sel = (selectedInvSlot.type==='equipitem' && selectedInvSlot.key===item.id)?'selected':'';
+      const isEquipped = equippedGear()[item.slot]===item.id;
+      html += `<div class="inv-slot ${sel}" data-sel-equipitem="${item.id}" style="background:${tier.color}33; border-color:${tier.color};">${equipSlotIcon(item)}${item.enhance>0?'<div class="qty-badge">+'+item.enhance+'</div>':''}${isEquipped?'<div class="qty-badge" style="left:1px;right:auto;background:#4ade80;">E</div>':''}</div>`;
     });
     html += `</div>`;
 
@@ -4195,14 +4814,29 @@
     html += `<div class="inv-detail" id="inv-detail"></div>`;
 
     equipList.innerHTML = html;
+    const sortBtn = document.getElementById('inv-sort-btn');
+    if(sortBtn) sortBtn.addEventListener('click', ()=>{ sortEquipInventory(); renderEquipList(); });
+    equipList.querySelectorAll('[data-color-filter]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{ invColorFilter[cb.dataset.colorFilter] = cb.checked; });
+    });
+    const bulkSellBtn = document.getElementById('inv-bulk-sell-btn');
+    if(bulkSellBtn) bulkSellBtn.addEventListener('click', ()=>{
+      const res = bulkSellFilteredGear();
+      if(res.count===0){ showToast('ยังไม่ได้ติ๊กสีที่จะขาย'); return; }
+      showToast('ขาย '+res.count+' ชิ้น ได้ 🪙'+res.total);
+      renderEquipList();
+    });
     equipList.querySelectorAll('[data-sel-equip]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'equip',key:el.dataset.selEquip}; renderEquipList(); });
     });
     equipList.querySelectorAll('[data-sel-legendary]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'legendary',key:el.dataset.selLegendary}; renderEquipList(); });
     });
-    equipList.querySelectorAll('[data-sel-foundgear]').forEach(el=>{
-      el.addEventListener('click', ()=>{ selectedInvSlot={type:'foundgear',key:el.dataset.selFoundgear}; renderEquipList(); });
+    equipList.querySelectorAll('[data-sel-equipped]').forEach(el=>{
+      el.addEventListener('click', (e)=>{ showEquipItemPopup(e, equippedGear()[el.dataset.selEquipped], el.dataset.selEquipped); });
+    });
+    equipList.querySelectorAll('[data-sel-equipitem]').forEach(el=>{
+      el.addEventListener('click', (e)=>{ showEquipItemPopup(e, el.dataset.selEquipitem, null); });
     });
     equipList.querySelectorAll('[data-sel-material]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'material',key:el.dataset.selMaterial}; renderEquipList(); });
@@ -4260,19 +4894,6 @@
         equipLegendary(item.slot, equipped? null : sel.key);
         renderEquipList();
         showToast(equipped? 'ถอดไอเทมตำนานแล้ว':'สวมใส่ไอเทมตำนานแล้ว');
-      });
-    } else if(sel.type==='foundgear'){
-      const tier = WEAPON_RARITY_TIERS.find(t=>t.key===sel.key);
-      const qty = foundGear()[sel.key]||0;
-      html += `<span class="rarity-tag" style="background:${tier.color}33;color:${tier.color};">${'★'.repeat(tier.star)} เกรด${tier.name}</span>`;
-      html += `<div class="inv-detail-title">อุปกรณ์เกรด${tier.name} x${qty}</div>`;
-      html += `<div class="inv-detail-desc">ของสะสมที่พบจากมอนสเตอร์เลเวล ${tier.min}-${tier.max===999?'60+':tier.max} ขายได้ชิ้นละ 🪙${tier.goldValue}</div>`;
-      html += `<button class="btn-sm gold" id="sell-foundgear-btn" style="margin-top:10px;" ${qty<=0?'disabled':''}>ขายทั้งหมด</button>`;
-      detail.innerHTML = html;
-      const sellBtn = document.getElementById('sell-foundgear-btn');
-      if(sellBtn) sellBtn.addEventListener('click', ()=>{
-        const total = sellFoundGear(sel.key);
-        if(total>0){ showToast('ขายอุปกรณ์เกรด'+tier.name+' ได้ 🪙'+total); renderEquipList(); }
       });
     } else if(sel.type==='material'){
       const m = MATERIALS.find(x=>x.key===sel.key);
@@ -4587,6 +5208,10 @@
   // ---------- Market modal ----------
   function renderMarketModal(){
     sysModalBody.innerHTML = `
+      <div style="display:flex; justify-content:center; gap:14px; margin-bottom:8px; font-size:12px; font-weight:800;">
+        <span style="color:#fbbf24;">🪙 <span id="market-gold-display">${player.gold}</span></span>
+        <span style="color:#67e8f9;">💎 <span id="market-gem-display">${player.gems}</span></span>
+      </div>
       <div class="tab-row">
         <div class="tab-btn active" data-mt="buy">ซื้อ</div>
         <div class="tab-btn" data-mt="sell">ขาย</div>
@@ -4609,18 +5234,14 @@
   function renderMarketList(tab){
     const list = document.getElementById('market-list');
     if(tab==='buy'){
-      list.innerHTML = MARKET_LISTINGS.map((item,i)=>`
-        <div class="card card-row">
-          <div class="card-icon">${item.icon}</div>
-          <div style="flex:1;">
-            <div class="card-title">${item.name}</div>
-            <div class="card-desc">🪙 ${item.price}</div>
-          </div>
-          <button class="btn-sm" data-buy="${i}" ${player.gold<item.price?'disabled':''}>ซื้อ</button>
+      list.innerHTML = `<div class="inv-grid">` + MARKET_LISTINGS.map((item,i)=>`
+        <div class="inv-slot" data-buy-slot="${i}">
+          <div class="market-grid-price">🪙${item.price}</div>
+          ${item.icon}
         </div>
-      `).join('');
-      list.querySelectorAll('button[data-buy]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{ marketBuy(MARKET_LISTINGS[parseInt(btn.dataset.buy)]); renderMarketList('buy'); });
+      `).join('') + `</div>`;
+      list.querySelectorAll('[data-buy-slot]').forEach(el=>{
+        el.addEventListener('click', (e)=> showMarketBuyPopup(e, parseInt(el.dataset.buySlot)));
       });
     } else if(tab==='fuse'){
       list.innerHTML = `<div class="card-desc" style="margin-bottom:8px;">หลอมวัสดุเทียร์ต่ำ 5 ชิ้น → เทียร์สูงกว่า 1 ชิ้น (แร่ลึกลับหลอมเป็นทองแทน)</div>` +
@@ -4686,13 +5307,60 @@
         btn.addEventListener('click', ()=>{ equipMount(btn.dataset.equipMount); renderMarketList('mounts'); });
       });
     } else if(tab==='gems'){
+      const wGoldCost = gearGachaCost(false), wGemCost = gearGachaCost(true);
+      const petGoldCost = petGachaCost(false), petGemCost = petGachaCost(true);
       list.innerHTML = `
         <div class="card-desc" style="margin-bottom:8px;">💎 เพชร: ${player.gems} — ได้จากบอส/หีบสมบัติ/ความสำเร็จ</div>
+
+        <div class="sys-title">🗡️ สุ่มกาชาอาวุธ (${CLASSES[player.classKey].name})</div>
         <div class="card">
-          <div class="card-title">🎰 กาชาไอเทมตำนาน</div>
-          <div class="card-desc">สุ่มไอเทมตำนาน 1 ชิ้นแบบรับประกัน ราคา 💎${GEM_GACHA_COST}</div>
-          <button class="btn-sm alt" id="gem-gacha-btn" ${player.gems<GEM_GACHA_COST?'disabled':''}>สุ่มเลย</button>
+          <div class="card-desc">🪙 ทอง — เกรดขาว-ฟ้า (ต้นทุน 🪙${wGoldCost})</div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn-sm gold" id="wep-gacha-gold-btn" ${player.gold<wGoldCost?'disabled':''}>สุ่มเดี่ยว</button>
+            <button class="btn-sm gold" id="wep-gacha-gold-x5-btn" ${player.gold<wGoldCost*5?'disabled':''}>สุ่ม x5</button>
+          </div>
         </div>
+        <div class="card">
+          <div class="card-desc">💎 เพชร — เกรดฟ้า-แดง (ต้นทุน 💎${wGemCost})</div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn-sm alt" id="wep-gacha-gem-btn" ${player.gems<wGemCost?'disabled':''}>สุ่มเดี่ยว</button>
+            <button class="btn-sm alt" id="wep-gacha-gem-x5-btn" ${player.gems<wGemCost*5?'disabled':''}>สุ่ม x5</button>
+          </div>
+        </div>
+
+        <div class="sys-title">🎽 สุ่มกาชาอุปกรณ์ (หมวก/เกราะ/รองเท้า/แหวน/สร้อย)</div>
+        <div class="card">
+          <div class="card-desc">🪙 ทอง — เกรดขาว-ฟ้า (ต้นทุน 🪙${wGoldCost})</div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn-sm gold" id="gear-gacha-gold-btn" ${player.gold<wGoldCost?'disabled':''}>สุ่มเดี่ยว</button>
+            <button class="btn-sm gold" id="gear-gacha-gold-x5-btn" ${player.gold<wGoldCost*5?'disabled':''}>สุ่ม x5</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-desc">💎 เพชร — เกรดฟ้า-แดง (ต้นทุน 💎${wGemCost})</div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn-sm alt" id="gear-gacha-gem-btn" ${player.gems<wGemCost?'disabled':''}>สุ่มเดี่ยว</button>
+            <button class="btn-sm alt" id="gear-gacha-gem-x5-btn" ${player.gems<wGemCost*5?'disabled':''}>สุ่ม x5</button>
+          </div>
+        </div>
+
+        <div class="sys-title">🥚 สุ่มกาชาสัตว์เลี้ยง</div>
+        <div class="card">
+          <div class="card-desc">🪙 ทอง — สุ่มได้ 1-3★ (ต้นทุน 🪙${petGoldCost})</div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn-sm gold" id="hatch-gold-btn" ${player.gold<petGoldCost?'disabled':''}>สุ่มเดี่ยว</button>
+            <button class="btn-sm gold" id="hatch-gold-x5-btn" ${player.gold<petGoldCost*5?'disabled':''}>สุ่ม x5</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-desc">💎 เพชร — สุ่มได้ 3-5★ (ต้นทุน 💎${petGemCost})</div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <button class="btn-sm alt" id="hatch-gem-btn" ${player.gems<petGemCost?'disabled':''}>สุ่มเดี่ยว</button>
+            <button class="btn-sm alt" id="hatch-gem-x5-btn" ${player.gems<petGemCost*5?'disabled':''}>สุ่ม x5</button>
+          </div>
+        </div>
+
+        <div class="sys-title">🧰 อื่น ๆ</div>
         <div class="card">
           <div class="card-title">🔄 สุ่มเควสประจำวันใหม่</div>
           <div class="card-desc">รีเซ็ตเควสประจำวันทั้ง 5 ข้อ ราคา 💎${GEM_REROLL_COST}</div>
@@ -4704,23 +5372,48 @@
           <button class="btn-sm alt" id="gem-revive-btn" ${player.gems<GEM_REVIVE_COST?'disabled':''}>ใช้</button>
         </div>
       `;
-      document.getElementById('gem-gacha-btn').addEventListener('click', ()=>{ gemGachaLegendary(); renderMarketList('gems'); });
+      document.getElementById('wep-gacha-gold-btn').addEventListener('click', ()=>{ gearGacha(false, WEAPON_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('wep-gacha-gold-x5-btn').addEventListener('click', ()=>{ gearGachaX5(false, WEAPON_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('wep-gacha-gem-btn').addEventListener('click', ()=>{ gearGacha(true, WEAPON_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('wep-gacha-gem-x5-btn').addEventListener('click', ()=>{ gearGachaX5(true, WEAPON_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('gear-gacha-gold-btn').addEventListener('click', ()=>{ gearGacha(false, GEAR_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('gear-gacha-gold-x5-btn').addEventListener('click', ()=>{ gearGachaX5(false, GEAR_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('gear-gacha-gem-btn').addEventListener('click', ()=>{ gearGacha(true, GEAR_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('gear-gacha-gem-x5-btn').addEventListener('click', ()=>{ gearGachaX5(true, GEAR_SLOT_POOL); renderMarketList('gems'); });
+      document.getElementById('hatch-gold-btn').addEventListener('click', ()=>{ hatchPet(false); renderMarketList('gems'); });
+      document.getElementById('hatch-gold-x5-btn').addEventListener('click', ()=>{ hatchPetX5(false); renderMarketList('gems'); });
+      document.getElementById('hatch-gem-btn').addEventListener('click', ()=>{ hatchPet(true); renderMarketList('gems'); });
+      document.getElementById('hatch-gem-x5-btn').addEventListener('click', ()=>{ hatchPetX5(true); renderMarketList('gems'); });
       document.getElementById('gem-reroll-btn').addEventListener('click', ()=>{ gemRerollDailies(); renderMarketList('gems'); });
       document.getElementById('gem-revive-btn').addEventListener('click', ()=>{ gemRevive(); renderMarketList('gems'); });
     } else {
-      list.innerHTML = MATERIALS.map(m=>`
-        <div class="card card-row">
-          <div class="card-icon">${m.icon}</div>
-          <div style="flex:1;">
-            <div class="card-title">${m.name}</div>
-            <div class="card-desc">มี ${player.materials[m.key]||0} ชิ้น · ราคา/ชิ้น 🪙${MATERIAL_SELL_PRICE[m.key]}</div>
-          </div>
-        </div>
-      `).join('') + `<button class="btn-sm gold" id="sell-all-btn" style="width:100%;margin-top:8px;">ขายวัสดุทั้งหมด</button>`;
+      let html = '';
+      if(equipInventory().length){
+        html += `<div class="card-desc" style="margin-bottom:6px;">🎒 อุปกรณ์ (${equipInventory().length} ชิ้น) — แตะเพื่อขาย</div><div class="inv-grid">`;
+        html += equipInventory().map(item=>{
+          const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+          const isEquipped = equippedGear()[item.slot]===item.id;
+          return `<div class="inv-slot" data-sel-equipitem="${item.id}" style="background:${tier.color}33; border-color:${tier.color};">${equipSlotIcon(item)}${item.enhance>0?'<div class="qty-badge">+'+item.enhance+'</div>':''}${isEquipped?'<div class="qty-badge" style="left:1px;right:auto;background:#4ade80;">E</div>':''}</div>`;
+        }).join('');
+        html += `</div>`;
+      }
+      html += `<div class="card-desc" style="margin:10px 0 6px;">🪨 วัสดุ — แตะเพื่อดูราคา</div><div class="inv-grid">`;
+      html += MATERIALS.map((m,i)=>{
+        const qty = player.materials[m.key]||0;
+        return `<div class="inv-slot ${qty===0?'empty-slot':''}" data-sell-mat-slot="${i}">${m.icon}<div class="qty-badge">${qty}</div></div>`;
+      }).join('');
+      html += `</div><button class="btn-sm gold" id="sell-all-btn" style="width:100%;margin-top:10px;">ขายวัสดุทั้งหมด</button>`;
+      list.innerHTML = html;
       document.getElementById('sell-all-btn').addEventListener('click', ()=>{
         const total = sellAllMaterials();
         showToast('ขายวัสดุได้ 🪙'+total);
         renderMarketList('sell');
+      });
+      list.querySelectorAll('[data-sell-mat-slot]').forEach(el=>{
+        el.addEventListener('click', (e)=> showMaterialSellPopup(e, MATERIALS[parseInt(el.dataset.sellMatSlot)]));
+      });
+      list.querySelectorAll('[data-sel-equipitem]').forEach(el=>{
+        el.addEventListener('click', (e)=> showEquipItemPopup(e, el.dataset.selEquipitem, null));
       });
     }
   }
@@ -4742,6 +5435,7 @@
       <div class="progress-track"><div class="progress-fill" style="width:${pet.exp/pet.expToNext*100}%"></div></div>
       <div class="card-desc">EXP ${pet.exp}/${pet.expToNext} · มีขนม 🍖 x${player.items.petFood||0}</div>
       <button class="btn-sm alt" id="feed-pet-btn" ${(player.items.petFood||0)<=0?'disabled':''}>🍖 ป้อนขนม</button>
+      <button class="btn-sm gold" id="sell-active-pet-btn">💰 ขาย (🪙${petSellValue(pet)})</button>
       <div class="sys-section">
         <div class="sys-title">🎯 Pet Mastery</div>
         <div class="card ${pet.level>=5?'':'locked'}">
@@ -4768,39 +5462,24 @@
             <div class="card-title">${p.type.name} · Lv.${p.level} <span class="rarity-tag" style="background:${rar.color}33;color:${rar.color};">${rar.name}★${p.rarity||1}</span></div>
           </div>
           <button class="btn-sm alt" data-switch-pet="${p.id}">สลับใช้งาน</button>
+          <button class="btn-sm gold" data-sell-pet="${p.id}">ขาย 🪙${petSellValue(p)}</button>
         </div>`;
       });
       html += `</div>`;
     }
 
-    html += `<div class="sys-section">
-      <div class="sys-title">🥚 สุ่มไข่สัตว์เลี้ยง</div>
-      <div class="card">
-        <div class="card-desc">🪙 ทอง — สุ่มได้ 1-3★ (ต้นทุน 🪙${goldCost})</div>
-        <div style="display:flex; gap:8px; margin-top:6px;">
-          <button class="btn-sm gold" id="hatch-gold-btn" ${player.gold<goldCost?'disabled':''}>สุ่มเดี่ยว</button>
-          <button class="btn-sm gold" id="hatch-gold-x5-btn" ${player.gold<goldCost*5?'disabled':''}>สุ่ม x5</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-desc">💎 เพชร — สุ่มได้ 3-5★ (ต้นทุน 💎${gemCost})</div>
-        <div style="display:flex; gap:8px; margin-top:6px;">
-          <button class="btn-sm alt" id="hatch-gem-btn" ${player.gems<gemCost?'disabled':''}>สุ่มเดี่ยว</button>
-          <button class="btn-sm alt" id="hatch-gem-x5-btn" ${player.gems<gemCost*5?'disabled':''}>สุ่ม x5</button>
-        </div>
-      </div>
-      <div class="card-desc">มีสัตว์เลี้ยงแล้ว ${totalPetsOwned()} ตัว (ต้นทุนเพิ่มขึ้นตามจำนวนที่มี)</div>
-    </div>`;
+    html += `<div class="card-desc" style="text-align:center; margin-top:8px;">มีสัตว์เลี้ยงแล้ว ${totalPetsOwned()} ตัว · ไปสุ่มไข่เพิ่มได้ที่ตลาด 💰 → แท็บ 💎 เพชร</div>`;
 
     sysModalBody.innerHTML = html;
-    const hb = document.getElementById('hatch-gold-btn'); if(hb) hb.addEventListener('click', ()=>{ hatchPet(false); renderPetModal(); });
-    const hb5 = document.getElementById('hatch-gold-x5-btn'); if(hb5) hb5.addEventListener('click', ()=>{ hatchPetX5(false); renderPetModal(); });
-    const gb = document.getElementById('hatch-gem-btn'); if(gb) gb.addEventListener('click', ()=>{ hatchPet(true); renderPetModal(); });
-    const gb5 = document.getElementById('hatch-gem-x5-btn'); if(gb5) gb5.addEventListener('click', ()=>{ hatchPetX5(true); renderPetModal(); });
     const feedBtn = document.getElementById('feed-pet-btn');
     if(feedBtn) feedBtn.addEventListener('click', ()=>{ useItem('petFood'); renderPetModal(); });
+    const sellActiveBtn = document.getElementById('sell-active-pet-btn');
+    if(sellActiveBtn) sellActiveBtn.addEventListener('click', ()=>{ const v=sellActivePet(); showToast('ขายสัตว์เลี้ยงได้ 🪙'+v); renderPetModal(); });
     sysModalBody.querySelectorAll('button[data-switch-pet]').forEach(btn=>{
       btn.addEventListener('click', ()=>{ switchActivePet(btn.dataset.switchPet); renderPetModal(); });
+    });
+    sysModalBody.querySelectorAll('button[data-sell-pet]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ const v=sellPetFromCollection(btn.dataset.sellPet); showToast('ขายสัตว์เลี้ยงได้ 🪙'+v); renderPetModal(); });
     });
   }
 
@@ -4999,14 +5678,12 @@
   }
 
   // ---------- Nav wiring ----------
-  document.getElementById('open-character').addEventListener('click', ()=> openModal('ตัวละคร', renderCharacterModal));
+  document.getElementById('level-panel-btn').addEventListener('click', ()=> openModal('ตัวละคร', renderCharacterModal));
   document.getElementById('open-skills').addEventListener('click', ()=> openModal('สกิลทรี', renderSkillsModal));
   document.getElementById('open-quests').addEventListener('click', ()=> openModal('เควส', renderQuestsModal));
-  document.getElementById('open-guild').addEventListener('click', ()=> openModal('กิลด์', renderGuildModal));
   document.getElementById('open-dungeon').addEventListener('click', ()=> openModal('ดันเจี้ยน & บอส', renderDungeonModal));
   document.getElementById('open-market').addEventListener('click', ()=> openModal('ตลาดกลาง', renderMarketModal));
   document.getElementById('open-pet').addEventListener('click', ()=> openModal('สัตว์เลี้ยง', renderPetModal));
-  document.getElementById('open-pvp').addEventListener('click', ()=> openModal('สนามประลอง PvP', renderPvpModal));
   document.getElementById('open-battlepass').addEventListener('click', ()=> openModal('Battle Pass', renderBattlepassModal));
   document.getElementById('open-achievements').addEventListener('click', ()=> openModal('ความสำเร็จ', renderAchievementsModal));
   document.getElementById('open-bestiary').addEventListener('click', ()=> openModal('สมุดภาพมอนสเตอร์', renderBestiaryModal));
@@ -5047,6 +5724,11 @@
     updateQuestTracker();
   });
   document.getElementById('qt-auto-btn').addEventListener('click', toggleQuestAutoHunt);
+  document.getElementById('npc-talk-btn').addEventListener('click', ()=>{
+    if(!nearbyNpc) return;
+    const key = currentMapId+'_'+nearbyNpc.name;
+    openModal(nearbyNpc.icon+' '+nearbyNpc.name, ()=>renderNpcDialog(nearbyNpc, key));
+  });
 
   // ---------- GM floating panel (draggable) ----------
   (function(){
@@ -5101,19 +5783,38 @@
     panel.querySelectorAll('button[data-gm-gem]').forEach(b=>{
       b.addEventListener('click', ()=>{ player.gems += parseInt(b.dataset.gmGem); updateHud(); showToast('💎 +'+b.dataset.gmGem); });
     });
+    document.getElementById('gm-custom-apply').addEventListener('click', ()=>{
+      const key = document.getElementById('gm-custom-select').value;
+      const val = parseFloat(document.getElementById('gm-custom-value').value);
+      if(isNaN(val) || val<0){ showToast('ใส่ตัวเลขให้ถูกต้อง'); return; }
+      if(key==='monsterPowerMult') monsterPowerMult = val;
+      else if(key==='bossHpMult') bossHpMult = val;
+      else if(key==='bossAtkMult') bossAtkMult = val;
+      else if(key==='goldRateMult') goldRateMult = val;
+      else if(key==='gemRateMult') gemRateMult = val;
+      else if(key==='expRateMult') expRateMult = val;
+      else if(key==='dropRateMult') dropRateMult = val;
+      refreshRateButtons();
+      updateHud();
+      showToast('ตั้งค่าเป็น x'+val+' แล้ว');
+    });
     function refreshRateButtons(){
       panel.querySelectorAll('#gm-exprate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmExprate)===expRateMult));
       panel.querySelectorAll('#gm-droprate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmDroprate)===dropRateMult));
       panel.querySelectorAll('#gm-monpower-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmMonpower)===monsterPowerMult));
-      panel.querySelectorAll('#gm-bosspower-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmBosspower)===bossPowerMult));
+      panel.querySelectorAll('#gm-bosshp-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmBosshp)===bossHpMult));
+      panel.querySelectorAll('#gm-bossatk-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmBossatk)===bossAtkMult));
       panel.querySelectorAll('#gm-goldrate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmGoldrate)===goldRateMult));
       panel.querySelectorAll('#gm-gemrate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmGemrate)===gemRateMult));
     }
     panel.querySelectorAll('button[data-gm-monpower]').forEach(b=>{
       b.addEventListener('click', ()=>{ monsterPowerMult = parseFloat(b.dataset.gmMonpower); refreshRateButtons(); showToast('ความแข็งแกร่งมอนสเตอร์ x'+monsterPowerMult); });
     });
-    panel.querySelectorAll('button[data-gm-bosspower]').forEach(b=>{
-      b.addEventListener('click', ()=>{ bossPowerMult = parseFloat(b.dataset.gmBosspower); refreshRateButtons(); showToast('ความแรง/เลือดบอส x'+bossPowerMult); });
+    panel.querySelectorAll('button[data-gm-bosshp]').forEach(b=>{
+      b.addEventListener('click', ()=>{ bossHpMult = parseFloat(b.dataset.gmBosshp); refreshRateButtons(); showToast('เลือดบอส x'+bossHpMult); });
+    });
+    panel.querySelectorAll('button[data-gm-bossatk]').forEach(b=>{
+      b.addEventListener('click', ()=>{ bossAtkMult = parseFloat(b.dataset.gmBossatk); refreshRateButtons(); showToast('ดาเมจบอส x'+bossAtkMult); });
     });
     panel.querySelectorAll('button[data-gm-goldrate]').forEach(b=>{
       b.addEventListener('click', ()=>{ goldRateMult = parseFloat(b.dataset.gmGoldrate); refreshRateButtons(); showToast('อัตราทอง x'+goldRateMult); });
