@@ -17,12 +17,7 @@
   canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
 
   /* ---------- Landscape-optimized compact HUD ---------- */
-  .rotate-hint {
-    display:none; position:fixed; top:8px; left:50%; transform:translateX(-50%);
-    z-index:50; background:rgba(20,18,40,0.92); color:#fde047; border:1px solid rgba(251,191,36,0.4);
-    padding:6px 14px; border-radius:10px; font-size:11px; pointer-events:none;
-  }
-  @media (orientation: portrait) { .rotate-hint { display:block; } }
+  .rotate-hint { display:none; }
   @media (orientation: landscape) and (max-height: 520px) {
     .minimap { width:46px !important; height:46px !important; }
     .level-panel { padding:3px 7px !important; min-width:100px !important; }
@@ -32,10 +27,14 @@
     .hud-left-col { gap:2px !important; }
     .worldboss-banner { display:none !important; }
     .icon-btn.small { width:21px !important; height:21px !important; font-size:10px !important; border-radius:6px !important; }
-    .topnav-icons { max-width:168px !important; gap:3px !important; }
+    .topnav-icons { max-width:168px !important; gap:3px !important; row-gap:3px !important; }
+    .icon-btn.small[data-label]::after { display:none !important; }
     .top-right-col { gap:2px !important; }
     .gold-panel, .zone-panel { padding:2px 6px !important; font-size:9px !important; }
     .rate-indicator { display:none !important; }
+    .boss-hp-bar { top:2px !important; width:min(50vw,190px) !important; padding:3px 8px !important; }
+    .boss-hp-bar .bhb-name { font-size:8px !important; }
+    .boss-hp-bar .bhb-track { height:5px !important; }
 
     .joystick-zone { width:60px !important; height:60px !important; left:6px !important; bottom:6px !important; right:auto !important; top:auto !important; }
     .joystick-thumb { width:26px !important; height:26px !important; top:17px !important; left:17px !important; }
@@ -77,6 +76,34 @@
     position:absolute; left:50%; transform:translateX(-50%); top:2px;
     font-size:9px; color:#94a3b8; background:rgba(10,9,20,0.6); padding:2px 8px; border-radius:8px;
     z-index:5; pointer-events:none; white-space:nowrap;
+  }
+  .boss-hp-bar {
+    position:absolute; top:108px; left:50%; transform:translateX(-50%); z-index:8;
+    background:rgba(15,13,28,0.9); border:1px solid rgba(239,68,68,0.55); border-radius:10px;
+    padding:5px 10px; width:min(66vw,240px); display:none; pointer-events:none;
+  }
+  .boss-hp-bar.show { display:block; }
+  .boss-hp-bar .bhb-name { font-size:10px; font-weight:800; color:#fca5a5; margin-bottom:3px; text-align:center; }
+  .boss-hp-bar .bhb-track { height:8px; border-radius:5px; background:rgba(255,255,255,0.1); overflow:hidden; }
+  .boss-hp-bar .bhb-fill { height:100%; background:linear-gradient(90deg,#f87171,#dc2626); transition:width 0.2s; }
+  .boss-hp-bar .bhb-text { font-size:8px; color:#94a3b8; text-align:center; margin-top:2px; }
+
+  .quest-tracker {
+    position:absolute; left:6px; top:220px; z-index:7; width:118px;
+    background:rgba(15,13,28,0.85); border:1px solid rgba(139,92,246,0.4); border-radius:10px;
+    padding:7px; pointer-events:auto;
+  }
+  .quest-tracker.hidden { display:none; }
+  .quest-tracker .qt-title { font-size:9px; font-weight:800; color:#c4b5fd; margin-bottom:3px; }
+  .quest-tracker .qt-desc { font-size:8.5px; color:#e2e8f0; margin-bottom:4px; line-height:1.3; }
+  .quest-tracker .qt-progress-track { height:5px; border-radius:4px; background:rgba(255,255,255,0.1); overflow:hidden; margin-bottom:5px; }
+  .quest-tracker .qt-progress-fill { height:100%; background:linear-gradient(90deg,#38bdf8,#818cf8); }
+  .quest-tracker button { width:100%; font-size:8.5px; padding:5px 0; border-radius:7px; border:none; font-weight:800; background:linear-gradient(135deg,#4ade80,#16a34a); color:#04150a; }
+  .quest-tracker button.on { background:linear-gradient(135deg,#fbbf24,#d97706); }
+  .quest-tracker .qt-toggle {
+    position:absolute; left:6px; top:190px; z-index:7; width:24px; height:24px; border-radius:7px;
+    background:rgba(20,18,40,0.8); border:1px solid rgba(139,92,246,0.4); color:#c4b5fd;
+    font-size:12px; display:flex; align-items:center; justify-content:center; pointer-events:auto;
   }
   .server-ticker {
     position:absolute; top:0; left:0; right:0; height:20px; z-index:15;
@@ -162,23 +189,23 @@
     box-shadow:0 4px 20px rgba(0,0,0,0.4);
     pointer-events:auto;
   }
-  .level-panel { min-width:158px; }
-  .level-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  .level-panel { min-width:112px; padding:5px 8px; }
+  .level-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
   .level-badge {
     background:linear-gradient(135deg,#f59e0b,#d97706);
-    color:#3a1e00; font-weight:800; font-size:12px;
-    padding:3px 9px; border-radius:8px;
+    color:#3a1e00; font-weight:800; font-size:10px;
+    padding:2px 7px; border-radius:7px;
   }
   .bar-track {
-    width:100%; height:8px; border-radius:6px;
+    width:100%; height:5px; border-radius:5px;
     background:rgba(255,255,255,0.08); overflow:hidden;
     border:1px solid rgba(255,255,255,0.06);
-    margin-bottom:4px;
+    margin-bottom:3px;
   }
   .bar-fill { height:100%; border-radius:6px; transition:width 0.25s ease; }
   .hp-fill { background:linear-gradient(90deg,#ef4444,#f87171); }
   .exp-fill { background:linear-gradient(90deg,#38bdf8,#818cf8); }
-  .bar-label { font-size:9px; color:#94a3b8; }
+  .bar-label { font-size:7.5px; color:#94a3b8; }
 
   .top-right-col { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
   .gold-panel { display:flex; align-items:center; gap:6px; font-weight:700; color:#fbbf24; font-size:14px; }
@@ -398,20 +425,27 @@
   .combo-badge.show { opacity:1; transform:translate(-50%,0) scale(1); }
 
   /* ---------- Top nav (MMORPG systems) ---------- */
-  .topnav-icons { display:flex; gap:5px; flex-wrap:wrap; justify-content:flex-end; max-width:260px; pointer-events:auto; }
+  .topnav-icons { display:flex; gap:5px; row-gap:11px; flex-wrap:wrap; justify-content:flex-end; max-width:260px; pointer-events:auto; }
   .icon-btn.small { width:32px; height:32px; font-size:15px; border-radius:9px; position:relative; }
   .icon-btn .ping {
     position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%;
     background:#f87171; border:1.5px solid #12101f; display:none;
   }
   .icon-btn .ping.show { display:block; }
+  .icon-btn.small { position:relative; overflow:visible; }
+  .icon-btn.small[data-label]::after {
+    content: attr(data-label);
+    position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    font-size:5.5px; color:#94a3b8; white-space:nowrap; margin-top:1px;
+    text-shadow:0 1px 2px rgba(0,0,0,0.9); pointer-events:none;
+  }
 
   .worldboss-banner {
-    background:rgba(20,18,40,0.85); border:1px solid rgba(251,191,36,0.5); border-radius:12px;
-    padding:6px 10px; font-size:10px; pointer-events:auto;
-    max-width:158px; line-height:1.4;
+    position:absolute; top:118px; right:8px; z-index:6;
+    color:#94a3b8; font-size:8.5px; pointer-events:none; text-align:right;
+    text-shadow:0 1px 2px rgba(0,0,0,0.8); max-width:130px;
   }
-  .worldboss-banner.active { border-color:#f87171; background:rgba(69,10,10,0.85); }
+  .worldboss-banner.active { color:#f87171; font-weight:700; }
 
   /* ---------- Generic system modal reuse ---------- */
   .sys-section { margin-bottom:16px; }
@@ -531,8 +565,12 @@
 <body>
 <div id="game-container">
   <canvas id="game"></canvas>
-  <div class="rotate-hint">🔄 หมุนจอเป็นแนวนอนเพื่อประสบการณ์ที่ดีที่สุด</div>
   <div class="rate-indicator" id="rate-indicator">EXP x1 · Drop x1</div>
+  <div class="boss-hp-bar" id="boss-hp-bar">
+    <div class="bhb-name" id="bhb-name"></div>
+    <div class="bhb-track"><div class="bhb-fill" id="bhb-fill"></div></div>
+    <div class="bhb-text" id="bhb-text"></div>
+  </div>
   <div class="server-ticker" id="server-ticker"><div class="server-ticker-text" id="server-ticker-text"></div></div>
   <div class="reward-stack" id="reward-stack"></div>
   <div class="portal-confirm" id="portal-confirm">
@@ -626,26 +664,25 @@
         <div class="bar-track"><div class="bar-fill exp-fill" id="exp-bar" style="width:0%"></div></div>
         <div class="bar-label" id="exp-label">EXP 0/100</div>
       </div>
-      <div class="worldboss-banner" id="worldboss-banner"></div>
     </div>
     <div class="top-right-col">
       <div class="menu-btn-row topnav-icons">
-        <div class="icon-btn small" id="open-character">👤</div>
-        <div class="icon-btn small" id="open-skills">🌳</div>
-        <div class="icon-btn small" id="open-quests">📜<span class="ping" id="ping-quests"></span></div>
-        <div class="icon-btn small" id="open-guild">🏯</div>
-        <div class="icon-btn small" id="open-dungeon">🗺️<span class="ping" id="ping-dungeon"></span></div>
-        <div class="icon-btn small" id="open-market">💰</div>
-        <div class="icon-btn small" id="open-pet">🐣</div>
-        <div class="icon-btn small" id="open-pvp">⚔️</div>
-        <div class="icon-btn small" id="open-battlepass">🎫</div>
-        <div class="icon-btn small" id="open-achievements">🏆</div>
-        <div class="icon-btn small" id="open-inventory">🎒</div>
-        <div class="icon-btn small" id="toggle-chat">💬</div>
-        <div class="icon-btn small" id="open-bestiary">📖</div>
-        <div class="icon-btn small" id="toggle-audio">🔊</div>
-        <div class="icon-btn small" id="return-village-btn">🏠</div>
-        <div class="icon-btn small" id="open-save">💾</div>
+        <div class="icon-btn small" id="open-character" data-label="ตัวละคร">👤</div>
+        <div class="icon-btn small" id="open-skills" data-label="สกิล">🌳</div>
+        <div class="icon-btn small" id="open-quests" data-label="เควส">📜<span class="ping" id="ping-quests"></span></div>
+        <div class="icon-btn small" id="open-guild" data-label="กิลด์">🏯</div>
+        <div class="icon-btn small" id="open-dungeon" data-label="ดันเจี้ยน">🗺️<span class="ping" id="ping-dungeon"></span></div>
+        <div class="icon-btn small" id="open-market" data-label="ร้านค้า">💰</div>
+        <div class="icon-btn small" id="open-pet" data-label="สัตว์เลี้ยง">🐣</div>
+        <div class="icon-btn small" id="open-pvp" data-label="ประลอง">⚔️</div>
+        <div class="icon-btn small" id="open-battlepass" data-label="แบทเทิลพาส">🎫</div>
+        <div class="icon-btn small" id="open-achievements" data-label="ความสำเร็จ">🏆</div>
+        <div class="icon-btn small" id="open-inventory" data-label="กระเป๋า">🎒</div>
+        <div class="icon-btn small" id="toggle-chat" data-label="แชท">💬</div>
+        <div class="icon-btn small" id="open-bestiary" data-label="สมุดมอน">📖</div>
+        <div class="icon-btn small" id="toggle-audio" data-label="เสียง">🔊</div>
+        <div class="icon-btn small" id="return-village-btn" data-label="เดินทาง">🏠</div>
+        <div class="icon-btn small" id="open-save" data-label="บันทึก">💾</div>
       </div>
       <div class="panel gold-panel">🪙 <span id="gold">0</span> · 💎 <span id="gems">0</span></div>
       <div class="panel zone-panel" id="zone-name">ป่าเริ่มต้น</div>
@@ -654,25 +691,33 @@
 
 
   <div class="toast" id="toast"></div>
+  <div class="worldboss-banner" id="worldboss-banner"></div>
+  <div class="qt-toggle" id="qt-toggle">📜</div>
+  <div class="quest-tracker" id="quest-tracker">
+    <div class="qt-title" id="qt-title">เควสหลัก</div>
+    <div class="qt-desc" id="qt-desc"></div>
+    <div class="qt-progress-track"><div class="qt-progress-fill" id="qt-progress-fill" style="width:0%"></div></div>
+    <button id="qt-auto-btn">▶ ล่าอัตโนมัติ</button>
+  </div>
 
   <div class="controls-layer">
     <div class="joystick-zone" id="joystick-zone">
       <div class="joystick-base"><div class="joystick-thumb" id="joystick-thumb"></div></div>
     </div>
     <div class="action-cluster">
-      <div class="skill-btn" id="skill-ult" style="right:150px; bottom:112px;">💥
+      <div class="skill-btn" id="skill-ult" style="right:68px; bottom:126px;">💥
         <div class="skill-lv-tag">Lv20</div>
       </div>
-      <div class="skill-btn" id="skill-heal" style="right:96px; bottom:150px;">💚
+      <div class="skill-btn" id="skill-heal" style="right:10px; bottom:126px;">💚
         <div class="skill-lv-tag">Lv15</div>
       </div>
-      <div class="skill-btn" id="skill-spin" style="right:150px; bottom:12px;">🌀
+      <div class="skill-btn" id="skill-spin" style="right:68px; bottom:68px;">🌀
         <div class="skill-lv-tag">Lv10</div>
       </div>
-      <div class="skill-btn" id="skill-ranged" style="right:12px; bottom:112px;">🏹
+      <div class="skill-btn" id="skill-ranged" style="right:10px; bottom:68px;">🏹
         <div class="skill-lv-tag">Lv5</div>
       </div>
-      <div class="skill-btn unlocked" id="jump-btn" style="right:204px; bottom:60px; background:radial-gradient(circle at 35% 30%, #94a3b8, #475569);">🦘
+      <div class="skill-btn unlocked" id="jump-btn" style="right:126px; bottom:12px; background:radial-gradient(circle at 35% 30%, #94a3b8, #475569);">🦘
         <div class="skill-lv-tag">หลบ</div>
       </div>
       <div class="attack-btn" id="attack-btn" style="position:absolute; right:12px; bottom:12px;">🐾</div>
@@ -808,13 +853,13 @@
   let gameStarted = false;
 
   const FOREST_ZONES = [
-    { name:'ป่าเริ่มต้น', color:'rgba(34,197,94,0.07)', xMin:0, xMax:FOREST_W, yMin:0, yMax:FOREST_H*0.4, diff:1 },
-    { name:'ทุ่งกลาง', color:'rgba(56,189,248,0.07)', xMin:0, xMax:FOREST_W, yMin:FOREST_H*0.4, yMax:FOREST_H*0.72, diff:1.6 },
-    { name:'ถ้ำโหด', color:'rgba(239,68,68,0.08)', xMin:0, xMax:FOREST_W, yMin:FOREST_H*0.72, yMax:FOREST_H, diff:2.4 }
+    { name:'ป่าเริ่มต้น', color:'rgba(34,197,94,0.07)', xMin:0, xMax:FOREST_W, yMin:0, yMax:FOREST_H*0.4, diff:1, lvlRange:[1,5] },
+    { name:'ทุ่งกลาง', color:'rgba(56,189,248,0.07)', xMin:0, xMax:FOREST_W, yMin:FOREST_H*0.4, yMax:FOREST_H*0.72, diff:1.6, lvlRange:[6,10] },
+    { name:'ถ้ำโหด', color:'rgba(239,68,68,0.08)', xMin:0, xMax:FOREST_W, yMin:FOREST_H*0.72, yMax:FOREST_H, diff:2.4, lvlRange:[11,15] }
   ];
   let ZONES = FOREST_ZONES;
-  function zoneAt(y){
-    for(const z of ZONES){ if(y >= z.yMin && y < z.yMax) return z; }
+  function zoneAt(x, y){
+    for(const z of ZONES){ if(x>=z.xMin && x<z.xMax && y >= z.yMin && y < z.yMax) return z; }
     return ZONES[ZONES.length-1];
   }
   let currentZoneName = null;
@@ -824,7 +869,7 @@
   const CLASSES = {
     warrior: {
       key:'warrior', name:'นักรบ', icon:'🗡️', color:'#f87171', weaponShape:'sword', weaponColor:'#cbd5e1',
-      catFur:'#f9a8a8', catEar:'#f87171', accessory:'headband',
+      catFur:'#f9a8a8', catEar:'#f87171', accessory:'headband', rangeMult:0.95,
       desc:'ตัวถัง HP/DEF สูงสุด แต่เดินช้า เหมาะมือใหม่',
       statMul:{ atk:1.05, def:1.4, hp:1.4, spd:0.85 }, critBonus:0.02, cdrBonus:0,
       skillNames:{ ranged:{name:'ฟาดพลังคลื่น', icon:'💢'}, spin:{name:'ฟันหมุนสายเลือด', icon:'🌪️'}, heal:{name:'คำรามฮีล', icon:'❤️‍🔥'}, ult:{name:'จอมทัพพิโรธ', icon:'💥'} },
@@ -851,7 +896,7 @@
     },
     archer: {
       key:'archer', name:'นักธนู', icon:'🏹', color:'#4ade80', weaponShape:'bow', weaponColor:'#a16207',
-      catFur:'#86efac', catEar:'#4ade80', accessory:'hood',
+      catFur:'#86efac', catEar:'#4ade80', accessory:'hood', rangeMult:1.75,
       desc:'ดาเมจ+ความแม่นยำสูงสุด วิ่งไว แต่ป้องกันบางเหมือนกระดาษ',
       statMul:{ atk:1.4, def:0.65, hp:0.8, spd:1.3 }, critBonus:0.08, cdrBonus:0,
       skillNames:{ ranged:{name:'สายฟ้าคำราม', icon:'🏹'}, spin:{name:'ห่าธนูรอบทิศ', icon:'🎯'}, heal:{name:'ลมหายใจป่า', icon:'🍃'}, ult:{name:'ธนูสิ้นโลก', icon:'☄️'} },
@@ -878,7 +923,7 @@
     },
     priest: {
       key:'priest', name:'หมอผี', icon:'🔮', color:'#a78bfa', weaponShape:'staff', weaponColor:'#c084fc',
-      catFur:'#c4b5fd', catEar:'#a78bfa', accessory:'collar',
+      catFur:'#c4b5fd', catEar:'#a78bfa', accessory:'collar', rangeMult:1.55,
       desc:'ฮีลแรง คูลดาวน์ไว เอาตัวรอดดี แต่ดาเมจต่ำสุด',
       statMul:{ atk:0.78, def:1.05, hp:1.15, spd:0.95 }, critBonus:0.02, cdrBonus:0.08,
       skillNames:{ ranged:{name:'ลูกไฟวิญญาณ', icon:'🔮'}, spin:{name:'วงเวทป้องปราณ', icon:'🌀'}, heal:{name:'พรสวรรค์', icon:'✨'}, ult:{name:'อวตารเทพเจ้า', icon:'🌟'} },
@@ -905,7 +950,7 @@
     },
     rogue: {
       key:'rogue', name:'โจร', icon:'🗡️', color:'#fbbf24', weaponShape:'daggers', weaponColor:'#fbbf24',
-      catFur:'#4b5563', catEar:'#374151', accessory:'mask',
+      catFur:'#4b5563', catEar:'#374151', accessory:'mask', rangeMult:0.85,
       desc:'คริติคอล+ความเร็วสูงสุดในเกม แต่ HP/DEF ต่ำสุด ตายง่ายมาก',
       statMul:{ atk:1.32, def:0.6, hp:0.7, spd:1.4 }, critBonus:0.12, cdrBonus:0.03,
       skillNames:{ ranged:{name:'มีดสังหาร', icon:'🔪'}, spin:{name:'พายุใบมีด', icon:'🌀'}, heal:{name:'พิษถอนพิษ', icon:'🧪'}, ult:{name:'ราตรีเพชฌฆาต', icon:'🌑'} },
@@ -1048,6 +1093,7 @@
   function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100 + (classData().critBonus||0); }
   function totalGoldBonus(){ return equipStat(equipment.necklace)/100 + player.passives.goldPct/100 + activeBuffMult('gold') + legendaryStat('gold')/100 + (hasSetBonus('wanderingsage')?0.25:0); }
   function totalCDR(){ return Math.min(0.5, player.passives.cdrPct/100 + (classData().cdrBonus||0)); }
+  function getAttackRange(){ return player.attackRange * (classData().rangeMult||1); }
   function computeMaxHp(){ return Math.round((100 + (player.level-1)*15 + Math.round(equipStat(equipment.armor)*4) + legendaryStat('hp')) * classData().statMul.hp * (1+player.passives.hpPct/100)); }
 
   // ---------- Legendary set items ----------
@@ -1535,6 +1581,33 @@
       case 'dungeon': return Object.values(player.stats.dungeonClears).reduce((a,b)=>a+b,0);
       default: return 0;
     }
+  }
+  let questAutoTargetName = null;
+  function currentActiveMainQuest(){
+    return MAIN_QUESTS.find(q=>q.ch === player.stats.questsMain+1) || null;
+  }
+  function updateQuestTracker(){
+    const el = document.getElementById('quest-tracker');
+    if(!gameStarted || !el || el.classList.contains('hidden')) return;
+    const q = currentActiveMainQuest();
+    if(!q){
+      document.getElementById('qt-title').textContent = 'เควสหลัก';
+      document.getElementById('qt-desc').textContent = 'ทำเควสหลักครบทั้งหมดแล้ว!';
+      document.getElementById('qt-progress-fill').style.width = '100%';
+      return;
+    }
+    const val = Math.min(q.value, mainQuestValue(q));
+    document.getElementById('qt-title').textContent = q.title;
+    document.getElementById('qt-desc').textContent = q.desc+' ('+val+'/'+q.value+')';
+    document.getElementById('qt-progress-fill').style.width = (val/q.value*100)+'%';
+  }
+  function toggleQuestAutoHunt(){
+    autoBattle = !autoBattle;
+    document.getElementById('auto-btn').classList.toggle('on', autoBattle);
+    document.getElementById('qt-auto-btn').classList.toggle('on', autoBattle);
+    const st = MAP_NPCS[currentMapId] ? Object.keys(player.npcQuests||{}).map(k=>player.npcQuests[k]).find(s=>s && s.status==='inProgress' && s.qDef.type==='killNamed') : null;
+    questAutoTargetName = (autoBattle && st) ? st.qDef.targetName : null;
+    showToast(autoBattle ? (questAutoTargetName?'🎯 ล่าอัตโนมัติ: '+questAutoTargetName:'🤖 เปิดล่าอัตโนมัติ') : '🤖 ปิดล่าอัตโนมัติ');
   }
   function initDailyQuests(){
     const shuffled = [...DAILY_POOL].sort(()=>Math.random()-0.5).slice(0,5);
@@ -2301,14 +2374,20 @@
     desert: {
       name:'ทะเลทรายเปลวเพลิง', w:4200, h:2600, safe:false, lvlRange:[16,30],
       spawn:{x:2100, y:220},
-      zones:[{ name:'ทะเลทรายเปลวเพลิง', color:'rgba(251,191,36,0.1)', xMin:0, xMax:4200, yMin:0, yMax:2600, diff:2.2 }],
+      zones:[
+        { name:'ทะเลทราย (โซนตะวันตก)', color:'rgba(251,191,36,0.1)', xMin:0, xMax:2100, yMin:0, yMax:2600, diff:1.8, lvlRange:[16,22] },
+        { name:'ทะเลทราย (โซนตะวันออก)', color:'rgba(217,119,6,0.14)', xMin:2100, xMax:4200, yMin:0, yMax:2600, diff:2.6, lvlRange:[23,30] }
+      ],
       monsterPool: DESERT_MONSTER_TYPES,
-      sceneryIcons:['🌵','🦴','🪨','☀️'], returnPortal:{x:2100, y:150}
+      sceneryIcons:['🌵','🦴','🪨','🏺','💎','⛺'], returnPortal:{x:2100, y:150}
     },
     snow: {
       name:'ดินแดนน้ำแข็งนิรันดร์', w:4200, h:2600, safe:false, lvlRange:[31,55],
       spawn:{x:2100, y:220},
-      zones:[{ name:'ดินแดนน้ำแข็งนิรันดร์', color:'rgba(147,197,253,0.13)', xMin:0, xMax:4200, yMin:0, yMax:2600, diff:3.2 }],
+      zones:[
+        { name:'หิมะ (โซนตะวันตก)', color:'rgba(147,197,253,0.13)', xMin:0, xMax:2100, yMin:0, yMax:2600, diff:2.8, lvlRange:[31,42] },
+        { name:'หิมะ (โซนตะวันออก)', color:'rgba(96,165,250,0.18)', xMin:2100, xMax:4200, yMin:0, yMax:2600, diff:3.8, lvlRange:[43,55] }
+      ],
       monsterPool: SNOW_MONSTER_TYPES,
       sceneryIcons:['❄️','🌲','🧊','⛄'], returnPortal:{x:2100, y:150}
     },
@@ -2405,9 +2484,94 @@
       ctx.shadowColor='#22d3ee'; ctx.shadowBlur=10;
       ctx.fillText(n.icon, sx, sy);
       ctx.shadowBlur=0;
-      ctx.font='9px sans-serif'; ctx.fillStyle='#e2e8f0';
+      ctx.font='9px sans-serif'; ctx.textAlign='center';
+      ctx.lineWidth=2; ctx.strokeStyle='rgba(0,0,0,0.85)';
+      ctx.strokeText(n.name, sx, sy+22);
+      ctx.fillStyle='#f1f5f9';
       ctx.fillText(n.name, sx, sy+22);
+      const key = currentMapId+'_'+n.name;
+      const st = player.npcQuests && player.npcQuests[key];
+      const prog = st ? npcQuestProgress(st) : 0;
+      const markColor = st && st.status==='inProgress' && prog>=st.qDef.count ? '#4ade80' : (st && st.status==='inProgress' ? '#fbbf24' : '#fde047');
+      ctx.font='bold 15px sans-serif'; ctx.fillStyle = markColor;
+      ctx.shadowColor = markColor; ctx.shadowBlur=6;
+      ctx.fillText('!', sx, sy-24);
       ctx.restore();
+    });
+  }
+
+  // ---------- NPC quests ----------
+  function generateNpcQuest(mapId){
+    const pool = (MAPS[mapId].monsterPool && MAPS[mapId].monsterPool.length) ? MAPS[mapId].monsterPool : MONSTER_TYPES;
+    const useNamed = Math.random()<0.6;
+    if(useNamed){
+      const t = pool[Math.floor(Math.random()*pool.length)];
+      const count = 5+Math.floor(Math.random()*8);
+      return { type:'killNamed', targetName:t.name, count, reward:{gold:40+count*8, exp:60+count*12} };
+    }
+    const count = 10+Math.floor(Math.random()*15);
+    return { type:'killAny', count, reward:{gold:30+count*6, exp:50+count*10} };
+  }
+  function ensureNpcQuestState(key){
+    if(!player.npcQuests) player.npcQuests = {};
+    if(!player.npcQuests[key]){
+      player.npcQuests[key] = { qDef: generateNpcQuest(currentMapId), status:'available', startCount:0 };
+    }
+    return player.npcQuests[key];
+  }
+  function npcQuestProgress(state){
+    if(state.status==='available') return 0;
+    const cur = state.qDef.type==='killNamed' ? (player.bestiary[state.qDef.targetName]||0) : player.kills;
+    return Math.min(state.qDef.count, Math.max(0, cur - state.startCount));
+  }
+  let npcDialogShownFor = null;
+  function checkNpcProximity(){
+    const list = MAP_NPCS[currentMapId] || [];
+    let near = null;
+    for(const n of list){ if(Math.hypot(player.x-n.x, player.y-n.y) < 50){ near = n; break; } }
+    if(near){
+      const key = currentMapId+'_'+near.name;
+      if(npcDialogShownFor !== key){
+        npcDialogShownFor = key;
+        openModal(near.icon+' '+near.name, ()=>renderNpcDialog(near, key));
+      }
+    } else {
+      npcDialogShownFor = null;
+    }
+  }
+  function renderNpcDialog(npc, key){
+    const state = ensureNpcQuestState(key);
+    const prog = npcQuestProgress(state);
+    const goalText = state.qDef.type==='killNamed' ? 'ปราบ '+state.qDef.targetName+' x'+state.qDef.count : 'ปราบมอนสเตอร์ '+state.qDef.count+' ตัว';
+    let html = `<div class="card card-row"><div class="card-icon" style="font-size:30px;">${npc.icon}</div><div><div class="card-title">${npc.name}</div><div class="card-desc">มีภารกิจให้ช่วยเหลือ</div></div></div>`;
+    html += `<div class="card"><div class="card-title">${goalText}</div><div class="card-desc">รางวัล: 🪙${state.qDef.reward.gold} + ✨${state.qDef.reward.exp} EXP</div>`;
+    if(state.status==='available'){
+      html += `<button class="btn-sm gold" id="npc-accept-btn" style="margin-top:8px;">รับเควส</button>`;
+    } else {
+      html += `<div class="progress-track"><div class="progress-fill" style="width:${prog/state.qDef.count*100}%"></div></div><div class="card-desc">${prog}/${state.qDef.count}</div>`;
+      if(prog>=state.qDef.count){
+        html += `<button class="btn-sm gold" id="npc-turnin-btn" style="margin-top:8px;">ส่งเควส รับรางวัล</button>`;
+      } else {
+        html += `<div class="badge-pill">ยังไม่เสร็จ กลับมาใหม่ทีหลัง</div>`;
+      }
+    }
+    html += `</div>`;
+    sysModalBody.innerHTML = html;
+    const acceptBtn = document.getElementById('npc-accept-btn');
+    if(acceptBtn) acceptBtn.addEventListener('click', ()=>{
+      state.status = 'inProgress';
+      state.startCount = state.qDef.type==='killNamed' ? (player.bestiary[state.qDef.targetName]||0) : player.kills;
+      showToast('รับเควสจาก '+npc.name+' แล้ว!');
+      renderNpcDialog(npc, key);
+    });
+    const turninBtn = document.getElementById('npc-turnin-btn');
+    if(turninBtn) turninBtn.addEventListener('click', ()=>{
+      player.gold += state.qDef.reward.gold;
+      gainExp(state.qDef.reward.exp);
+      delete player.npcQuests[key];
+      updateHud();
+      showToast('✅ ส่งเควสสำเร็จ! ได้รางวัลแล้ว');
+      closeModal();
     });
   }
 
@@ -2435,7 +2599,7 @@
       } while((Math.hypot(x-player.x,y-player.y) < 220 || (spawnPt && Math.hypot(x-spawnPt.x,y-spawnPt.y) < 260)) && tries < 12);
     }
 
-    const zone = zoneAt(y);
+    const zone = zoneAt(x, y);
     const pool = opts.type ? null : (mapDef.monsterPool.length ? mapDef.monsterPool : MONSTER_TYPES);
     const type = opts.type || pool[Math.floor(Math.random()*pool.length)];
     const isBoss = opts.isBoss !== undefined ? opts.isBoss : Math.random() < 0.04;
@@ -2445,7 +2609,7 @@
     if(opts.isDungeon || opts.isTower){
       lvl = Math.max(1, Math.round(player.level*0.7 + zone.diff*3 + (isBoss?5:0)));
     } else {
-      const range = mapDef.lvlRange || [1,15];
+      const range = zone.lvlRange || mapDef.lvlRange || [1,15];
       lvl = range[0] + Math.floor(Math.random()*(range[1]-range[0]+1));
       if(isBoss) lvl = Math.min(range[1]+5, lvl+5);
     }
@@ -2459,7 +2623,8 @@
       id: monsterIdCounter++, type, x, y,
       hp: Math.round(type.hp*scale), maxHp: Math.round(type.hp*scale),
       r: isWorldBoss ? type.r*2.4 : (isBoss? type.r*1.6 : type.r), hitFlash:0, wobble: Math.random()*1000,
-      isBoss: isBoss||isWorldBoss, isWorldBoss, lvl, isDungeon: !!opts.isDungeon, isTower: !!opts.isTower, isFieldBoss: !!opts.isFieldBoss
+      isBoss: isBoss||isWorldBoss, isWorldBoss, lvl, isDungeon: !!opts.isDungeon, isTower: !!opts.isTower, isFieldBoss: !!opts.isFieldBoss,
+      zoneBounds: (opts.isDungeon||opts.isTower||opts.force) ? null : { xMin:zone.xMin, xMax:zone.xMax, yMin:zone.yMin, yMax:zone.yMax }
     };
     monsters.push(m);
     return m;
@@ -2527,7 +2692,7 @@
       spawnParticle({
         type:'slashArc', x:player.x, y:player.y,
         life: big?260:190,
-        size: player.attackRange*(0.55+i*0.08),
+        size: getAttackRange()*(0.55+i*0.08),
         rotation: baseAngle + (i-(count-1)/2)*0.32,
         color: big ? '#fde68a' : skinColor,
         lineWidth: big ? 4.5 : 2.5
@@ -2782,22 +2947,32 @@
 
   // ---------- Combat ----------
   const WEAPON_RARITY_TIERS = [
-    {min:1, max:5, name:'ขาว', color:'#e5e7eb', star:1, goldValue:8},
-    {min:6, max:10, name:'เขียว', color:'#4ade80', star:2, goldValue:20},
-    {min:11, max:20, name:'ฟ้า', color:'#60a5fa', star:3, goldValue:45},
-    {min:21, max:40, name:'ม่วง', color:'#c084fc', star:4, goldValue:90},
-    {min:41, max:55, name:'ทอง', color:'#fbbf24', star:5, goldValue:180},
-    {min:56, max:999, name:'แดง', color:'#f87171', star:6, goldValue:350}
+    {key:'white', min:1, max:5, name:'ขาว', color:'#e5e7eb', star:1, goldValue:8},
+    {key:'green', min:6, max:10, name:'เขียว', color:'#4ade80', star:2, goldValue:20},
+    {key:'blue', min:11, max:20, name:'ฟ้า', color:'#60a5fa', star:3, goldValue:45},
+    {key:'purple', min:21, max:40, name:'ม่วง', color:'#c084fc', star:4, goldValue:90},
+    {key:'gold', min:41, max:55, name:'ทอง', color:'#fbbf24', star:5, goldValue:180},
+    {key:'red', min:56, max:999, name:'แดง', color:'#f87171', star:6, goldValue:350}
   ];
   function weaponRarityForLevel(lvl){
     return WEAPON_RARITY_TIERS.find(t=>lvl>=t.min && lvl<=t.max) || WEAPON_RARITY_TIERS[0];
   }
+  function foundGear(){ return player.foundGear || (player.foundGear = {white:0,green:0,blue:0,purple:0,gold:0,red:0}); }
   function rollWeaponFind(m){
     if(Math.random() > 0.09*dropRateMult) return null;
     const tier = weaponRarityForLevel(m.isWorldBoss ? 60 : m.lvl);
-    const goldGain = Math.round(tier.goldValue * (1+totalGoldBonus()) * goldRateMult * (m.isBoss?2:1));
-    player.gold += goldGain;
-    return {tier, goldGain};
+    foundGear()[tier.key] = (foundGear()[tier.key]||0) + 1;
+    return {tier};
+  }
+  function sellFoundGear(tierKey){
+    const tier = WEAPON_RARITY_TIERS.find(t=>t.key===tierKey);
+    const qty = foundGear()[tierKey]||0;
+    if(qty<=0) return 0;
+    const total = Math.round(qty*tier.goldValue*(1+totalGoldBonus())*goldRateMult);
+    player.gold += total;
+    foundGear()[tierKey] = 0;
+    updateHud();
+    return total;
   }
   function rollMaterialDrop(m){
     let dropChance = (m.isBoss ? 0.95 : 0.35) * dropRateMult;
@@ -2844,27 +3019,20 @@
       const legDrop = rollLegendaryDrop(m);
       const wepFind = rollWeaponFind(m);
 
-      if(m.isBoss || m.isWorldBoss || m.isFieldBoss || legDrop || (wepFind && wepFind.tier.star>=4)){
-        const rows = [ {icon:'✨', text:'+'+expGain+' EXP'}, {icon:'🪙', text:'+'+goldGain+' ทอง'} ];
-        if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); rows.push({icon:matDef.icon, text:'+'+drop.qty+' '+matDef.name}); }
-        if(wepFind) rows.push({icon:'🗡️', text:'อาวุธเกรด'+wepFind.tier.name+' (+'+wepFind.goldGain+'🪙)'});
-        if(legDrop) rows.push({icon:'🌟', text:legDrop.name});
-        showRewardCard({
-          icon: legDrop?'🌟':'👑',
-          title: legDrop ? 'ไอเทมตำนาน!' : m.type.name+' พ่ายแพ้!',
-          stars: legDrop?3:(m.isWorldBoss?5:(m.isFieldBoss?4:3)),
-          legendary: !!legDrop,
-          rows
-        });
-        if(legDrop){
-          showToast('🌟 ได้ไอเทมตำนาน: '+legDrop.name+'! ไปใส่ที่กระเป๋า 🎒');
-          announceServer('🌟 '+(player.name||'นักผจญภัย')+' ได้รับไอเทมตำนาน '+legDrop.name+'!');
-        }
-      } else {
-        spawnFloatText(m.x, m.y-42, '+'+expGain+' EXP', '#38bdf8');
-        spawnFloatText(m.x, m.y-60, '+'+goldGain+' 🪙', '#fbbf24');
-        if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); spawnFloatText(m.x, m.y-78, '+'+drop.qty+' '+matDef.icon, '#a78bfa'); }
-        if(wepFind) spawnFloatText(m.x, m.y-96, 'อาวุธ'+wepFind.tier.name+' +'+wepFind.goldGain+'🪙', wepFind.tier.color, wepFind.tier.star>=3);
+      const rows = [ {icon:'✨', text:'+'+expGain+' EXP'}, {icon:'🪙', text:'+'+goldGain+' ทอง'} ];
+      if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); rows.push({icon:matDef.icon, text:'+'+drop.qty+' '+matDef.name}); }
+      if(wepFind) rows.push({icon:'🗡️', text:'พบอุปกรณ์เกรด'+wepFind.tier.name+' (ในกระเป๋า)'});
+      if(legDrop) rows.push({icon:'🌟', text:legDrop.name});
+      showRewardCard({
+        icon: legDrop?'🌟':(m.isBoss?'👑':'💀'),
+        title: legDrop ? 'ไอเทมตำนาน!' : m.type.name+' พ่ายแพ้!',
+        stars: legDrop?3:(m.isWorldBoss?5:(m.isFieldBoss?4:(m.isBoss?3:(wepFind?wepFind.tier.star:0)))),
+        legendary: !!legDrop,
+        rows
+      });
+      if(legDrop){
+        showToast('🌟 ได้ไอเทมตำนาน: '+legDrop.name+'! ไปใส่ที่กระเป๋า 🎒');
+        announceServer('🌟 '+(player.name||'นักผจญภัย')+' ได้รับไอเทมตำนาน '+legDrop.name+'!');
       }
       spawnDeathPoof(m);
       sfxDeath(m.r/18);
@@ -2915,7 +3083,7 @@
     let hitAny = false;
     for(const m of [...monsters]){
       const dist = Math.hypot(m.x-player.x, m.y-player.y);
-      if(dist <= player.attackRange + m.r){
+      if(dist <= getAttackRange() + m.r){
         hitAny = true;
         const {dmg,crit} = rollDamage(1);
         damageMonster(m, dmg, crit);
@@ -2966,7 +3134,7 @@
     let totalDmgDealt = 0;
     for(const m of [...monsters]){
       const dist = Math.hypot(m.x-player.x, m.y-player.y);
-      if(dist <= player.attackRange*1.6 + m.r){
+      if(dist <= getAttackRange()*1.6 + m.r){
         hitAny = true;
         const {dmg,crit} = rollDamage(1.4);
         totalDmgDealt += dmg;
@@ -2978,11 +3146,11 @@
       player.hp = Math.min(player.maxHp, player.hp+lifesteal);
       spawnFloatText(player.x, player.y-30, '+'+lifesteal+' HP', '#4ade80', true);
     }
-    spawnParticle({ type:'ring', x:player.x, y:player.y, life:350, startRadius:10, endRadius:player.attackRange*1.6, color:(CLASS_SKILL_VISUAL[player.classKey]||CLASS_SKILL_VISUAL.warrior).color, lineWidth:3.5 });
+    spawnParticle({ type:'ring', x:player.x, y:player.y, life:350, startRadius:10, endRadius:getAttackRange()*1.6, color:(CLASS_SKILL_VISUAL[player.classKey]||CLASS_SKILL_VISUAL.warrior).color, lineWidth:3.5 });
     for(let i=0;i<6;i++){
       spawnParticle({
         type:'slashArc', x:player.x, y:player.y, life:320,
-        size: player.attackRange*1.1, rotation:(i/6)*Math.PI*2,
+        size: getAttackRange()*1.1, rotation:(i/6)*Math.PI*2,
         color:(CLASS_SKILL_VISUAL[player.classKey]||CLASS_SKILL_VISUAL.warrior).trail, lineWidth:3
       });
     }
@@ -3026,14 +3194,14 @@
     const dmgMult = s.awakened ? 3.2*1.3 : 3.2;
     for(const m of [...monsters]){
       const dist = Math.hypot(m.x-player.x, m.y-player.y);
-      if(dist <= player.attackRange*2.4 + m.r){
+      if(dist <= getAttackRange()*2.4 + m.r){
         hitAny = true;
         const dmg = Math.round(totalATK()*dmgMult*(0.9+Math.random()*0.3));
         damageMonster(m, dmg, true);
       }
     }
-    spawnParticle({ type:'ring', x:player.x, y:player.y, life:550, startRadius:14, endRadius:player.attackRange*2.4, color:'#fbbf24', lineWidth:5 });
-    spawnParticle({ type:'ring', x:player.x, y:player.y, life:750, startRadius:8, endRadius:player.attackRange*2.8, color:'#f87171', lineWidth:2.5 });
+    spawnParticle({ type:'ring', x:player.x, y:player.y, life:550, startRadius:14, endRadius:getAttackRange()*2.4, color:'#fbbf24', lineWidth:5 });
+    spawnParticle({ type:'ring', x:player.x, y:player.y, life:750, startRadius:8, endRadius:getAttackRange()*2.8, color:'#f87171', lineWidth:2.5 });
     for(let i=0;i<26;i++){
       const ang = (i/26)*Math.PI*2;
       const spd = 3+Math.random()*2.4;
@@ -3093,6 +3261,10 @@
         const spd = m.type.speed;
         m.x += (dx/dist)*spd*(dt/16);
         m.y += (dy/dist)*spd*(dt/16);
+      }
+      if(m.zoneBounds){
+        m.x = Math.max(m.zoneBounds.xMin+22, Math.min(m.zoneBounds.xMax-22, m.x));
+        m.y = Math.max(m.zoneBounds.yMin+22, Math.min(m.zoneBounds.yMax-22, m.y));
       }
       if(m.hitFlash > 0) m.hitFlash -= dt;
       if(dist < m.r+player.r+4 && playerDamageCooldown <= 0 && player.invulTimer<=0){
@@ -3170,18 +3342,20 @@
   function autoConf(){ return autoPresets[activeAutoPreset]; }
   function updatePlayer(dt){
     if(joyActive && (Math.abs(joyDX)>0.08 || Math.abs(joyDY)>0.08)){
-      const spd = player.speedBase*2.2*classData().statMul.spd*mountSpeedMult();
+      const spd = player.speedBase*1.15*classData().statMul.spd*mountSpeedMult();
       player.x += joyDX*spd*(dt/16);
       player.y += joyDY*spd*(dt/16);
       if(joyDX !== 0) player.facing = joyDX>0?1:-1;
     } else if(autoBattle && !dungeonState.active){
       let target = null, best = Infinity;
-      for(const m of monsters){
+      const preferred = questAutoTargetName ? monsters.filter(m=>m.type.name===questAutoTargetName) : null;
+      const searchPool = (preferred && preferred.length) ? preferred : monsters;
+      for(const m of searchPool){
         const d = Math.hypot(m.x-player.x, m.y-player.y);
         if(d < best){ best = d; target = m; }
       }
-      if(target && best > player.attackRange*0.7){
-        const spd = player.speedBase*2.2*classData().statMul.spd*mountSpeedMult();
+      if(target && best > getAttackRange()*0.7){
+        const spd = player.speedBase*1.15*classData().statMul.spd*mountSpeedMult();
         const dx = (target.x-player.x)/best, dy=(target.y-player.y)/best;
         player.x += dx*spd*(dt/16);
         player.y += dy*spd*(dt/16);
@@ -3206,7 +3380,7 @@
     camera.x = Math.max(0, Math.min(WORLD_W-W, player.x - W/2));
     camera.y = Math.max(0, Math.min(WORLD_H-H, player.y - H/2));
 
-    const z = zoneAt(player.y);
+    const z = zoneAt(player.x, player.y);
     if(z.name !== currentZoneName){
       currentZoneName = z.name;
       zoneNameEl.textContent = z.name;
@@ -3325,7 +3499,7 @@
         const sx = px-camera.x, sy = py-camera.y;
         if(sx<-40||sx>W+40||sy<-40||sy>H+40) continue;
         const mapDef = MAPS[currentMapId];
-        const set = mapDef.sceneryIcons || SCENERY[zoneAt(py).name] || SCENERY['ป่าเริ่มต้น'];
+        const set = mapDef.sceneryIcons || SCENERY[zoneAt(px, py).name] || SCENERY['ป่าเริ่มต้น'];
         const icon = set[Math.floor(frac*97)%set.length];
         const sizeSeed = Math.sin(wx*3.1+wy*7.7)*5432.19;
         const sizeFrac = sizeSeed-Math.floor(sizeSeed);
@@ -3339,11 +3513,34 @@
       }
     }
     if(currentMapId==='village') drawVillageStructures();
+    if(currentMapId==='desert') drawDesertRuins();
   }
   const VILLAGE_HOUSES = [
     {x:180, y:520, size:1.1}, {x:340, y:600, size:0.9}, {x:620, y:600, size:1.0},
     {x:790, y:520, size:0.9}, {x:500, y:820, size:1.3}
   ];
+  const DESERT_RUINS = [
+    {x:1750, y:500, size:1.2}, {x:2450, y:480, size:1.0}, {x:1900, y:1000, size:1.4},
+    {x:2600, y:1050, size:0.9}, {x:2100, y:900, size:1.1}
+  ];
+  function drawDesertRuins(){
+    DESERT_RUINS.forEach(r=>{
+      const sx = r.x-camera.x, sy = r.y-camera.y;
+      if(sx<-70||sx>W+70||sy<-70||sy>H+70) return;
+      const s = 30*r.size;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(0,s*0.7,s*0.85,s*0.2,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#b8925a';
+      ctx.fillRect(-s*0.5, -s*0.5, s*0.32, s*1.1);
+      ctx.fillRect(s*0.18, -s*0.7, s*0.32, s*1.3);
+      ctx.fillStyle = '#9c7a48';
+      ctx.fillRect(-s*0.5, -s*0.5, s*0.32, s*0.18);
+      ctx.fillRect(s*0.18, -s*0.7, s*0.32, s*0.18);
+      ctx.restore();
+    });
+  }
+
   function drawVillageStructures(){
     VILLAGE_HOUSES.forEach(h=>{
       const sx = h.x-camera.x, sy = h.y-camera.y;
@@ -3533,11 +3730,14 @@
     }
     ctx.restore();
 
-    const barW = m.r*2, bx = sx-barW/2, by = sy-m.r-16;
-    ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(bx,by,barW,5);
-    ctx.fillStyle = m.isBoss? '#fbbf24' : '#ef4444'; ctx.fillRect(bx,by,barW*Math.max(0,m.hp/m.maxHp),5);
-    ctx.fillStyle= m.isBoss? '#fbbf24' : '#e2e8f0'; ctx.font=(m.isBoss?'bold 11px':'10px')+' sans-serif'; ctx.textAlign='center';
-    ctx.fillText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-4);
+    const barW = m.r*1.5, bx = sx-barW/2, by = sy-m.r-13;
+    ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(bx,by,barW,3);
+    ctx.fillStyle = m.isBoss? '#fbbf24' : '#ef4444'; ctx.fillRect(bx,by,barW*Math.max(0,m.hp/m.maxHp),3);
+    ctx.font=(m.isBoss?'bold 9px':'8px')+' sans-serif'; ctx.textAlign='center';
+    ctx.lineWidth=2; ctx.strokeStyle='rgba(0,0,0,0.85)';
+    ctx.strokeText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-3);
+    ctx.fillStyle= m.isBoss? '#fbbf24' : '#f1f5f9';
+    ctx.fillText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-3);
   }
 
   function drawPlayer(){
@@ -3546,7 +3746,7 @@
     const hopOffset = jumpT>0 ? -Math.sin(jumpT*Math.PI)*16 : 0;
     ctx.save(); ctx.translate(sx,sy+hopOffset);
     if(player.attackCooldown>0){
-      ctx.beginPath(); ctx.arc(0,0,player.attackRange,0,Math.PI*2);
+      ctx.beginPath(); ctx.arc(0,0,getAttackRange(),0,Math.PI*2);
       ctx.strokeStyle='rgba(248,113,113,0.35)'; ctx.lineWidth=2; ctx.stroke();
     }
     // shadow
@@ -3628,6 +3828,14 @@
     drawClassWeapon();
     ctx.restore();
     ctx.restore();
+
+    const pBarW = player.r*1.8, pbx = sx-pBarW/2, pby = sy-player.r-16+hopOffset;
+    ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(pbx,pby,pBarW,3.5);
+    ctx.fillStyle='#4ade80'; ctx.fillRect(pbx,pby,pBarW*Math.max(0,player.hp/player.maxHp),3.5);
+    if(player.shield>0){
+      ctx.strokeStyle='#93c5fd'; ctx.lineWidth=1;
+      ctx.strokeRect(pbx,pby,pBarW*Math.min(1,player.shield/player.maxHp),3.5);
+    }
   }
 
   function drawClassAccessory(){
@@ -3792,6 +4000,15 @@
   }
 
   let lastTs = 0;
+  function updateBossHpBar(){
+    const boss = monsters.find(m=>m.isBoss);
+    const el = document.getElementById('boss-hp-bar');
+    if(!boss){ el.classList.remove('show'); return; }
+    el.classList.add('show');
+    document.getElementById('bhb-name').textContent = (boss.isWorldBoss?'🌍 ':boss.isFieldBoss?'👑 ':'👑 ')+boss.type.name+' Lv.'+boss.lvl;
+    document.getElementById('bhb-fill').style.width = Math.max(0,(boss.hp/boss.maxHp*100))+'%';
+    document.getElementById('bhb-text').textContent = Math.max(0,Math.round(boss.hp))+' / '+boss.maxHp;
+  }
   let worldBossUiTimer = 0;
   function loop(ts){
     if(!lastTs) lastTs = ts;
@@ -3807,6 +4024,7 @@
 
       updatePlayer(dt);
       tryEnterPortal();
+      checkNpcProximity();
       updateMonsters(dt);
       updateProjectiles(dt);
       updateParticles(dt);
@@ -3816,6 +4034,8 @@
       spawnAmbient(dt);
       updatePetFollow(dt);
       updatePetMastery(dt);
+      updateBossHpBar();
+      updateQuestTracker();
       updateGuildChat(dt);
       updateWorldChat(dt);
       updateRaid(dt);
@@ -3948,6 +4168,14 @@
       html += `</div>`;
     }
 
+    html += `<div class="inv-grid-title">🗡️ อุปกรณ์ที่พบ (ขายได้)</div><div class="inv-grid">`;
+    WEAPON_RARITY_TIERS.forEach(t=>{
+      const qty = foundGear()[t.key]||0;
+      const sel = (selectedInvSlot.type==='foundgear' && selectedInvSlot.key===t.key)?'selected':'';
+      html += `<div class="inv-slot ${qty===0?'empty-slot':''} ${sel}" data-sel-foundgear="${t.key}" style="background:${t.color}33; border-color:${t.color};">🗡️<div class="qty-badge">${qty}</div></div>`;
+    });
+    html += `</div>`;
+
     html += `<div class="inv-grid-title">วัสดุ</div><div class="inv-grid">`;
     MATERIALS.forEach(m=>{
       const qty = player.materials[m.key]||0;
@@ -3972,6 +4200,9 @@
     });
     equipList.querySelectorAll('[data-sel-legendary]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'legendary',key:el.dataset.selLegendary}; renderEquipList(); });
+    });
+    equipList.querySelectorAll('[data-sel-foundgear]').forEach(el=>{
+      el.addEventListener('click', ()=>{ selectedInvSlot={type:'foundgear',key:el.dataset.selFoundgear}; renderEquipList(); });
     });
     equipList.querySelectorAll('[data-sel-material]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'material',key:el.dataset.selMaterial}; renderEquipList(); });
@@ -4029,6 +4260,19 @@
         equipLegendary(item.slot, equipped? null : sel.key);
         renderEquipList();
         showToast(equipped? 'ถอดไอเทมตำนานแล้ว':'สวมใส่ไอเทมตำนานแล้ว');
+      });
+    } else if(sel.type==='foundgear'){
+      const tier = WEAPON_RARITY_TIERS.find(t=>t.key===sel.key);
+      const qty = foundGear()[sel.key]||0;
+      html += `<span class="rarity-tag" style="background:${tier.color}33;color:${tier.color};">${'★'.repeat(tier.star)} เกรด${tier.name}</span>`;
+      html += `<div class="inv-detail-title">อุปกรณ์เกรด${tier.name} x${qty}</div>`;
+      html += `<div class="inv-detail-desc">ของสะสมที่พบจากมอนสเตอร์เลเวล ${tier.min}-${tier.max===999?'60+':tier.max} ขายได้ชิ้นละ 🪙${tier.goldValue}</div>`;
+      html += `<button class="btn-sm gold" id="sell-foundgear-btn" style="margin-top:10px;" ${qty<=0?'disabled':''}>ขายทั้งหมด</button>`;
+      detail.innerHTML = html;
+      const sellBtn = document.getElementById('sell-foundgear-btn');
+      if(sellBtn) sellBtn.addEventListener('click', ()=>{
+        const total = sellFoundGear(sel.key);
+        if(total>0){ showToast('ขายอุปกรณ์เกรด'+tier.name+' ได้ 🪙'+total); renderEquipList(); }
       });
     } else if(sel.type==='material'){
       const m = MATERIALS.find(x=>x.key===sel.key);
@@ -4798,6 +5042,11 @@
   }
   document.getElementById('return-village-btn').addEventListener('click', ()=> openModal('🗺️ เดินทาง', renderTravelModal));
   document.getElementById('open-save').addEventListener('click', ()=> openModal('บันทึก / ชื่อตัวละคร', renderSaveModal));
+  document.getElementById('qt-toggle').addEventListener('click', ()=>{
+    document.getElementById('quest-tracker').classList.toggle('hidden');
+    updateQuestTracker();
+  });
+  document.getElementById('qt-auto-btn').addEventListener('click', toggleQuestAutoHunt);
 
   // ---------- GM floating panel (draggable) ----------
   (function(){
