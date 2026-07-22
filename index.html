@@ -230,6 +230,9 @@
   body.layout-edit-active #open-inventory {
     outline:2px dashed #fbbf24; outline-offset:3px; box-shadow:0 0 12px rgba(251,191,36,0.6);
   }
+  body.layout-edit-active .skill-btn {
+    pointer-events:auto !important; opacity:0.85 !important;
+  }
 
   /* ---------- #7: draggable/closable floating windows ---------- */
   .chat-drag-handle {
@@ -419,9 +422,10 @@
   .skill-btn.unlocked { opacity:1; pointer-events:auto; }
   .skill-btn .cd-overlay {
     position:absolute; inset:0; border-radius:50%;
-    background:rgba(0,0,0,0.55);
+    background:rgba(0,0,0,0.4); pointer-events:none;
     display:flex; align-items:center; justify-content:center;
-    font-size:12px; font-weight:700; color:#fff;
+    font-size:15px; font-weight:900; color:#fde047;
+    text-shadow:0 1px 3px rgba(0,0,0,0.9);
   }
   .skill-lv-tag {
     position:absolute; bottom:-14px; left:50%; transform:translateX(-50%);
@@ -3774,11 +3778,13 @@
       } else if(overlay){ overlay.remove(); }
     }
     const jbtn = document.getElementById('jump-btn');
-    let joverlay = jbtn.querySelector('.cd-overlay');
-    if(jumpCd > 0){
-      if(!joverlay){ joverlay = document.createElement('div'); joverlay.className='cd-overlay'; jbtn.appendChild(joverlay); }
-      joverlay.textContent = Math.ceil(jumpCd/1000);
-    } else if(joverlay){ joverlay.remove(); }
+    if(jbtn){
+      let joverlay = jbtn.querySelector('.cd-overlay');
+      if(jumpCd > 0){
+        if(!joverlay){ joverlay = document.createElement('div'); joverlay.className='cd-overlay'; jbtn.appendChild(joverlay); }
+        joverlay.textContent = Math.ceil(jumpCd/1000);
+      } else if(joverlay){ joverlay.remove(); }
+    }
   }
 
   // ---------- Monster AI / collision ----------
@@ -5023,6 +5029,19 @@
     });
     html += `</div>`;
 
+    html += `<div class="inv-grid-title">หินตีบวก</div><div class="inv-grid">`;
+    Object.keys(STONE_CATEGORIES).forEach(cat=>{
+      STONE_TIERS.forEach(t=>{
+        const qty = enhanceStones()[cat][t.key]||0;
+        const key = cat+'_'+t.key;
+        const sel = (selectedInvSlot.type==='stone' && selectedInvSlot.key===key)?'selected':'';
+        html += `<div class="inv-slot ${qty===0?'empty-slot':''} ${sel}" data-sel-stone="${key}">${t.icon}<div class="qty-badge">${qty}</div></div>`;
+      });
+    });
+    const amuletQty = player.amulets||0;
+    html += `<div class="inv-slot ${amuletQty===0?'empty-slot':''} ${(selectedInvSlot.type==='amulet')?'selected':''}" data-sel-amulet="1">🧿<div class="qty-badge">${amuletQty}</div></div>`;
+    html += `</div>`;
+
     html += `<div class="inv-grid-title">ไอเทมใช้ได้</div><div class="inv-grid">`;
     Object.keys(CONSUMABLE_ITEMS).forEach(k=>{
       const qty = player.items[k]||0;
@@ -5060,6 +5079,12 @@
     });
     equipList.querySelectorAll('[data-sel-material]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'material',key:el.dataset.selMaterial}; renderEquipList(); });
+    });
+    equipList.querySelectorAll('[data-sel-stone]').forEach(el=>{
+      el.addEventListener('click', ()=>{ selectedInvSlot={type:'stone',key:el.dataset.selStone}; renderEquipList(); });
+    });
+    equipList.querySelectorAll('[data-sel-amulet]').forEach(el=>{
+      el.addEventListener('click', ()=>{ selectedInvSlot={type:'amulet',key:'amulet'}; renderEquipList(); });
     });
     equipList.querySelectorAll('[data-sel-item]').forEach(el=>{
       el.addEventListener('click', ()=>{ selectedInvSlot={type:'item',key:el.dataset.selItem}; renderEquipList(); });
@@ -5119,6 +5144,18 @@
       const m = MATERIALS.find(x=>x.key===sel.key);
       html += `<div class="inv-detail-title">${m.icon} ${m.name} x${player.materials[m.key]||0}</div>`;
       html += `<div class="inv-detail-desc">${m.desc}</div>`;
+      detail.innerHTML = html;
+    } else if(sel.type==='stone'){
+      const [cat, tierKey] = sel.key.split('_');
+      const t = STONE_TIERS.find(x=>x.key===tierKey);
+      const qty = enhanceStones()[cat][tierKey]||0;
+      html += `<div class="inv-detail-title">${t.icon} ${t.name} (${STONE_CATEGORIES[cat].name}) x${qty}</div>`;
+      html += `<div class="inv-detail-desc">ใช้ตอนตีบวกอุปกรณ์หมวด${STONE_CATEGORIES[cat].name} — เปิดของในกระเป๋าอุปกรณ์ด้านบนแล้วกด "เสริม" เพื่อใช้ ยิ่งของเสริมสูงยิ่งต้องใช้เยอะขึ้น</div>`;
+      detail.innerHTML = html;
+    } else if(sel.type==='amulet'){
+      const qty = player.amulets||0;
+      html += `<div class="inv-detail-title">🧿 ยันต์เสริมพลัง x${qty}</div>`;
+      html += `<div class="inv-detail-desc">เพิ่มโอกาสตีบวกสำเร็จ +15% ต่อการใช้ 1 ชิ้น ใช้อัตโนมัติตอนกดเสริมอุปกรณ์ในกระเป๋าอุปกรณ์ (ถ้ามีของอยู่)</div>`;
       detail.innerHTML = html;
     } else if(sel.type==='item'){
       const it = CONSUMABLE_ITEMS[sel.key];
