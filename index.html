@@ -175,6 +175,88 @@
   .portal-confirm #pc-yes { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
   .portal-confirm #pc-no { background:rgba(255,255,255,0.1); color:#94a3b8; }
 
+  .death-overlay {
+    position:absolute; inset:0; background:rgba(10,2,4,0.82); z-index:40;
+    display:none; align-items:center; justify-content:center; pointer-events:none;
+  }
+  .death-overlay.show { display:flex; pointer-events:auto; }
+  .death-overlay .death-box { text-align:center; }
+  .death-overlay .death-title {
+    font-size:26px; font-weight:900; color:#f87171;
+    text-shadow:0 0 20px rgba(248,113,113,0.7), 0 2px 8px rgba(0,0,0,0.8);
+    margin-bottom:10px;
+  }
+  .death-overlay .death-timer { font-size:14px; color:#e2e8f0; font-weight:700; }
+
+  .quickuse-btn {
+    position:absolute; left:20px; bottom:196px; width:44px; height:44px; border-radius:12px;
+    background:rgba(20,18,40,0.85); border:2px solid rgba(74,222,128,0.5); z-index:7;
+    display:flex; align-items:center; justify-content:center; font-size:18px; pointer-events:auto;
+  }
+  .quickuse-btn:active { background:rgba(74,222,128,0.3); }
+  .quickuse-badge {
+    position:absolute; bottom:-4px; right:-4px; font-size:9px; font-weight:800;
+    background:#16a34a; color:#fff; padding:1px 4px; border-radius:6px;
+    border:1px solid rgba(255,255,255,0.3);
+  }
+  .invquick-btn {
+    position:absolute; left:20px; bottom:248px; width:44px; height:44px; border-radius:12px;
+    background:rgba(20,18,40,0.85); border:2px solid rgba(139,92,246,0.5); z-index:7;
+    display:flex; align-items:center; justify-content:center; font-size:18px; pointer-events:auto;
+  }
+  .invquick-btn:active { background:rgba(139,92,246,0.3); }
+
+  /* ---------- #13: Layout edit mode (drag control buttons) ---------- */
+  .layout-edit-bar {
+    position:absolute; top:0; left:0; right:0; z-index:55;
+    background:rgba(124,58,237,0.92); color:#fff; font-size:11.5px; font-weight:700;
+    padding:8px 10px; display:none; align-items:center; justify-content:space-between; gap:8px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.4);
+  }
+  .layout-edit-bar.show { display:flex; }
+  .layout-edit-bar button { font-size:11px; padding:6px 10px; border-radius:8px; border:none; font-weight:800; flex-shrink:0; }
+  #layout-edit-reset { background:rgba(255,255,255,0.2); color:#fff; }
+  #layout-edit-done { background:#fbbf24; color:#3a1e00; }
+  body.layout-edit-active #joystick-zone,
+  body.layout-edit-active #attack-btn,
+  body.layout-edit-active #skill-ult,
+  body.layout-edit-active #skill-heal,
+  body.layout-edit-active #skill-spin,
+  body.layout-edit-active #skill-ranged,
+  body.layout-edit-active #jump-btn,
+  body.layout-edit-active #auto-btn,
+  body.layout-edit-active #auto-settings-btn,
+  body.layout-edit-active #quickuse-btn,
+  body.layout-edit-active #open-inventory {
+    outline:2px dashed #fbbf24; outline-offset:3px; box-shadow:0 0 12px rgba(251,191,36,0.6);
+  }
+
+  /* ---------- #7: draggable/closable floating windows ---------- */
+  .chat-drag-handle {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:5px 8px; font-size:10px; font-weight:800; color:#c4b5fd;
+    background:rgba(139,92,246,0.15); border-bottom:1px solid rgba(255,255,255,0.08);
+    cursor:grab; touch-action:none;
+  }
+  .chat-drag-handle #chat-close-btn { cursor:pointer; color:#94a3b8; font-size:13px; padding:0 3px; }
+  .qt-drag-handle { cursor:grab; touch-action:none; }
+
+  /* ---------- #8: fullscreen + adjustable UI scale ---------- */
+  body.ui-scale-compact .minimap { width:88px !important; height:88px !important; }
+  body.ui-scale-compact .level-panel { min-width:108px !important; padding:5px 7px !important; }
+  body.ui-scale-compact .icon-btn.small { width:27px !important; height:27px !important; font-size:12px !important; }
+  body.ui-scale-compact .topnav-icons { max-width:200px !important; }
+  body.ui-scale-compact .joystick-zone { width:96px !important; height:96px !important; }
+  body.ui-scale-compact .attack-btn { width:66px !important; height:66px !important; font-size:21px !important; }
+  body.ui-scale-compact .skill-btn { width:42px !important; height:42px !important; font-size:16px !important; }
+
+  body.ui-scale-large .minimap { width:132px !important; height:132px !important; }
+  body.ui-scale-large .level-panel { min-width:170px !important; padding:8px 10px !important; }
+  body.ui-scale-large .icon-btn.small { width:39px !important; height:39px !important; font-size:17px !important; }
+  body.ui-scale-large .joystick-zone { width:132px !important; height:132px !important; }
+  body.ui-scale-large .attack-btn { width:92px !important; height:92px !important; font-size:30px !important; }
+  body.ui-scale-large .skill-btn { width:60px !important; height:60px !important; font-size:23px !important; }
+
   /* ---------- GM floating panel ---------- */
   .gm-float-btn {
     position:fixed; width:42px; height:42px; border-radius:50%;
@@ -354,7 +436,7 @@
   }
   .modal-backdrop.show { display:flex; }
   .modal-sheet {
-    width:100%; max-width:520px; max-height:78vh; overflow-y:auto;
+    width:100%; max-width:520px; max-height:86vh; overflow-y:auto;
     background:linear-gradient(180deg,#1a1730,#12101f);
     border-radius:20px 20px 0 0;
     border:1px solid rgba(139,92,246,0.35);
@@ -386,7 +468,7 @@
 
   /* ---------- Slot-grid inventory ---------- */
   .inv-grid-title { font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin:12px 0 6px; font-weight:700; }
-  .inv-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:7px; background:rgba(0,0,0,0.15); padding:8px; border-radius:12px; }
+  .inv-grid { display:grid; grid-template-columns: repeat(6, 1fr); gap:6px; background:rgba(0,0,0,0.15); padding:8px; border-radius:12px; }
   .inv-slot {
     aspect-ratio:1; border-radius:10px; display:flex; align-items:center; justify-content:center;
     font-size:22px; position:relative; border:2px solid rgba(255,255,255,0.14);
@@ -615,6 +697,21 @@
     </div>
   </div>
 
+  <div class="death-overlay" id="death-overlay">
+    <div class="death-box">
+      <div class="death-title">💀 คุณสิ้นสติ</div>
+      <div class="death-timer" id="death-timer">ฟื้นคืนสติในอีก 5 วิ</div>
+    </div>
+  </div>
+
+  <div class="layout-edit-bar" id="layout-edit-bar">
+    <span>🖐️ ลากปุ่มเพื่อจัดตำแหน่ง</span>
+    <div style="display:flex; gap:6px;">
+      <button id="layout-edit-reset">รีเซ็ต</button>
+      <button id="layout-edit-done">เสร็จสิ้น</button>
+    </div>
+  </div>
+
   <div class="gm-float-btn" id="gm-float-btn">🛠️</div>
   <div class="gm-panel" id="gm-panel">
     <button class="gm-close" id="gm-close-btn">✕</button>
@@ -737,15 +834,7 @@
         <div class="icon-btn small" id="open-quests" data-label="เควส">📜<span class="ping" id="ping-quests"></span></div>
         <div class="icon-btn small" id="open-dungeon" data-label="ดันเจี้ยน">🗺️<span class="ping" id="ping-dungeon"></span></div>
         <div class="icon-btn small" id="open-market" data-label="ร้านค้า">💰</div>
-        <div class="icon-btn small" id="open-pet" data-label="สัตว์เลี้ยง">🐣</div>
-        <div class="icon-btn small" id="open-battlepass" data-label="แบทเทิลพาส">🎫</div>
-        <div class="icon-btn small" id="open-achievements" data-label="ความสำเร็จ">🏆</div>
-        <div class="icon-btn small" id="open-inventory" data-label="กระเป๋า">🎒</div>
-        <div class="icon-btn small" id="toggle-chat" data-label="แชท">💬</div>
-        <div class="icon-btn small" id="open-bestiary" data-label="สมุดมอน">📖</div>
-        <div class="icon-btn small" id="toggle-audio" data-label="เสียง">🔊</div>
-        <div class="icon-btn small" id="return-village-btn" data-label="เดินทาง">🏠</div>
-        <div class="icon-btn small" id="open-save" data-label="บันทึก">💾</div>
+        <div class="icon-btn small" id="open-more" data-label="เพิ่มเติม">☰</div>
       </div>
       <div class="panel gold-panel">🪙 <span id="gold">0</span> · 💎 <span id="gems">0</span></div>
       <div class="panel zone-panel" id="zone-name">ป่าเริ่มต้น</div>
@@ -758,7 +847,7 @@
   <div class="qt-toggle" id="qt-toggle">📜</div>
   <div class="npc-talk-btn" id="npc-talk-btn">💬 คุย</div>
   <div class="quest-tracker" id="quest-tracker">
-    <div class="qt-title" id="qt-title">เควสหลัก</div>
+    <div class="qt-title qt-drag-handle" id="qt-title">เควสหลัก</div>
     <div class="qt-desc" id="qt-desc"></div>
     <div class="qt-progress-track"><div class="qt-progress-fill" id="qt-progress-fill" style="width:0%"></div></div>
     <button id="qt-auto-btn">▶ ล่าอัตโนมัติ</button>
@@ -803,8 +892,14 @@
 
   <div class="auto-btn" id="auto-btn">🤖</div>
   <div class="auto-btn" id="auto-settings-btn" style="left:70px; bottom:144px; width:36px; height:36px; font-size:14px;">⚙️</div>
+  <div class="quickuse-btn" id="quickuse-btn">🧪<span class="quickuse-badge" id="quickuse-badge">0</span></div>
+  <div class="invquick-btn" id="open-inventory">🎒</div>
 
   <div class="chat-panel" id="chat-panel">
+    <div class="chat-drag-handle" id="chat-drag-handle">
+      <span>⠿ แชท</span>
+      <span id="chat-close-btn">✕</span>
+    </div>
     <div class="chat-tabs">
       <div class="chat-tab active" data-tab="world">โลก</div>
       <div class="chat-tab" data-tab="guild">กิลด์</div>
@@ -933,7 +1028,7 @@
   const CLASSES = {
     warrior: {
       key:'warrior', name:'เหมียวสมิง', icon:'🗡️', color:'#f97316', weaponShape:'sword', weaponColor:'#cbd5e1',
-      catFur:'#fb923c', catEar:'#ea580c', accessory:'headband', rangeMult:0.95,
+      catFur:'#fb923c', catEar:'#ea580c', accessory:'headband', rangeMult:0.95, skillRange:300,
       desc:'นักดาบเสือส้ม ตัวถัง HP/DEF สูงสุด ถือดาบใหญ่+โล่ แต่เดินช้า เหมาะมือใหม่',
       statMul:{ atk:1.05, def:1.4, hp:1.4, spd:0.85 }, critBonus:0.02, cdrBonus:0,
       skillNames:{ ranged:{name:'ฟาดพลังคลื่น', icon:'💢'}, spin:{name:'ฟันหมุนสายเลือด', icon:'🌪️'}, heal:{name:'คำรามฮีล', icon:'❤️‍🔥'}, ult:{name:'จอมทัพพิโรธ', icon:'💥'} },
@@ -960,7 +1055,7 @@
     },
     archer: {
       key:'archer', name:'เหมียวศร', icon:'🏹', color:'#d4b896', weaponShape:'bow', weaponColor:'#a16207',
-      catFur:'#f0dcb8', catEar:'#4b3621', accessory:'hood', rangeMult:1.75,
+      catFur:'#f0dcb8', catEar:'#4b3621', accessory:'hood', rangeMult:1.15, skillRange:480,
       desc:'นักธนูวิเชียรมาศ ถือธนูใหญ่ ดาเมจ+ความแม่นยำสูงสุด วิ่งไว แต่ป้องกันบางเหมือนกระดาษ',
       statMul:{ atk:1.4, def:0.65, hp:0.8, spd:1.3 }, critBonus:0.08, cdrBonus:0,
       skillNames:{ ranged:{name:'สายฟ้าคำราม', icon:'🏹'}, spin:{name:'ห่าธนูรอบทิศ', icon:'🎯'}, heal:{name:'ลมหายใจป่า', icon:'🍃'}, ult:{name:'ธนูสิ้นโลก', icon:'☄️'} },
@@ -987,7 +1082,7 @@
     },
     priest: {
       key:'priest', name:'เหมียวขมัง', icon:'🔮', color:'#7c3aed', weaponShape:'staff', weaponColor:'#c084fc',
-      catFur:'#3f3f46', catEar:'#18181b', accessory:'collar', rangeMult:1.55,
+      catFur:'#3f3f46', catEar:'#18181b', accessory:'collar', rangeMult:1.05, skillRange:420,
       desc:'แมวดำนักเวทย์ ใส่หมวกถือไม้เท้ายาว ฮีลแรง คูลดาวน์ไว เอาตัวรอดดี แต่ดาเมจต่ำสุด',
       statMul:{ atk:0.78, def:1.05, hp:1.15, spd:0.95 }, critBonus:0.02, cdrBonus:0.08,
       skillNames:{ ranged:{name:'ลูกไฟวิญญาณ', icon:'🔮'}, spin:{name:'วงเวทป้องปราณ', icon:'🌀'}, heal:{name:'พรสวรรค์', icon:'✨'}, ult:{name:'อวตารเทพเจ้า', icon:'🌟'} },
@@ -1014,7 +1109,7 @@
     },
     rogue: {
       key:'rogue', name:'เหมียวเงา', icon:'🗡️', color:'#94a3b8', weaponShape:'daggers', weaponColor:'#e2e8f0',
-      catFur:'#64748b', catEar:'#334155', accessory:'mask', rangeMult:0.85,
+      catFur:'#64748b', catEar:'#334155', accessory:'mask', rangeMult:0.85, skillRange:260,
       desc:'โจรสลิดเทา ใส่ผ้าคลุมถือกริชคู่ คริติคอล+ความเร็วสูงสุดในเกม แต่ HP/DEF ต่ำสุด ตายง่ายมาก',
       statMul:{ atk:1.32, def:0.6, hp:0.7, spd:1.4 }, critBonus:0.12, cdrBonus:0.03,
       skillNames:{ ranged:{name:'มีดสังหาร', icon:'🔪'}, spin:{name:'พายุใบมีด', icon:'🌀'}, heal:{name:'พิษถอนพิษ', icon:'🧪'}, ult:{name:'ราตรีเพชฌฆาต', icon:'🌑'} },
@@ -1104,11 +1199,15 @@
     hitFlash: 0,
     critChance: 0.05,
     invulTimer: 0,
+    isDead: false,
+    deathTimer: 0,
     materials: { shard:0, core:0, crystal:0, fang:0, ore:0 },
     items: {},                // consumable items owned: {itemKey: qty}
     buffs: { atk:null, gold:null },  // {mult, expiresAt}
     skillPoints: 0,
     unlockedNodes: {},        // "branchKey_nodeIndex": true
+    statPoints: 0,
+    baseStats: { str:0, agi:0, vit:0, luk:0 },
     passives: { atkPct:0, defFlat:0, hpPct:0, critPct:0, cdrPct:0, goldPct:0 },
     stats: { craftCount:0, enhanceSuccess:0, dungeonClears:{1:0,2:0,3:0,4:0,5:0}, worldBossKills:0, raidClears:0, pvpWins:0, pvpLosses:0, questsMain:0, questsDaily:0, questsGuild:0, marketBuys:0, marketSells:0, chestsOpened:0, fusions:0 },
     unlockedAchievements: {},
@@ -1152,17 +1251,17 @@
     });
     return bonus;
   }
-  function totalATK(){ return Math.round((60 + (player.level-1)*4 + equipStat(equipment.weapon) + legendaryStat('atk') + equippedGearBonus('atk')*8) * classData().statMul.atk * (1+player.passives.atkPct/100+activeBuffMult('atk')+bestiaryBonusPct()/100)); }
-  function totalDEF(){ return Math.round((10 + (player.level-1)*2 + equipStat(equipment.armor) + player.passives.defFlat + legendaryStat('def') + equippedGearBonus('def')*8) * classData().statMul.def); }
-  function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100 + (classData().critBonus||0) + equippedGearBonus('critPct')/100; }
-  function totalGoldBonus(){ return equipStat(equipment.necklace)/100 + player.passives.goldPct/100 + activeBuffMult('gold') + legendaryStat('gold')/100 + (hasSetBonus('wanderingsage')?0.25:0) + equippedGearBonus('goldPct')/100; }
+  function totalATK(){ return Math.round((60 + (player.level-1)*4 + equipStat(equipment.weapon) + legendaryStat('atk') + equippedGearBonus('atk')*8 + player.baseStats.str*2) * classData().statMul.atk * (1+player.passives.atkPct/100+activeBuffMult('atk')+bestiaryBonusPct()/100)); }
+  function totalDEF(){ return Math.round((10 + (player.level-1)*2 + equipStat(equipment.armor) + player.passives.defFlat + legendaryStat('def') + equippedGearBonus('def')*8 + player.baseStats.vit*1.5) * classData().statMul.def); }
+  function totalCrit(){ return player.critChance + equipStat(equipment.ring)/100 + player.passives.critPct/100 + legendaryStat('crit')/100 + (classData().critBonus||0) + equippedGearBonus('critPct')/100 + player.baseStats.agi*0.003 + player.baseStats.luk*0.0015; }
+  function totalGoldBonus(){ return equipStat(equipment.necklace)/100 + player.passives.goldPct/100 + activeBuffMult('gold') + legendaryStat('gold')/100 + (hasSetBonus('wanderingsage')?0.25:0) + equippedGearBonus('goldPct')/100 + player.baseStats.luk*0.004; }
   function totalExpBonus(){ return equippedGearBonus('expPct')/100; }
   function totalDodge(){ return Math.min(0.6, equippedGearBonus('dodge')/100); }
   function totalAccuracy(){ return equippedGearBonus('accuracy')/100; }
   function totalAtkSpeedBonus(){ return equippedGearBonus('atkSpeed')/100; }
   function totalCDR(){ return Math.min(0.5, player.passives.cdrPct/100 + (classData().cdrBonus||0)); }
   function getAttackRange(){ return player.attackRange * (classData().rangeMult||1); }
-  function computeMaxHp(){ return Math.round((300 + (player.level-1)*45 + Math.round(equipStat(equipment.armor)*4) + legendaryStat('hp') + equippedGearBonus('hp')*8) * classData().statMul.hp * (1+player.passives.hpPct/100)); }
+  function computeMaxHp(){ return Math.round((300 + (player.level-1)*45 + Math.round(equipStat(equipment.armor)*4) + legendaryStat('hp') + equippedGearBonus('hp')*8 + player.baseStats.vit*8) * classData().statMul.hp * (1+player.passives.hpPct/100)); }
 
   // ---------- Legendary set items ----------
   const LEGENDARY_SETS = {
@@ -1185,11 +1284,8 @@
     { key:'wanderingsage_necklace', set:'wanderingsage', slot:'necklace', name:'สร้อยปราชญ์พเนจร', icon:'📿', gold:10 }
   ];
   function rollLegendaryDrop(m){
-    const chance = m.isWorldBoss ? 0.22 : (m.isDungeon && m.isBoss ? 0.12 : (m.isBoss ? 0.04 : 0));
-    if(chance<=0 || Math.random()>chance) return null;
-    const item = LEGENDARY_ITEMS[Math.floor(Math.random()*LEGENDARY_ITEMS.length)];
-    player.legendaryOwned[item.key] = true;
-    return item;
+    // #16: legendary drops disabled — always returns null, no legendary items can drop anymore
+    return null;
   }
   function equipLegendary(slot, key){
     player.legendary[slot] = key || null;
@@ -1572,19 +1668,20 @@
     if(!pet.owned) return;
     if(pet.level>=5){
       petAttackTimer += dt;
-      if(petAttackTimer > 4000){
+      if(petAttackTimer > 3000){
         petAttackTimer = 0;
-        let target=null, best=140;
+        let target=null, best=190;
         for(const m of monsters){ const d=Math.hypot(m.x-pet.x,m.y-pet.y); if(d<best){ best=d; target=m; } }
         if(target){
-          const dmg = Math.max(1, Math.round(totalATK()*0.15));
+          const dmg = Math.max(1, Math.round(totalATK()*0.18));
+          spawnParticle({ type:'ring', x:pet.x, y:pet.y, life:220, startRadius:4, endRadius:22, color:'#fde047', lineWidth:2 });
           damageMonster(target, dmg, false);
         }
       }
     }
     if(pet.level>=15){
       for(const c of [...chests]){
-        if(Math.hypot(c.x-pet.x, c.y-pet.y) < 60) openChest(c);
+        if(Math.hypot(c.x-pet.x, c.y-pet.y) < 90) openChest(c);
       }
     }
   }
@@ -1904,6 +2001,8 @@
       pet.level++;
       pet.expToNext = Math.round(pet.expToNext*1.22);
       applyPetPassive();
+      if(pet.level===5) showToast('🐾 '+pet.type.name+' ปลดล็อก: ออโต้ตีมอนใกล้ตัว!');
+      if(pet.level===15) showToast('🐾 '+pet.type.name+' ปลดล็อก: ออโต้เก็บหีบสมบัติ!');
     }
   }
   function updatePetFollow(dt){
@@ -2323,11 +2422,14 @@
       gold: player.gold, gems: player.gems, kills: player.kills, bossKills: player.bossKills,
       materials: player.materials, items: player.items,
       skillPoints: player.skillPoints, unlockedNodes: player.unlockedNodes,
+      statPoints: player.statPoints, baseStats: player.baseStats,
       stats: player.stats, unlockedAchievements: player.unlockedAchievements,
       legendaryOwned: player.legendaryOwned, legendary: player.legendary,
       bestiary: player.bestiary, activeTitle: player.activeTitle, sweepsUsed: player.sweepsUsed,
       ownedSkins: player.ownedSkins||{default:true}, equippedSkin: player.equippedSkin||'default',
       ownedMounts: player.ownedMounts||{none:true}, equippedMount: player.equippedMount||'none',
+      equipInventory: equipInventory(), equippedGear: equippedGear(),
+      enhanceStones: enhanceStones(), amulets: player.amulets||0,
       equipment: {
         weapon:{tier:equipment.weapon.tier, enhance:equipment.weapon.enhance},
         armor:{tier:equipment.armor.tier, enhance:equipment.armor.enhance},
@@ -2352,11 +2454,16 @@
     player.gold=data.gold; player.gems=data.gems||0; player.kills=data.kills; player.bossKills=data.bossKills;
     player.materials=data.materials; player.items=data.items||{};
     player.skillPoints=data.skillPoints; player.unlockedNodes=data.unlockedNodes||{};
+    player.statPoints=data.statPoints||0; player.baseStats=data.baseStats||{str:0,agi:0,vit:0,luk:0};
     player.stats=data.stats; player.unlockedAchievements=data.unlockedAchievements||{};
     player.legendaryOwned=data.legendaryOwned||{}; player.legendary=data.legendary||{weapon:null,armor:null,ring:null,necklace:null};
     player.bestiary=data.bestiary||{}; player.activeTitle=data.activeTitle||null; player.sweepsUsed=data.sweepsUsed||{1:0,2:0,3:0,4:0,5:0};
     player.ownedSkins=data.ownedSkins||{default:true}; player.equippedSkin=data.equippedSkin||'default';
     player.ownedMounts=data.ownedMounts||{none:true}; player.equippedMount=data.equippedMount||'none';
+    player.equipInventory = Array.isArray(data.equipInventory) ? data.equipInventory : [];
+    player.equippedGear = data.equippedGear || {weapon:null,helmet:null,armor:null,boots:null,ring:null,necklace:null};
+    player.enhanceStones = data.enhanceStones || {weapon:{t1:0,t2:0,t3:0,t4:0}, armor:{t1:0,t2:0,t3:0,t4:0}, jewelry:{t1:0,t2:0,t3:0,t4:0}};
+    player.amulets = data.amulets || 0;
     equipment.weapon.tier=data.equipment.weapon.tier; equipment.weapon.enhance=data.equipment.weapon.enhance;
     equipment.armor.tier=data.equipment.armor.tier; equipment.armor.enhance=data.equipment.armor.enhance;
     equipment.ring.lvl=data.equipment.ring.lvl; equipment.necklace.lvl=data.equipment.necklace.lvl;
@@ -2967,6 +3074,8 @@
     shieldLabel.textContent = player.shield>0 ? '🛡️ โล่ '+Math.round(player.shield) : '';
     const rateEl = document.getElementById('rate-indicator');
     if(rateEl) rateEl.textContent = 'EXP x'+expRateMult+' · Drop x'+dropRateMult;
+    const quickBadge = document.getElementById('quickuse-badge');
+    if(quickBadge) quickBadge.textContent = player.items.hpPotion||0;
     const avatarEl = document.getElementById('lp-avatar');
     if(avatarEl && player.classKey){
       const cd = classData();
@@ -3008,6 +3117,7 @@
       showLevelUp();
       sfxLevelUp();
       checkSkillUnlocks();
+      player.statPoints += 3;
       if(player.level % 5 === 0){
         player.skillPoints++;
         showToast('🌳 ได้พอยท์สกิลทรี 1 แต้ม!');
@@ -3041,7 +3151,7 @@
     spawnParticle({ type:'ring', x:moveTarget.x, y:moveTarget.y, life:450, startRadius:4, endRadius:34, color:'#a78bfa', lineWidth:2.5 });
   }
   const JOY_MAX = 32;
-  function joyStart(id,cx,cy){ joyActive=true; joyTouchId=id; moveTarget=null; updateJoy(cx,cy); }
+  function joyStart(id,cx,cy){ if(layoutEditMode) return; joyActive=true; joyTouchId=id; moveTarget=null; updateJoy(cx,cy); }
   function updateJoy(clientX, clientY){
     const rect = joyZone.getBoundingClientRect();
     const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
@@ -3166,15 +3276,31 @@
   }
   function equipInventory(){ return player.equipInventory || (player.equipInventory=[]); }
   function equippedGear(){ return player.equippedGear || (player.equippedGear={weapon:null,helmet:null,armor:null,boots:null,ring:null,necklace:null}); }
+  const EQUIP_INV_CAP = 90;
+  function safeAddEquipItem(item){
+    const inv = equipInventory();
+    inv.push(item);
+    while(inv.length > EQUIP_INV_CAP){
+      const eg = equippedGear();
+      const equippedIds = Object.values(eg);
+      let removeIdx = -1, lowestRank = Infinity;
+      for(let i=0;i<inv.length;i++){
+        if(equippedIds.includes(inv[i].id)) continue; // never remove a currently-equipped item
+        const rank = tierIdxOf(inv[i].tier);
+        if(rank < lowestRank){ lowestRank = rank; removeIdx = i; }
+      }
+      if(removeIdx === -1) break; // everything left is equipped, stop trimming rather than lose gear
+      inv.splice(removeIdx, 1);
+    }
+    return item;
+  }
   function rollEquipDrop(m){
     if(Math.random() > 0.07*dropRateMult) return null;
     const tier = weaponRarityForLevel(m.isWorldBoss ? 60 : m.lvl);
     const slots = Object.keys(EQUIP_SLOTS_INFO);
     const slot = slots[Math.floor(Math.random()*slots.length)];
     const item = generateEquipItem(slot, tier.key, player.classKey);
-    equipInventory().push(item);
-    if(equipInventory().length > 60) equipInventory().shift();
-    return item;
+    return safeAddEquipItem(item);
   }
 
   // ---------- Gear gacha (weapon pool + gear pool, mirrors pet gacha) ----------
@@ -3200,19 +3326,21 @@
     const slot = slotPool[Math.floor(Math.random()*slotPool.length)];
     const tierKey = rollGearTier(isPremium);
     const item = generateEquipItem(slot, tierKey, player.classKey);
-    equipInventory().push(item);
-    if(equipInventory().length > 60) equipInventory().shift();
-    return item;
+    return safeAddEquipItem(item);
   }
   function gearGacha(isPremium, slotPool){
     const item = gearGachaOnce(isPremium, slotPool);
     if(!item){ showToast(isPremium?'เพชรไม่พอ':'ทองไม่พอ'); return false; }
     const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
+    const isUpgrade = isUpgradeOverEquipped(item);
+    const rows = [{icon:'', text:equipItemName(item)}];
+    if(isUpgrade) rows.push({icon:'🆙', text:'แรงกว่าที่ใส่อยู่ตอนนี้!'});
     showRewardCard({
-      icon: equipSlotIcon(item), title:'สุ่มกาชาได้!', stars: tier.star, legendary: tier.star>=5,
-      rows:[{icon:'', text:equipItemName(item)}]
+      icon: equipSlotIcon(item), title:'สุ่มกาชาได้!', stars: tier.star, legendary: tier.star>=5 || isUpgrade,
+      rows
     });
     if(tier.star>=5) announceServer('🎰 '+(player.name||'นักผจญภัย')+' สุ่มกาชาได้ '+equipItemName(item)+'!', tier.star>=6);
+    if(isUpgrade) showToast('🆙 '+equipItemName(item)+' แรงกว่าที่ใส่อยู่!');
     updateHud();
     return true;
   }
@@ -3227,12 +3355,14 @@
     showRewardCard({
       icon: equipSlotIcon(results[results.length-1]), title:'สุ่ม x5 ได้ '+results.length+' ชิ้น!',
       stars: Math.max(...results.map(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star)),
-      legendary: results.some(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=5),
-      rows: results.map(it=>({icon:equipSlotIcon(it), text:equipItemName(it)}))
+      legendary: results.some(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=5 || isUpgradeOverEquipped(it)),
+      rows: results.map(it=>({icon:equipSlotIcon(it), text:equipItemName(it)+(isUpgradeOverEquipped(it)?' 🆙':'')}))
     });
     results.filter(it=>WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=5).forEach(it=>{
       announceServer('🎰 '+(player.name||'นักผจญภัย')+' สุ่มกาชาได้ '+equipItemName(it)+'!', WEAPON_RARITY_TIERS.find(t=>t.key===it.tier).star>=6);
     });
+    const upgrades = results.filter(it=>isUpgradeOverEquipped(it));
+    if(upgrades.length) showToast('🆙 มี '+upgrades.length+' ชิ้นที่แรงกว่าที่ใส่อยู่!');
     updateHud();
     return results;
   }
@@ -3310,6 +3440,23 @@
     return total;
   }
 
+  // ---------- Upgrade-comparison helper (#10) ----------
+  function equipItemPowerScore(item){
+    if(!item) return 0;
+    const tierIdx = tierIdxOf(item.tier);
+    let score = tierIdx*20 + item.enhance*6;
+    Object.keys(item.stats).forEach(k=> score += item.stats[k]*(1+item.enhance*0.08));
+    return score;
+  }
+  function isUpgradeOverEquipped(item){
+    if(!item || item.classKey !== player.classKey) return false;
+    const equippedId = equippedGear()[item.slot];
+    if(!equippedId) return true;
+    const equippedItem = equipInventory().find(i=>i.id===equippedId);
+    if(!equippedItem) return true;
+    return equipItemPowerScore(item) > equipItemPowerScore(equippedItem);
+  }
+
   function foundGear(){ return player.foundGear || (player.foundGear = {white:0,green:0,blue:0,purple:0,gold:0,red:0}); }
   function rollMaterialDrop(m){
     let dropChance = (m.isBoss ? 0.95 : 0.35) * dropRateMult;
@@ -3360,7 +3507,11 @@
 
       const rows = [ {icon:'✨', text:'+'+expGain+' EXP'}, {icon:'🪙', text:'+'+goldGain+' ทอง'} ];
       if(drop){ const matDef = MATERIALS.find(mm=>mm.key===drop.key); rows.push({icon:matDef.icon, text:'+'+drop.qty+' '+matDef.name}); }
-      if(eqDrop) rows.push({icon:equipSlotIcon(eqDrop), text:equipItemName(eqDrop)+' (ในกระเป๋า)'});
+      const eqDropIsUpgrade = eqDrop ? isUpgradeOverEquipped(eqDrop) : false;
+      if(eqDrop){
+        rows.push({icon:equipSlotIcon(eqDrop), text:equipItemName(eqDrop)+' (ในกระเป๋า)'});
+        if(eqDropIsUpgrade) rows.push({icon:'🆙', text:'แรงกว่าที่ใส่อยู่ตอนนี้!'});
+      }
       if(stoneDrop) rows.push({icon:STONE_TIERS.find(t=>t.key===stoneDrop.tier).icon, text:'+'+stoneDrop.qty+' '+STONE_TIERS.find(t=>t.key===stoneDrop.tier).name+' ('+STONE_CATEGORIES[stoneDrop.cat].name+')'});
       if(amuletDrop) rows.push({icon:'🧿', text:'+1 ยันต์เสริมพลัง'});
       if(legDrop) rows.push({icon:'🌟', text:legDrop.name});
@@ -3368,7 +3519,7 @@
         icon: legDrop?'🌟':(m.isBoss?'👑':'💀'),
         title: legDrop ? 'ไอเทมตำนาน!' : m.type.name+' พ่ายแพ้!',
         stars: legDrop?3:(m.isWorldBoss?5:(m.isFieldBoss?4:(m.isBoss?3:(eqDrop?WEAPON_RARITY_TIERS.find(t=>t.key===eqDrop.tier).star:0)))),
-        legendary: !!legDrop,
+        legendary: !!legDrop || eqDropIsUpgrade,
         rows
       });
       if(legDrop){
@@ -3378,6 +3529,7 @@
       if(eqDrop){
         const eqTier = WEAPON_RARITY_TIERS.find(t=>t.key===eqDrop.tier);
         if(eqTier.star>=5) announceServer('🎁 '+(player.name||'นักผจญภัย')+' ได้รับ '+equipItemName(eqDrop)+' จากการล่ามอน!', eqTier.star>=6);
+        if(eqDropIsUpgrade) showToast('🆙 ได้ '+equipItemName(eqDrop)+' แรงกว่าที่ใส่อยู่!');
       }
       spawnDeathPoof(m);
       sfxDeath(m.r/18);
@@ -3422,6 +3574,7 @@
   }
 
   function doAttack(){
+    if(player.isDead || layoutEditMode) return;
     if(player.attackCooldown > 0) return;
     if(isInSafeZone()) return;
     player.attackCooldown = 350;
@@ -3449,20 +3602,42 @@
     const sp = MAPS[currentMapId].spawn;
     return sp && Math.hypot(player.x-sp.x, player.y-sp.y) < SAFE_ZONE_RADIUS;
   }
+  let safeZoneRegenTimer = 0;
+  const SAFE_ZONE_REGEN_PCT = 0.04;
+  function updateSafeZoneHeal(dt){
+    if(player.isDead || player.hp >= player.maxHp || !isInSafeZone()){
+      safeZoneRegenTimer = 0;
+      return;
+    }
+    safeZoneRegenTimer += dt;
+    if(safeZoneRegenTimer >= 1000){
+      safeZoneRegenTimer -= 1000;
+      const heal = Math.max(1, Math.round(player.maxHp*SAFE_ZONE_REGEN_PCT));
+      const before = player.hp;
+      player.hp = Math.min(player.maxHp, player.hp+heal);
+      if(player.hp > before){
+        spawnFloatText(player.x, player.y-24, '+'+(player.hp-before)+' HP', '#4ade80', false);
+        updateHud();
+      }
+    }
+  }
   function fireRanged(){
+    if(player.isDead || layoutEditMode) return;
     const s = skills.ranged;
     if(player.level < s.unlockLv || s.cd > 0) return;
     if(isInSafeZone()){ showToast('อยู่ในเขตปลอดภัย ใช้สกิลระยะไกลไม่ได้'); return; }
-    s.cd = s.cooldown * (1-totalCDR());
-    s.useCount++;
-    const vis = CLASS_SKILL_VISUAL[player.classKey] || CLASS_SKILL_VISUAL.warrior;
+    const skillRange = classData().skillRange || 380;
     let target = null, best = Infinity;
     for(const m of monsters){
       const d = Math.hypot(m.x-player.x, m.y-player.y);
       if(d < best){ best = d; target = m; }
     }
+    if(!target || best > skillRange){ showToast('ไม่มีมอนสเตอร์ในระยะสกิล ('+skillRange+')'); return; }
+    s.cd = s.cooldown * (1-totalCDR());
+    s.useCount++;
+    const vis = CLASS_SKILL_VISUAL[player.classKey] || CLASS_SKILL_VISUAL.warrior;
     let dx=player.facing, dy=0;
-    if(target){ const d=Math.hypot(target.x-player.x,target.y-player.y)||1; dx=(target.x-player.x)/d; dy=(target.y-player.y)/d; }
+    { const d=Math.hypot(target.x-player.x,target.y-player.y)||1; dx=(target.x-player.x)/d; dy=(target.y-player.y)/d; }
     if(s.awakened){
       [-0.28, 0, 0.28].forEach(offset=>{
         const ca = Math.cos(offset), sa = Math.sin(offset);
@@ -3476,6 +3651,7 @@
     sfxSkill();
   }
   function castSpin(){
+    if(player.isDead || layoutEditMode) return;
     const s = skills.spin;
     if(player.level < s.unlockLv || s.cd > 0) return;
     if(isInSafeZone()){ showToast('อยู่ในเขตปลอดภัย ใช้สกิลไม่ได้'); return; }
@@ -3513,6 +3689,7 @@
     showToast('🌀 ฟันหมุนรอบตัว!');
   }
   function castHeal(){
+    if(player.isDead || layoutEditMode) return;
     const s = skills.heal;
     if(player.level < s.unlockLv || s.cd > 0) return;
     s.cd = s.cooldown * (1-totalCDR());
@@ -3537,6 +3714,7 @@
     updateHud();
   }
   function castUlt(){
+    if(player.isDead || layoutEditMode) return;
     const s = skills.ult;
     if(player.level < s.unlockLv || s.cd > 0) return;
     if(isInSafeZone()){ showToast('อยู่ในเขตปลอดภัย ใช้สกิลไม่ได้'); return; }
@@ -3667,7 +3845,7 @@
           player.hitFlash = 150;
           spawnFloatText(player.x, player.y-30, '-'+dmg, '#f87171');
         }
-        if(player.hp <= 0) respawnPlayer();
+        if(player.hp <= 0) startDeathSequence();
         updateHud();
         }
       }
@@ -3679,8 +3857,37 @@
     const sp = MAPS[currentMapId].spawn;
     player.x = sp.x; player.y = sp.y;
     monsters = monsters.filter(m => Math.hypot(m.x-player.x,m.y-player.y) > 200);
-    showToast('คุณสลบ... ฟื้นคืนพลังที่จุดเริ่มต้น');
+    showToast('ฟื้นคืนพลังที่จุดเริ่มต้น');
     updateHud();
+  }
+  const DEATH_DELAY = 5000;
+  function startDeathSequence(){
+    if(player.isDead) return;
+    player.isDead = true;
+    player.deathTimer = DEATH_DELAY;
+    player.hp = 0;
+    player.invulTimer = DEATH_DELAY + 1000;
+    monsters.forEach(m=>{ m.provoked = false; });
+    document.getElementById('death-overlay').classList.add('show');
+    updateDeathOverlay();
+    updateHud();
+    sfxWarn();
+  }
+  function updateDeathOverlay(){
+    const secs = Math.max(0, Math.ceil(player.deathTimer/1000));
+    const el = document.getElementById('death-timer');
+    if(el) el.textContent = 'ฟื้นคืนสติในอีก '+secs+' วิ';
+  }
+  function finishDeathSequence(){
+    player.isDead = false;
+    document.getElementById('death-overlay').classList.remove('show');
+    respawnPlayer();
+  }
+  function updateDeathState(dt){
+    if(!player.isDead) return;
+    player.deathTimer -= dt;
+    updateDeathOverlay();
+    if(player.deathTimer <= 0) finishDeathSequence();
   }
 
   function updateProjectiles(dt){
@@ -3706,6 +3913,7 @@
   let autoBattle = false;
   let jumpCd = 0;
   function doJump(){
+    if(player.isDead || layoutEditMode) return;
     if(jumpCd>0) return;
     jumpCd = 2200;
     player.invulTimer = 500;
@@ -3727,6 +3935,7 @@
   let activeAutoPreset = 'normal';
   function autoConf(){ return autoPresets[activeAutoPreset]; }
   function updatePlayer(dt){
+    if(player.isDead) return;
     if(joyActive && (Math.abs(joyDX)>0.08 || Math.abs(joyDY)>0.08)){
       const spd = player.speedBase*1.15*classData().statMul.spd*mountSpeedMult();
       player.x += joyDX*spd*(dt/16);
@@ -4190,14 +4399,23 @@
     }
     ctx.restore();
 
-    const barW = m.r*1.5, bx = sx-barW/2, by = sy-m.r-13;
-    ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(bx,by,barW,3);
-    ctx.fillStyle = m.isBoss? '#fbbf24' : '#ef4444'; ctx.fillRect(bx,by,barW*Math.max(0,m.hp/m.maxHp),3);
-    ctx.font=(m.isBoss?'bold 9px':'8px')+' sans-serif'; ctx.textAlign='center';
+    const barW = Math.max(38, m.r*1.7), bx = sx-barW/2, by = sy-m.r-24;
+    const nameText = `Lv ${m.lvl} · ${m.type.name}`;
+    ctx.font=(m.isBoss?'bold 9.5px':'8.5px')+' sans-serif'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    const nameW = ctx.measureText(nameText).width;
+    ctx.fillStyle='rgba(0,0,0,0.5)';
+    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(sx-nameW/2-5, by-11, nameW+10, 12, 4); ctx.fill(); }
+    else { ctx.fillRect(sx-nameW/2-5, by-11, nameW+10, 12); }
     ctx.lineWidth=2; ctx.strokeStyle='rgba(0,0,0,0.85)';
-    ctx.strokeText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-3);
+    ctx.strokeText(nameText, sx, by-2);
     ctx.fillStyle = monsterThreatTier(m).color;
-    ctx.fillText(`Lv ${m.lvl} · ${m.type.name}`, sx, by-3);
+    ctx.fillText(nameText, sx, by-2);
+    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(bx-1,by+2,barW+2,6);
+    ctx.fillStyle = m.isBoss? '#fbbf24' : '#ef4444'; ctx.fillRect(bx,by+3,barW*Math.max(0,m.hp/m.maxHp),4);
+    if(m.isBoss){
+      ctx.font='7px sans-serif'; ctx.fillStyle='#fde68a'; ctx.textAlign='center';
+      ctx.fillText(Math.max(0,Math.round(m.hp))+'/'+m.maxHp, sx, by+13);
+    }
   }
 
   function drawPlayer(){
@@ -4489,7 +4707,9 @@
         for(let i=0;i<SPAWN_PER_TICK;i++) spawnMonster();
       }
 
+      updateDeathState(dt);
       updatePlayer(dt);
+      updateSafeZoneHeal(dt);
       tryEnterPortal();
       checkNpcProximity();
       updateMonsters(dt);
@@ -4564,7 +4784,7 @@
   // ---------- Inventory / Crafting modal ----------
   const invModal = document.getElementById('inv-modal');
   const equipList = document.getElementById('equip-list');
-  document.getElementById('open-inventory').addEventListener('click', ()=>{ renderEquipList(); invModal.classList.add('show'); });
+  document.getElementById('open-inventory').addEventListener('click', ()=>{ if(layoutEditMode) return; renderEquipList(); invModal.classList.add('show'); });
   document.getElementById('close-inventory').addEventListener('click', ()=> invModal.classList.remove('show'));
   invModal.addEventListener('click', e=>{ if(e.target===invModal) invModal.classList.remove('show'); });
 
@@ -4790,7 +5010,8 @@
       const tier = WEAPON_RARITY_TIERS.find(t=>t.key===item.tier);
       const sel = (selectedInvSlot.type==='equipitem' && selectedInvSlot.key===item.id)?'selected':'';
       const isEquipped = equippedGear()[item.slot]===item.id;
-      html += `<div class="inv-slot ${sel}" data-sel-equipitem="${item.id}" style="background:${tier.color}33; border-color:${tier.color};">${equipSlotIcon(item)}${item.enhance>0?'<div class="qty-badge">+'+item.enhance+'</div>':''}${isEquipped?'<div class="qty-badge" style="left:1px;right:auto;background:#4ade80;">E</div>':''}</div>`;
+      const isUpgrade = !isEquipped && isUpgradeOverEquipped(item);
+      html += `<div class="inv-slot ${sel}" data-sel-equipitem="${item.id}" style="background:${tier.color}33; border-color:${tier.color};">${equipSlotIcon(item)}${item.enhance>0?'<div class="qty-badge">+'+item.enhance+'</div>':''}${isEquipped?'<div class="qty-badge" style="left:1px;right:auto;background:#4ade80;">E</div>':(isUpgrade?'<div class="qty-badge" style="left:1px;right:auto;bottom:auto;top:1px;background:#22c55e;">🆙</div>':'')}</div>`;
     });
     html += `</div>`;
 
@@ -4945,6 +5166,19 @@
           </div>`}
       </div>
       <div class="sys-section">
+        <div class="sys-title">สเตตัส (${player.statPoints} แต้มคงเหลือ)</div>
+        ${STAT_DEFS.map(sd=>`
+          <div class="card card-row">
+            <div class="card-icon" style="font-size:20px;">${sd.icon}</div>
+            <div style="flex:1;">
+              <div class="card-title">${sd.label} — ${player.baseStats[sd.key]}</div>
+              <div class="card-desc">${sd.desc}</div>
+            </div>
+            <button class="btn-sm gold" data-stat="${sd.key}" ${player.statPoints<=0?'disabled':''}>+1</button>
+          </div>
+        `).join('')}
+      </div>
+      <div class="sys-section">
         <div class="sys-title">วัสดุที่มี</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           ${MATERIALS.map(m=>`<div class="badge-pill">${m.icon} ${m.name} x${player.materials[m.key]||0}</div>`).join('')}
@@ -4960,6 +5194,23 @@
         updateHud(); renderCharacterModal();
       });
     });
+    sysModalBody.querySelectorAll('button[data-stat]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ allocateStat(btn.dataset.stat); });
+    });
+  }
+  const STAT_DEFS = [
+    { key:'str', icon:'💪', label:'STR (พละกำลัง)', desc:'+2 ATK ต่อแต้ม' },
+    { key:'agi', icon:'🏃', label:'AGI (ความว่องไว)', desc:'+0.3% คริติคอล ต่อแต้ม' },
+    { key:'vit', icon:'❤️', label:'VIT (ความอึด)', desc:'+8 HP สูงสุด, +1.5 DEF ต่อแต้ม' },
+    { key:'luk', icon:'🍀', label:'LUK (โชค)', desc:'+0.4% ทอง, +0.15% คริติคอล ต่อแต้ม' }
+  ];
+  function allocateStat(key){
+    if(player.statPoints<=0) return;
+    player.statPoints--;
+    player.baseStats[key]++;
+    if(key==='vit'){ player.maxHp = computeMaxHp(); }
+    updateHud();
+    renderCharacterModal();
   }
 
   // ---------- Skill tree modal ----------
@@ -5439,7 +5690,7 @@
         <div class="sys-title">🎯 Pet Mastery</div>
         <div class="card ${pet.level>=5?'':'locked'}">
           <div class="card-title">⚔️ ออโต้ตี (Lv.5)</div>
-          <div class="card-desc">${pet.level>=5? 'ปลดล็อกแล้ว — สัตว์เลี้ยงโจมตีมอนสเตอร์ใกล้ตัวอัตโนมัติทุก 4 วิ' : 'ปลดล็อกที่เลเวล 5'}</div>
+          <div class="card-desc">${pet.level>=5? 'ปลดล็อกแล้ว — สัตว์เลี้ยงโจมตีมอนสเตอร์ใกล้ตัวอัตโนมัติทุก 3 วิ' : 'ปลดล็อกที่เลเวล 5'}</div>
         </div>
         <div class="card ${pet.level>=15?'':'locked'}">
           <div class="card-title">🎁 ออโต้เก็บหีบ (Lv.15)</div>
@@ -5682,15 +5933,66 @@
   document.getElementById('open-quests').addEventListener('click', ()=> openModal('เควส', renderQuestsModal));
   document.getElementById('open-dungeon').addEventListener('click', ()=> openModal('ดันเจี้ยน & บอส', renderDungeonModal));
   document.getElementById('open-market').addEventListener('click', ()=> openModal('ตลาดกลาง', renderMarketModal));
-  document.getElementById('open-pet').addEventListener('click', ()=> openModal('สัตว์เลี้ยง', renderPetModal));
-  document.getElementById('open-battlepass').addEventListener('click', ()=> openModal('Battle Pass', renderBattlepassModal));
-  document.getElementById('open-achievements').addEventListener('click', ()=> openModal('ความสำเร็จ', renderAchievementsModal));
-  document.getElementById('open-bestiary').addEventListener('click', ()=> openModal('สมุดภาพมอนสเตอร์', renderBestiaryModal));
-  document.getElementById('toggle-audio').addEventListener('click', (e)=>{
-    audioMuted = !audioMuted;
-    e.target.textContent = audioMuted ? '🔇' : '🔊';
-    if(!audioMuted){ ensureAudio(); sfxClick(); }
-  });
+  function renderMoreModal(){
+    sysModalBody.innerHTML = `
+      <div class="sys-section">
+        <div class="card card-row" data-more="pet" style="cursor:pointer;">
+          <div class="card-icon">🐣</div><div class="card-title" style="flex:1;">สัตว์เลี้ยง</div>
+        </div>
+        <div class="card card-row" data-more="battlepass" style="cursor:pointer;">
+          <div class="card-icon">🎫</div><div class="card-title" style="flex:1;">Battle Pass</div>
+        </div>
+        <div class="card card-row" data-more="achievements" style="cursor:pointer;">
+          <div class="card-icon">🏆</div><div class="card-title" style="flex:1;">ความสำเร็จ</div>
+        </div>
+        <div class="card card-row" data-more="bestiary" style="cursor:pointer;">
+          <div class="card-icon">📖</div><div class="card-title" style="flex:1;">สมุดภาพมอนสเตอร์</div>
+        </div>
+        <div class="card card-row" data-more="travel" style="cursor:pointer;">
+          <div class="card-icon">🏠</div><div class="card-title" style="flex:1;">เดินทาง</div>
+        </div>
+        <div class="card card-row" data-more="save" style="cursor:pointer;">
+          <div class="card-icon">💾</div><div class="card-title" style="flex:1;">บันทึก / ชื่อตัวละคร</div>
+        </div>
+        <div class="card card-row" data-more="chat" style="cursor:pointer;">
+          <div class="card-icon">💬</div><div class="card-title" style="flex:1;">แชท</div>
+        </div>
+        <div class="card card-row" data-more="audio" style="cursor:pointer;">
+          <div class="card-icon">${audioMuted?'🔇':'🔊'}</div><div class="card-title" style="flex:1;">เสียง (${audioMuted?'ปิดอยู่':'เปิดอยู่'})</div>
+        </div>
+        <div class="card card-row" data-more="layout" style="cursor:pointer;">
+          <div class="card-icon">🖐️</div><div class="card-title" style="flex:1;">จัดตำแหน่งปุ่ม</div>
+        </div>
+        <div class="card card-row" data-more="fullscreen" style="cursor:pointer;">
+          <div class="card-icon">🖥️</div><div class="card-title" style="flex:1;">เต็มจอ</div>
+        </div>
+        <div class="card card-row" data-more="uiscale" style="cursor:pointer;">
+          <div class="card-icon">🔍</div><div class="card-title" style="flex:1;">ขนาด UI (${(function(){ let s; try{s=localStorage.getItem('mb_ui_scale')||'normal';}catch(e){s='normal';} return UI_SCALE_LABEL[s]; })()})</div>
+        </div>
+      </div>
+    `;
+    sysModalBody.querySelectorAll('[data-more]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const key = el.dataset.more;
+        if(key==='pet') openModal('สัตว์เลี้ยง', renderPetModal);
+        else if(key==='battlepass') openModal('Battle Pass', renderBattlepassModal);
+        else if(key==='achievements') openModal('ความสำเร็จ', renderAchievementsModal);
+        else if(key==='bestiary') openModal('สมุดภาพมอนสเตอร์', renderBestiaryModal);
+        else if(key==='travel') openModal('🗺️ เดินทาง', renderTravelModal);
+        else if(key==='save') openModal('บันทึก / ชื่อตัวละคร', renderSaveModal);
+        else if(key==='chat'){ closeModal(); chatPanel.classList.toggle('show'); if(chatPanel.classList.contains('show')) renderChat(); }
+        else if(key==='audio'){
+          audioMuted = !audioMuted;
+          if(!audioMuted){ ensureAudio(); sfxClick(); }
+          renderMoreModal();
+        }
+        else if(key==='layout'){ closeModal(); enterLayoutEditMode(); }
+        else if(key==='fullscreen'){ toggleFullscreen(); }
+        else if(key==='uiscale'){ cycleUiScale(); renderMoreModal(); }
+      });
+    });
+  }
+  document.getElementById('open-more').addEventListener('click', ()=> openModal('เมนูเพิ่มเติม', renderMoreModal));
   function renderTravelModal(){
     sysModalBody.innerHTML = `
       <div class="card-desc" style="margin-bottom:8px;">พอร์ทัลเดินชนถูกปิดชั่วคราว — เดินทางผ่านเมนูนี้แทน</div>
@@ -5716,8 +6018,6 @@
       });
     });
   }
-  document.getElementById('return-village-btn').addEventListener('click', ()=> openModal('🗺️ เดินทาง', renderTravelModal));
-  document.getElementById('open-save').addEventListener('click', ()=> openModal('บันทึก / ชื่อตัวละคร', renderSaveModal));
   document.getElementById('qt-toggle').addEventListener('click', ()=>{
     document.getElementById('quest-tracker').classList.toggle('hidden');
     updateQuestTracker();
@@ -5844,10 +6144,6 @@
 
   // ---------- Chat panel ----------
   const chatPanel = document.getElementById('chat-panel');
-  document.getElementById('toggle-chat').addEventListener('click', ()=>{
-    chatPanel.classList.toggle('show');
-    if(chatPanel.classList.contains('show')) renderChat();
-  });
   document.querySelectorAll('.chat-tab').forEach(tab=>{
     tab.addEventListener('click', ()=>{
       document.querySelectorAll('.chat-tab').forEach(t=>t.classList.remove('active'));
@@ -5924,11 +6220,21 @@
   // ---------- Auto-battle ----------
   const autoBtn = document.getElementById('auto-btn');
   autoBtn.addEventListener('click', ()=>{
+    if(layoutEditMode) return;
     autoBattle = !autoBattle;
     autoBtn.classList.toggle('on', autoBattle);
     showToast(autoBattle? '🤖 เปิดโหมดออโต้แล้ว' : '🤖 ปิดโหมดออโต้แล้ว');
   });
-  document.getElementById('auto-settings-btn').addEventListener('click', ()=> openModal('ตั้งค่าออโต้', renderAutoSettingsModal));
+  document.getElementById('auto-settings-btn').addEventListener('click', ()=>{ if(!layoutEditMode) openModal('ตั้งค่าออโต้', renderAutoSettingsModal); });
+
+  // ---------- Quick-use potion (#2) ----------
+  function quickUsePotion(){
+    if(player.isDead || layoutEditMode) return;
+    if((player.items.hpPotion||0) > 0) useItem('hpPotion');
+    else showToast('ไม่มียาเพิ่มพลัง ไปซื้อที่ตลาด 💰');
+  }
+  document.getElementById('quickuse-btn').addEventListener('click', quickUsePotion);
+  document.getElementById('quickuse-btn').addEventListener('touchstart', e=>{ e.preventDefault(); quickUsePotion(); }, {passive:false});
 
   // ---------- Class select ----------
   let selectedClassKey = null;
@@ -5977,6 +6283,153 @@
     checkAchievements();
   });
   renderClassSelect();
+
+  // ==================== Phase 4 ====================
+
+  // ---------- #13: draggable control buttons with saved layout ----------
+  const DRAGGABLE_IDS = ['joystick-zone','attack-btn','skill-ult','skill-heal','skill-spin','skill-ranged','jump-btn','auto-btn','auto-settings-btn','quickuse-btn','open-inventory'];
+  let layoutEditMode = false;
+  const originalControlLayout = {};
+  function captureOriginalLayout(){
+    DRAGGABLE_IDS.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) originalControlLayout[id] = el.getAttribute('style') || '';
+    });
+  }
+  function clampToViewport(x, y, w, h){
+    return [ Math.max(0, Math.min(window.innerWidth-w, x)), Math.max(0, Math.min(window.innerHeight-h, y)) ];
+  }
+  function saveControlLayout(){
+    const data = {};
+    DRAGGABLE_IDS.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ const r = el.getBoundingClientRect(); data[id] = { left:Math.round(r.left), top:Math.round(r.top) }; }
+    });
+    try { localStorage.setItem('mb_control_layout', JSON.stringify(data)); } catch(e){}
+  }
+  function loadControlLayout(){
+    let data;
+    try { data = JSON.parse(localStorage.getItem('mb_control_layout')||'null'); } catch(e){ data = null; }
+    if(!data) return;
+    DRAGGABLE_IDS.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && data[id]){
+        el.style.position='absolute';
+        el.style.left = data[id].left+'px'; el.style.top = data[id].top+'px';
+        el.style.right='auto'; el.style.bottom='auto';
+      }
+    });
+  }
+  function makeDraggableControl(el){
+    if(!el) return;
+    let dragging=false, offX=0, offY=0;
+    function start(clientX,clientY){
+      if(!layoutEditMode) return;
+      dragging = true;
+      const r = el.getBoundingClientRect();
+      offX = clientX-r.left; offY = clientY-r.top;
+      el.style.position='absolute';
+    }
+    function moveTo(clientX,clientY){
+      if(!dragging) return;
+      const r = el.getBoundingClientRect();
+      const [nx,ny] = clampToViewport(clientX-offX, clientY-offY, r.width, r.height);
+      el.style.left = nx+'px'; el.style.top = ny+'px'; el.style.right='auto'; el.style.bottom='auto';
+    }
+    function end(){ if(dragging){ dragging=false; saveControlLayout(); } }
+    el.addEventListener('touchstart', e=>{ if(!layoutEditMode) return; e.preventDefault(); const t=e.touches[0]; start(t.clientX,t.clientY); }, {passive:false});
+    el.addEventListener('touchmove', e=>{ if(!dragging) return; e.preventDefault(); const t=e.touches[0]; moveTo(t.clientX,t.clientY); }, {passive:false});
+    el.addEventListener('touchend', end);
+    el.addEventListener('mousedown', e=>{ if(!layoutEditMode) return; start(e.clientX,e.clientY); });
+    window.addEventListener('mousemove', e=>{ if(dragging) moveTo(e.clientX,e.clientY); });
+    window.addEventListener('mouseup', end);
+  }
+  captureOriginalLayout();
+  loadControlLayout();
+  DRAGGABLE_IDS.forEach(id=> makeDraggableControl(document.getElementById(id)));
+  function enterLayoutEditMode(){
+    layoutEditMode = true;
+    document.body.classList.add('layout-edit-active');
+    document.getElementById('layout-edit-bar').classList.add('show');
+  }
+  function exitLayoutEditMode(){
+    layoutEditMode = false;
+    document.body.classList.remove('layout-edit-active');
+    document.getElementById('layout-edit-bar').classList.remove('show');
+  }
+  document.getElementById('layout-edit-done').addEventListener('click', exitLayoutEditMode);
+  document.getElementById('layout-edit-reset').addEventListener('click', ()=>{
+    DRAGGABLE_IDS.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el && originalControlLayout[id]!==undefined) el.setAttribute('style', originalControlLayout[id]);
+    });
+    try { localStorage.removeItem('mb_control_layout'); } catch(e){}
+    showToast('รีเซ็ตตำแหน่งปุ่มเรียบร้อย');
+  });
+
+  // ---------- #7: draggable/closable floating windows ----------
+  function makeDraggableWindow(handleEl, panelEl, storageKey){
+    if(!handleEl || !panelEl) return;
+    let dragging=false, offX=0, offY=0;
+    function save(){
+      const r = panelEl.getBoundingClientRect();
+      try { localStorage.setItem(storageKey, JSON.stringify({left:Math.round(r.left), top:Math.round(r.top)})); } catch(e){}
+    }
+    function load(){
+      let pos; try { pos = JSON.parse(localStorage.getItem(storageKey)||'null'); } catch(e){ pos=null; }
+      if(pos){ panelEl.style.left=pos.left+'px'; panelEl.style.top=pos.top+'px'; panelEl.style.right='auto'; panelEl.style.bottom='auto'; }
+    }
+    function start(clientX,clientY){
+      dragging = true;
+      const r = panelEl.getBoundingClientRect();
+      offX = clientX-r.left; offY = clientY-r.top;
+    }
+    function moveTo(clientX,clientY){
+      if(!dragging) return;
+      const r = panelEl.getBoundingClientRect();
+      const [nx,ny] = clampToViewport(clientX-offX, clientY-offY, r.width, r.height);
+      panelEl.style.left=nx+'px'; panelEl.style.top=ny+'px'; panelEl.style.right='auto'; panelEl.style.bottom='auto';
+    }
+    function end(){ if(dragging){ dragging=false; save(); } }
+    handleEl.addEventListener('touchstart', e=>{ e.preventDefault(); const t=e.touches[0]; start(t.clientX,t.clientY); }, {passive:false});
+    handleEl.addEventListener('touchmove', e=>{ if(!dragging) return; e.preventDefault(); const t=e.touches[0]; moveTo(t.clientX,t.clientY); }, {passive:false});
+    handleEl.addEventListener('touchend', end);
+    handleEl.addEventListener('mousedown', e=>{ start(e.clientX,e.clientY); });
+    window.addEventListener('mousemove', e=>{ if(dragging) moveTo(e.clientX,e.clientY); });
+    window.addEventListener('mouseup', end);
+    load();
+  }
+  makeDraggableWindow(document.getElementById('chat-drag-handle'), chatPanel, 'mb_chat_pos');
+  makeDraggableWindow(document.getElementById('qt-title'), document.getElementById('quest-tracker'), 'mb_quest_pos');
+  document.getElementById('chat-close-btn').addEventListener('click', ()=> chatPanel.classList.remove('show'));
+
+  // ---------- #8: fullscreen + adjustable UI scale ----------
+  function toggleFullscreen(){
+    const el = document.documentElement;
+    if(!document.fullscreenElement){
+      (el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen||function(){}).call(el);
+    } else {
+      (document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen||function(){}).call(document);
+    }
+  }
+  const UI_SCALES = ['compact','normal','large'];
+  const UI_SCALE_LABEL = { compact:'เล็ก', normal:'ปกติ', large:'ใหญ่' };
+  function applyUiScale(scale){
+    document.body.classList.remove('ui-scale-compact','ui-scale-large');
+    if(scale==='compact') document.body.classList.add('ui-scale-compact');
+    else if(scale==='large') document.body.classList.add('ui-scale-large');
+    try { localStorage.setItem('mb_ui_scale', scale); } catch(e){}
+  }
+  function cycleUiScale(){
+    let cur; try { cur = localStorage.getItem('mb_ui_scale')||'normal'; } catch(e){ cur='normal'; }
+    const next = UI_SCALES[(UI_SCALES.indexOf(cur)+1) % UI_SCALES.length];
+    applyUiScale(next);
+    showToast('🔍 ขนาด UI: '+UI_SCALE_LABEL[next]);
+  }
+  (function initUiScale(){
+    let saved; try { saved = localStorage.getItem('mb_ui_scale'); } catch(e){ saved=null; }
+    if(saved) applyUiScale(saved);
+  })();
 
   // ---------- init ----------
   buildAchievements();
