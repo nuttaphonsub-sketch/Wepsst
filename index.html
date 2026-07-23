@@ -253,7 +253,7 @@
     background:rgba(139,92,246,0.15); border-bottom:1px solid rgba(255,255,255,0.08);
     cursor:grab; touch-action:none;
   }
-  .chat-drag-handle #chat-close-btn { cursor:pointer; color:#94a3b8; font-size:13px; padding:0 3px; }
+  .chat-drag-handle #chat-close-btn { cursor:pointer; color:#fff; font-size:15px; padding:8px 12px; margin:-5px -8px -5px 0; background:rgba(255,255,255,0.08); border-radius:0 8px 0 8px; min-width:32px; text-align:center; }
   .qt-drag-handle { cursor:grab; touch-action:none; }
 
   /* ---------- #8: fullscreen + adjustable UI scale ---------- */
@@ -4088,6 +4088,7 @@ body.layout-edit-active #heal-btn {
       const goldGain = Math.round(m.type.gold*bossMult*(m.isWorldBoss?8:1)*(1+totalGoldBonus()));
       gainGold(m.type.gold*bossMult*(m.isWorldBoss?8:1));
       gainExp(expGain);
+      if(typeof broadcastPartyExpShare === 'function') broadcastPartyExpShare(expGain);
       gainBattlepassExp(m.isWorldBoss?200:(m.isBoss?15:3));
       const drop = rollMaterialDrop(m);
       const legDrop = rollLegendaryDrop(m);
@@ -4595,7 +4596,19 @@ body.layout-edit-active #heal-btn {
       // #8: priest's heal also pulses to nearby party/teammates — their support identity
       spawnParticle({ type:'ring', x:player.x, y:player.y, life:600, startRadius:20, endRadius:320, color:'#67e8f9', lineWidth:2 });
       if(typeof broadcastHealPulse === 'function') broadcastHealPulse();
-      showToast('💚 ส่งพลังฮีลให้เพื่อนรอบตัวด้วย!');
+      // Show the caster who actually got healed — previously only the recipient saw a number
+      let healedCount = 0;
+      if(typeof otherMapPlayers === 'function'){
+        otherMapPlayers().forEach(rp=>{
+          const d = Math.hypot(rp.x-player.x, rp.y-player.y);
+          if(d < 320){
+            const allyHeal = Math.round((rp.maxHp||100)*0.25);
+            spawnFloatText(rp.x, rp.y-30, '+'+allyHeal+' HP', '#67e8f9', true);
+            healedCount++;
+          }
+        });
+      }
+      showToast(healedCount>0 ? '💚 ฮีลเพื่อน '+healedCount+' คนรอบตัว!' : '💚 ส่งพลังฮีล (ไม่มีเพื่อนอยู่ในระยะ)');
     }
   }
   document.getElementById('heal-btn').addEventListener('click', castInnateHeal);
@@ -7457,6 +7470,9 @@ body.layout-edit-active #heal-btn {
   let partyMembers = {};
   let partyMemberRef = null;
   let partySyncTimer = 0;
+  let partyLeaderId = null;
+  let partyLeaderRef = null;
+  let partyJoinedAt = 0;
   // #6: Party bonus — rewards teaming up without being overpowered
   function partySize(){
     if(!partyCode) return 1;
@@ -7485,19 +7501,71 @@ body.layout-edit-active #heal-btn {
     if(!code){ showToast('กรอกรหัสปาร์ตี้ก่อน'); return; }
     leaveParty();
     partyCode = code;
+    partyJoinedAt = Date.now();
     partyMemberRef = fbDb.ref('parties/'+code+'/members/'+myPlayerId);
     partyMemberRef.onDisconnect().remove();
     fbDb.ref('parties/'+code+'/members').on('value', snap=>{
       partyMembers = snap.val() || {};
+      if(partyCode===code && !partyMembers[myPlayerId] && Date.now()-partyJoinedAt > 3000){
+        showToast('คุณถูกเตะออกจากปาร์ตี้');
+        leaveParty();
+        if(sysModal.classList.contains('show')) renderPartyModal();
+        return;
+      }
       if(sysModal.classList.contains('show') && document.getElementById('party-leave-btn')) renderPartyModal();
     });
+    partyLeaderRef = fbDb.ref('parties/'+code+'/leaderId');
+    partyLeaderRef.on('value', snap=>{
+      partyLeaderId = snap.val();
+      if(sysModal.classList.contains('show') && document.getElementById('party-leave-btn')) renderPartyModal();
+    });
+    if(isNew){
+      partyLeaderRef.set(myPlayerId);
+      partyLeaderRef.onDisconnect().remove();
+    }
+    joinPartyExpShareChannel(code);
     showToast(isNew? '🎉 สร้างปาร์ตี้ '+code+' แล้ว' : '✅ เข้าร่วมปาร์ตี้ '+code+' แล้ว');
     renderPartyModal();
   }
   function leaveParty(){
     if(partyMemberRef){ partyMemberRef.remove(); partyMemberRef.off(); }
     if(partyCode){ try{ fbDb.ref('parties/'+partyCode+'/members').off(); }catch(e){} }
-    partyCode = null; partyMembers = {}; partyMemberRef = null;
+    if(partyLeaderRef){ partyLeaderRef.off(); }
+    leavePartyExpShareChannel();
+    partyCode = null; partyMembers = {}; partyMemberRef = null; partyLeaderId = null; partyLeaderRef = null;
+  }
+  let partyExpShareRef = null;
+  function joinPartyExpShareChannel(code){
+    if(!fbReady) return;
+    partyExpShareRef = fbDb.ref('parties/'+code+'/expShares').limitToLast(10);
+    partyExpShareRef.on('child_added', snap=>{
+      const share = snap.val();
+      if(!share || share.by===myPlayerId) return;
+      if(share.mapId !== currentMapId) return; // only share if actually on the same map
+      const dist = Math.hypot((share.x||0)-player.x, (share.y||0)-player.y);
+      if(dist > 700) return; // must be reasonably nearby to share in the kill
+      gainExp(share.amount);
+      spawnFloatText(player.x, player.y-30, '+'+share.amount+' EXP (ปาร์ตี้)', '#a78bfa', true);
+    });
+  }
+  function leavePartyExpShareChannel(){
+    if(partyExpShareRef){ partyExpShareRef.off(); partyExpShareRef = null; }
+  }
+  function broadcastPartyExpShare(expAmount){
+    if(!fbReady || !partyCode) return;
+    const shareAmt = Math.round(expAmount * 0.5);
+    if(shareAmt <= 0) return;
+    fbDb.ref('parties/'+partyCode+'/expShares').push({ by: myPlayerId, amount: shareAmt, x: Math.round(player.x), y: Math.round(player.y), mapId: currentMapId, ts: Date.now() }).catch(()=>{});
+  }
+  function kickPartyMember(targetId, targetName){
+    if(!partyCode || partyLeaderId!==myPlayerId) return;
+    fbDb.ref('parties/'+partyCode+'/members/'+targetId).remove();
+    showToast('เตะ '+(targetName||'สมาชิก')+' ออกจากปาร์ตี้แล้ว');
+  }
+  function transferPartyLeader(targetId, targetName){
+    if(!partyCode || partyLeaderId!==myPlayerId) return;
+    fbDb.ref('parties/'+partyCode+'/leaderId').set(targetId);
+    showToast('โอนหัวหน้าปาร์ตี้ให้ '+(targetName||'สมาชิก')+' แล้ว');
   }
   let myPresenceRef = null, mapPlayersRef = null, mapPlayers = {};
   function joinMapPresence(mapId){
@@ -7532,10 +7600,14 @@ body.layout-edit-active #heal-btn {
     partySyncTimer += dt;
     if(partySyncTimer < 250) return;
     partySyncTimer = 0;
-    myPresenceRef.set({
+    const payload = {
       name: player.name||'นักผจญภัย', classKey: player.classKey, x: Math.round(player.x), y: Math.round(player.y),
       lvl: player.level, hp: Math.round(player.hp), maxHp: player.maxHp, facing: player.facing, lastSeen: Date.now()
-    });
+    };
+    myPresenceRef.set(payload);
+    if(partyMemberRef){
+      partyMemberRef.set({ ...payload, mapId: currentMapId }).catch(()=>{});
+    }
   }
   function otherMapPlayers(){
     const list = [];
@@ -7629,7 +7701,9 @@ body.layout-edit-active #heal-btn {
         joinPartyByCode(document.getElementById('party-code-input').value, false);
       });
     } else {
-      const others = Object.keys(partyMembers).filter(id=>id!==myPlayerId).map(id=>partyMembers[id]).filter(Boolean);
+      const others = Object.keys(partyMembers).filter(id=>id!==myPlayerId).map(id=>({...partyMembers[id], _id:id})).filter(m=>m._id);
+      const amLeader = partyLeaderId === myPlayerId;
+      const myHpPct = Math.max(0, Math.min(1, player.hp/player.maxHp));
       sysModalBody.innerHTML = `
         <div class="sys-section">
           <div class="card" style="text-align:center;">
@@ -7641,17 +7715,40 @@ body.layout-edit-active #heal-btn {
         </div>
         <div class="sys-section">
           <div class="sys-title">สมาชิกในปาร์ตี้ (${others.length+1})</div>
-          <div class="card card-row"><div class="card-icon">${CLASSES[player.classKey]?CLASSES[player.classKey].icon:'🐱'}</div><div style="flex:1;"><div class="card-title">${player.name||'คุณ'} (คุณ)</div><div class="card-desc">Lv.${player.level} · ${currentMapId}</div></div></div>
+          <div class="card card-row">
+            <div class="card-icon">${CLASSES[player.classKey]?CLASSES[player.classKey].icon:'🐱'}</div>
+            <div style="flex:1;">
+              <div class="card-title">${amLeader?'👑 ':''}${player.name||'คุณ'} (คุณ)</div>
+              <div class="card-desc">Lv.${player.level}</div>
+              <div style="background:rgba(255,255,255,0.1); border-radius:4px; height:6px; margin-top:4px; overflow:hidden;"><div style="background:#4ade80; height:100%; width:${myHpPct*100}%;"></div></div>
+            </div>
+          </div>
           ${others.length===0? '<div class="card-desc" style="text-align:center; padding:10px;">รอเพื่อนเข้าร่วม... (2 คน +10% · 3 คน +20% · 4+ คน +30%)</div>' : others.map(m=>{
             const online = Date.now()-(m.lastSeen||0) < 15000;
+            const hpPct = Math.max(0, Math.min(1, (m.hp||0)/(m.maxHp||1)));
+            const isLeaderM = partyLeaderId === m._id;
             return `<div class="card card-row">
               <div class="card-icon">${CLASSES[m.classKey]?CLASSES[m.classKey].icon:'🐱'}</div>
-              <div style="flex:1;"><div class="card-title">${m.name||'เพื่อน'} ${online?'🟢':'⚪'}</div><div class="card-desc">Lv.${m.lvl||1} · ${m.mapId||'-'}</div></div>
+              <div style="flex:1;">
+                <div class="card-title">${isLeaderM?'👑 ':''}${m.name||'เพื่อน'} ${online?'🟢':'⚪'}</div>
+                <div class="card-desc">Lv.${m.lvl||1} · ${m.mapId||'-'}</div>
+                <div style="background:rgba(255,255,255,0.1); border-radius:4px; height:6px; margin-top:4px; overflow:hidden;"><div style="background:#4ade80; height:100%; width:${hpPct*100}%;"></div></div>
+              </div>
+              ${amLeader? `<div style="display:flex; flex-direction:column; gap:4px;">
+                <button class="btn-sm alt" data-transfer="${m._id}" data-name="${m.name||'เพื่อน'}" style="font-size:10px; padding:4px 8px;">โอนหัวหน้า</button>
+                <button class="btn-sm danger" data-kick="${m._id}" data-name="${m.name||'เพื่อน'}" style="font-size:10px; padding:4px 8px;">เตะ</button>
+              </div>` : ''}
             </div>`;
           }).join('')}
         </div>
         <button class="btn-sm danger" id="party-leave-btn" style="width:100%;">ออกจากปาร์ตี้</button>
       `;
+      sysModalBody.querySelectorAll('[data-kick]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{ kickPartyMember(btn.dataset.kick, btn.dataset.name); });
+      });
+      sysModalBody.querySelectorAll('[data-transfer]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{ transferPartyLeader(btn.dataset.transfer, btn.dataset.name); });
+      });
       document.getElementById('party-leave-btn').addEventListener('click', ()=>{
         leaveParty();
         showToast('ออกจากปาร์ตี้แล้ว');
