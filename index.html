@@ -7106,6 +7106,29 @@ body.layout-edit-active #heal-btn {
     checkAchievements();
     autoSaveGame();
   });
+  // ==================== Firebase init (must run before anything below references it) ====================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAI1UA7vWqJhJaLud0aPuT_2up4Mj_RSRw",
+    authDomain: "monster-basher-coop.firebaseapp.com",
+    databaseURL: "https://monster-basher-coop-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "monster-basher-coop",
+    storageBucket: "monster-basher-coop.firebasestorage.app",
+    messagingSenderId: "39133552780",
+    appId: "1:39133552780:web:ec504645f1fe9e7fcd9ba9"
+  };
+  let fbDb = null, fbReady = false, fbAuth = null;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    fbDb = firebase.database();
+    fbAuth = firebase.auth();
+    fbReady = true;
+  } catch(e){ console.warn('Firebase init failed', e); }
+  let authReadyPromise = Promise.resolve();
+  if(fbAuth){
+    fbAuth.onAuthStateChanged(user=>{ if(user && typeof checkGmStatus==='function') checkGmStatus(user.uid); });
+    authReadyPromise = fbAuth.signInAnonymously().catch(()=>{});
+  }
+
   renderClassSelect();
 
   // ---------- Login screen (gacha-style splash) ----------
@@ -7280,22 +7303,6 @@ body.layout-edit-active #heal-btn {
   });
 
   // ==================== Co-op Party System ====================
-  const firebaseConfig = {
-    apiKey: "AIzaSyAI1UA7vWqJhJaLud0aPuT_2up4Mj_RSRw",
-    authDomain: "monster-basher-coop.firebaseapp.com",
-    databaseURL: "https://monster-basher-coop-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "monster-basher-coop",
-    storageBucket: "monster-basher-coop.firebasestorage.app",
-    messagingSenderId: "39133552780",
-    appId: "1:39133552780:web:ec504645f1fe9e7fcd9ba9"
-  };
-  let fbDb = null, fbReady = false, fbAuth = null;
-  try {
-    firebase.initializeApp(firebaseConfig);
-    fbDb = firebase.database();
-    fbAuth = firebase.auth();
-    fbReady = true;
-  } catch(e){ console.warn('Firebase init failed', e); }
 
   // ---------- Network status indicator ----------
   function updateNetStatusIcon(connected){
@@ -7335,11 +7342,6 @@ body.layout-edit-active #heal-btn {
     }).catch(()=>{
       showToast('❌ เข้าสู่ระบบไม่สำเร็จ: อีเมลหรือรหัสผ่านไม่ถูกต้อง');
     });
-  }
-  let authReadyPromise = Promise.resolve();
-  if(fbAuth){
-    fbAuth.onAuthStateChanged(user=>{ if(user) checkGmStatus(user.uid); });
-    authReadyPromise = fbAuth.signInAnonymously().catch(()=>{});
   }
 
   let myPlayerId = null;
