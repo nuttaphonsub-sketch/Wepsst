@@ -673,6 +673,9 @@
   .login-btn.primary { background:linear-gradient(135deg,#fbbf24,#d97706); color:#3a1e00; box-shadow:0 4px 14px rgba(251,191,36,0.4); }
   .login-btn:disabled { opacity:0.4; }
   .login-btn.alt { background:rgba(255,255,255,0.05); color:#94a3b8; font-size:12px; padding:9px; }
+  .login-gm-link { text-align:center; font-size:10.5px; color:#64748b; margin-top:6px; cursor:pointer; }
+  .login-gm-form { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .login-gm-form input { width:100%; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.3); color:#fff; font-size:12px; }
 
   .class-select-overlay {
     position:absolute; inset:0; background:rgba(5,8,16,0.97); z-index:30;
@@ -786,6 +789,7 @@ body.layout-edit-active #heal-btn {
 </style>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 </head>
 <body>
 <div id="game-container">
@@ -1037,6 +1041,12 @@ body.layout-edit-active #heal-btn {
         <button class="login-btn primary" id="login-newgame-btn">🆕 เริ่มใหม่</button>
         <button class="login-btn" id="login-continue-btn" disabled>▶️ เล่นต่อ</button>
         <button class="login-btn alt" id="login-settings-btn">⚙️ ตั้งค่า</button>
+        <div class="login-gm-link" id="login-gm-link">🔑 เข้าสู่ระบบผู้ดูแล</div>
+        <div class="login-gm-form" id="login-gm-form" style="display:none;">
+          <input type="email" id="login-gm-email" placeholder="อีเมล GM" autocomplete="off">
+          <input type="password" id="login-gm-pass" placeholder="รหัสผ่าน" autocomplete="off">
+          <button class="login-btn alt" id="login-gm-submit" style="margin-top:4px;">เข้าสู่ระบบ GM</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1556,19 +1566,24 @@ body.layout-edit-active #heal-btn {
     const mapId = currentMapId;
     const st = fieldBossState[mapId];
     if(!st || MAPS[mapId].safe) return;
-    if(!st.active){
-      if(Date.now() >= st.nextSpawnAt){
-        st.active = true;
-        st.activeUntil = Date.now()+6*60*1000;
-        spawnMonster({ force:true, isBoss:true, isFieldBoss:true, x:player.x, y:Math.max(40,player.y-220), scaleMul:2.2 });
-        showToast('👑 บอสประจำแมพปรากฏตัวใน '+MAPS[mapId].name+'!');
-        pushChat('system','ระบบ','บอสใหญ่ปรากฏตัวใน '+MAPS[mapId].name+'! รีบไปจัดการ');
+    if(isMapHost()){
+      if(!st.active){
+        if(Date.now() >= st.nextSpawnAt){
+          st.active = true;
+          st.activeUntil = Date.now()+6*60*1000;
+          spawnMonster({ force:true, isBoss:true, isFieldBoss:true, x:player.x, y:Math.max(40,player.y-220), scaleMul:2.2 });
+          showToast('👑 บอสประจำแมพปรากฏตัวใน '+MAPS[mapId].name+'!');
+          pushChat('system','ระบบ','บอสใหญ่ปรากฏตัวใน '+MAPS[mapId].name+'! รีบไปจัดการ');
+        }
+      } else {
+        if(Date.now() > st.activeUntil || !monsters.some(m=>m.isFieldBoss)){
+          st.active = false;
+          st.nextSpawnAt = Date.now()+FIELD_BOSS_INTERVAL;
+        }
       }
     } else {
-      if(Date.now() > st.activeUntil || !monsters.some(m=>m.isFieldBoss)){
-        st.active = false;
-        st.nextSpawnAt = Date.now()+FIELD_BOSS_INTERVAL;
-      }
+      // Guest: mirror reality from the synced monster list instead of an independent timer
+      st.active = monsters.some(m=>m.isFieldBoss);
     }
   }
   const raidState = { active:false, bossHp:0, bossMaxHp:0, partyHp:0, partyMaxHp:0, allies:[], attackCd:0 };
@@ -1699,8 +1714,10 @@ body.layout-edit-active #heal-btn {
     chests.push({ id:chestIdCounter++, x, y, wobble:Math.random()*1000 });
   }
   function updateChests(dt){
-    chestSpawnTimer += dt;
-    if(chestSpawnTimer > CHEST_SPAWN_INTERVAL){ chestSpawnTimer=0; spawnChest(); }
+    if(isMapHost()){
+      chestSpawnTimer += dt;
+      if(chestSpawnTimer > CHEST_SPAWN_INTERVAL){ chestSpawnTimer=0; spawnChest(); }
+    }
     for(const c of chests){ c.wobble += dt; }
     for(const c of [...chests]){
       if(Math.hypot(c.x-player.x, c.y-player.y) < player.r+26) openChest(c);
@@ -1708,6 +1725,7 @@ body.layout-edit-active #heal-btn {
   }
   function openChest(c){
     chests = chests.filter(cc=>cc.id!==c.id);
+    if(isNetActive() && netChestsRef){ netChestsRef.child(String(c.id)).remove().catch(()=>{}); }
     const goldAmt = 50+Math.floor(Math.random()*100);
     gainGold(goldAmt);
     const matKeys = Object.keys(player.materials);
@@ -2357,20 +2375,26 @@ body.layout-edit-active #heal-btn {
   // ---------- World Boss ----------
   function updateWorldBoss(dt){
     if(MAPS[currentMapId].safe) return;
-    if(!worldBossState.active){
-      if(Date.now() >= worldBossState.nextSpawnAt){
-        worldBossState.active = true;
-        worldBossState.activeUntil = Date.now()+WORLD_BOSS_WINDOW;
-        const m = spawnMonster({ force:true, isWorldBoss:true, x:player.x, y:Math.max(40,player.y-260), type: MONSTER_TYPES[4] });
-        worldBossState.monsterId = m ? m.id : null;
-        pushChat('system','ระบบ','🌍 เวิลด์บอสปรากฏตัวแล้ว! รีบไปร่วมต่อสู้');
+    if(isMapHost()){
+      if(!worldBossState.active){
+        if(Date.now() >= worldBossState.nextSpawnAt){
+          worldBossState.active = true;
+          worldBossState.activeUntil = Date.now()+WORLD_BOSS_WINDOW;
+          const m = spawnMonster({ force:true, isWorldBoss:true, x:player.x, y:Math.max(40,player.y-260), type: MONSTER_TYPES[4] });
+          worldBossState.monsterId = m ? m.id : null;
+          pushChat('system','ระบบ','🌍 เวิลด์บอสปรากฏตัวแล้ว! รีบไปร่วมต่อสู้');
+        }
+      } else {
+        if(Date.now() > worldBossState.activeUntil || !monsters.some(m=>m.isWorldBoss)){
+          worldBossState.active = false;
+          worldBossState.nextSpawnAt = Date.now()+WORLD_BOSS_INTERVAL;
+          monsters = monsters.filter(m=>!m.isWorldBoss);
+        }
       }
     } else {
-      if(Date.now() > worldBossState.activeUntil || !monsters.some(m=>m.isWorldBoss)){
-        worldBossState.active = false;
-        worldBossState.nextSpawnAt = Date.now()+WORLD_BOSS_INTERVAL;
-        monsters = monsters.filter(m=>!m.isWorldBoss);
-      }
+      // Guest: don't run an independent spawn timer — just mirror whether a world boss
+      // actually exists in the host's synced monster list, so status always matches reality.
+      worldBossState.active = monsters.some(m=>m.isWorldBoss);
     }
     renderWorldBossBanner();
   }
@@ -2529,12 +2553,7 @@ body.layout-edit-active #heal-btn {
   }
   let worldChatTimer = 0;
   function updateWorldChat(dt){
-    worldChatTimer += dt;
-    if(worldChatTimer > 7000+Math.random()*9000){
-      worldChatTimer = 0;
-      const names = ['BungBEN','MeoJung','PangTee','ArnoldZa','TukkataMoo','NueaGamer','JJSlash'];
-      pushChat('world', names[Math.floor(Math.random()*names.length)], CHAT_WORLD_LINES[Math.floor(Math.random()*CHAT_WORLD_LINES.length)]);
-    }
+    // Fake NPC world chat retired — replaced by real cross-player chat via sendWorldChatMessage.
   }
 
   // ---------- Achievements ----------
@@ -2800,6 +2819,7 @@ body.layout-edit-active #heal-btn {
     currentMapId = mapId;
     leaveNetMap();
     leaveMapPresence();
+    leaveWorldChat();
     monsters = []; chests = []; projectiles = [];
     WORLD_W = m.w; WORLD_H = m.h; ZONES = m.zones.length? m.zones : [{name:m.name, color:'rgba(255,255,255,0.02)', xMin:0,xMax:m.w,yMin:0,yMax:m.h,diff:1}];
     player.x = m.spawn.x; player.y = m.spawn.y;
@@ -2812,6 +2832,7 @@ body.layout-edit-active #heal-btn {
     if(mmName) mmName.textContent = m.name;
     if(!m.safe && mapId!=='tower' && fbReady) claimHostIfNeeded(mapId);
     if(fbReady) joinMapPresence(mapId);
+    if(fbReady) joinWorldChat(mapId);
     updateHud();
   }
   let portalConfirmShownFor = null;
@@ -3743,6 +3764,26 @@ body.layout-edit-active #heal-btn {
     if(hasSetBonus('wanderingsage') && Math.random()<0.15) qty *= 2;
     player.materials[key] = (player.materials[key]||0) + qty;
     return {key, qty};
+  }
+
+  let netChatRef = null;
+  function joinWorldChat(mapId){
+    if(!fbReady) return;
+    netChatRef = fbDb.ref('world/'+mapId+'/chat').limitToLast(30);
+    netChatRef.on('child_added', snap=>{
+      const msg = snap.val();
+      if(!msg || msg.by===myPlayerId) return; // already shown locally by the sender
+      pushChat('world', msg.name||'นักผจญภัย', msg.text||'');
+    });
+  }
+  function leaveWorldChat(){
+    if(netChatRef){ netChatRef.off(); netChatRef = null; }
+  }
+  function sendWorldChatMessage(text){
+    pushChat('world', player.name||'นักผจญภัย', text);
+    if(fbReady && netChatRef){
+      fbDb.ref('world/'+currentMapId+'/chat').push({ name: player.name||'นักผจญภัย', text, by: myPlayerId, ts: Date.now() });
+    }
   }
 
   function damageMonster(m, dmg, crit){
@@ -5093,7 +5134,7 @@ body.layout-edit-active #heal-btn {
       updateMapPresence(dt);
       if(isNetActive() && netIsHost && !inInstancedContent){
         netSnapshotTimer += dt;
-        if(netSnapshotTimer > 220){ netSnapshotTimer = 0; pushMonsterSnapshot(); }
+        if(netSnapshotTimer > 220){ netSnapshotTimer = 0; pushMonsterSnapshot(); pushChestSnapshot(); }
       }
 
       worldBossUiTimer += dt;
@@ -6767,7 +6808,8 @@ body.layout-edit-active #heal-btn {
     const text = input.value.trim();
     if(!text) return;
     if(text.startsWith('/')){ tryParseCommand(text); input.value=''; return; }
-    pushChat(activeChatTab, 'คุณ', text);
+    if(activeChatTab === 'world') sendWorldChatMessage(text);
+    else pushChat(activeChatTab, 'คุณ', text);
     input.value = '';
   }
   document.getElementById('chat-send').addEventListener('click', sendChatMsg);
@@ -6990,6 +7032,13 @@ body.layout-edit-active #heal-btn {
   document.getElementById('login-settings-btn').addEventListener('click', ()=>{
     openModal('ตั้งค่า', renderLoginSettingsModal);
   });
+  document.getElementById('login-gm-link').addEventListener('click', ()=>{
+    const form = document.getElementById('login-gm-form');
+    form.style.display = form.style.display==='none' ? 'flex' : 'none';
+  });
+  document.getElementById('login-gm-submit').addEventListener('click', ()=>{
+    gmSignIn(document.getElementById('login-gm-email').value, document.getElementById('login-gm-pass').value);
+  });
 
   // ==================== Co-op Party System ====================
   const firebaseConfig = {
@@ -7001,12 +7050,41 @@ body.layout-edit-active #heal-btn {
     messagingSenderId: "39133552780",
     appId: "1:39133552780:web:ec504645f1fe9e7fcd9ba9"
   };
-  let fbDb = null, fbReady = false;
+  let fbDb = null, fbReady = false, fbAuth = null;
   try {
     firebase.initializeApp(firebaseConfig);
     fbDb = firebase.database();
+    fbAuth = firebase.auth();
     fbReady = true;
   } catch(e){ console.warn('Firebase init failed', e); }
+
+  // ---------- GM verification (real login, not the old /gm chat trick) ----------
+  // GM status is a direct UID match against the account you created in Firebase Auth.
+  // This is safe even hardcoded in client code: Firebase Auth (server-side) is what proves
+  // a signed-in user actually owns that UID — nobody can fake it without your real password.
+  const GM_UID = 'Tfmgt8ZyjXY3D4ep9OebLddBBOb2';
+  let isGM = false;
+  function checkGmStatus(uid){
+    if(uid === GM_UID){
+      isGM = true;
+      showToast('🛠️ เข้าสู่ระบบในฐานะ GM แล้ว');
+      const gmBtn = document.getElementById('gm-float-btn');
+      if(gmBtn) gmBtn.classList.add('unlocked');
+    }
+  }
+  function gmSignIn(email, pass){
+    if(!fbAuth){ showToast('ต่อระบบยืนยันตัวตนไม่ได้'); return; }
+    if(!email || !pass){ showToast('กรอกอีเมลและรหัสผ่านก่อน'); return; }
+    fbAuth.signInWithEmailAndPassword(email.trim(), pass).then(cred=>{
+      checkGmStatus(cred.user.uid);
+    }).catch(()=>{
+      showToast('เข้าสู่ระบบไม่สำเร็จ: อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+    });
+  }
+  if(fbAuth){
+    fbAuth.onAuthStateChanged(user=>{ if(user) checkGmStatus(user.uid); });
+    fbAuth.signInAnonymously().catch(()=>{});
+  }
 
   let myPlayerId = null;
   try {
@@ -7160,7 +7238,7 @@ body.layout-edit-active #heal-btn {
   // running their own — so everyone sees the exact same monsters at the exact same HP.
   // When offline/alone, isMapHost() always returns true, so solo play is 100% unchanged.
   let netMapId = null, netIsHost = false, netHostId = null;
-  let netMonstersRef = null, netHitsRef = null, netHostIdRef = null, netHbRef = null, netHbInterval = null;
+  let netMonstersRef = null, netHitsRef = null, netHostIdRef = null, netHbRef = null, netHbInterval = null, netChestsRef = null;
   let netSnapshotTimer = 0;
   function isNetActive(){ return fbReady && netMapId === currentMapId && netMapId !== null; }
   function isMapHost(){ return !isNetActive() || netIsHost; }
@@ -7190,11 +7268,18 @@ body.layout-edit-active #heal-btn {
     monsters.forEach(m=>{ out[m.id] = serializeMonsterForSync(m); });
     netMonstersRef.set(out);
   }
+  function pushChestSnapshot(){
+    if(!netChestsRef) return;
+    const out = {};
+    chests.forEach(c=>{ out[c.id] = {x:Math.round(c.x), y:Math.round(c.y)}; });
+    netChestsRef.set(out);
+  }
   function leaveNetMap(){
     if(netHbInterval){ clearInterval(netHbInterval); netHbInterval = null; }
     if(netIsHost && netHostIdRef){ netHostIdRef.remove(); }
     if(netHitsRef){ netHitsRef.off(); netHitsRef = null; }
     if(netMonstersRef){ netMonstersRef.off(); netMonstersRef = null; }
+    if(netChestsRef){ netChestsRef.off(); netChestsRef = null; }
     netHostIdRef = null; netHbRef = null;
     netMapId = null; netIsHost = false; netHostId = null;
   }
@@ -7208,6 +7293,8 @@ body.layout-edit-active #heal-btn {
     netHbInterval = setInterval(()=>{ if(netIsHost) netHbRef.set(Date.now()); }, 3000);
     netMonstersRef = fbDb.ref('world/'+mapId+'/monsters');
     netMonstersRef.onDisconnect().remove();
+    netChestsRef = fbDb.ref('world/'+mapId+'/chests');
+    netChestsRef.onDisconnect().remove();
     netHitsRef = fbDb.ref('world/'+mapId+'/hits');
     netHitsRef.on('child_added', snap=>{
       const hit = snap.val();
@@ -7223,6 +7310,11 @@ body.layout-edit-active #heal-btn {
     netMonstersRef.on('value', snap=>{
       const data = snap.val() || {};
       monsters = Object.keys(data).map(id=>deserializeMonsterFromSync(id, data[id]));
+    });
+    netChestsRef = fbDb.ref('world/'+mapId+'/chests');
+    netChestsRef.on('value', snap=>{
+      const data = snap.val() || {};
+      chests = Object.keys(data).map(id=>({ id, x:data[id].x, y:data[id].y, wobble:Date.now()%1000 }));
     });
     netHitsRef = fbDb.ref('world/'+mapId+'/hits'); // guests write here, don't listen
   }
