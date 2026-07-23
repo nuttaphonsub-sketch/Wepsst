@@ -758,6 +758,11 @@
     display:flex; align-items:center; justify-content:center; font-size:16px; pointer-events:auto;
   }
   .auto-btn.on { background:linear-gradient(135deg,#fbbf24,#d97706); border-color:#fde047; color:#3a1e00; }
+  .chat-toggle-btn {
+    position:absolute; left:20px; bottom:198px; width:40px; height:40px; border-radius:12px;
+    background:rgba(20,18,40,0.85); border:2px solid rgba(56,189,248,0.4); z-index:7;
+    display:flex; align-items:center; justify-content:center; font-size:16px; pointer-events:auto;
+  }
 
   /* raid panel */
   .raid-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
@@ -1000,6 +1005,7 @@ body.layout-edit-active #heal-btn {
   </div>
 
   <div class="auto-btn" id="auto-btn">🤖</div>
+  <div class="chat-toggle-btn" id="chat-toggle-btn">💬</div>
   <div class="auto-btn" id="auto-settings-btn" style="left:70px; bottom:144px; width:36px; height:36px; font-size:14px;">⚙️</div>
   <div class="quickuse-btn" id="quickuse-btn">🧪<span class="quickuse-badge" id="quickuse-badge">0</span></div>
   <div class="invquick-btn" id="open-inventory">🎒<span class="ping" id="ping-bag"></span></div>
@@ -2604,7 +2610,12 @@ body.layout-edit-active #heal-btn {
     const code = serializeSave();
     try { localStorage.setItem('mb_autosave', code); } catch(e){}
     if(fbReady && fbDb && fbAuth && fbAuth.currentUser){
-      fbDb.ref('players/'+fbAuth.currentUser.uid+'/save').set(code).catch(()=>{});
+      const uid = fbAuth.currentUser.uid;
+      fbDb.ref('players/'+uid+'/save').set(code).catch(()=>{});
+      const powerScore = Math.round(totalATK()*1.0 + totalDEF()*0.6 + player.maxHp*0.05 + player.level*2);
+      fbDb.ref('leaderboard/'+uid).set({
+        name: player.name||'นักผจญภัย', level: player.level, powerScore, towerBest: towerState.bestFloor||0, ts: Date.now()
+      }).catch(()=>{});
     }
   }
   function hasAutoSave(){
@@ -3829,7 +3840,7 @@ body.layout-edit-active #heal-btn {
         const h = snap.val();
         if(!h || h.by===myPlayerId || player.isDead) return;
         const dist = Math.hypot(h.x-player.x, h.y-player.y);
-        if(dist < (h.radius||320)){
+        if(dist < (h.radius||500)){
           const heal = Math.round(player.maxHp*(h.pct||0.25));
           player.hp = Math.min(player.maxHp, player.hp+heal);
           spawnFloatText(player.x, player.y-30, '+'+heal+' HP (เพื่อน)', '#67e8f9', true);
@@ -3843,7 +3854,9 @@ body.layout-edit-active #heal-btn {
   }
   function broadcastHealPulse(){
     if(!fbReady) return;
-    fbDb.ref('world/'+currentMapId+'/heals').push({ by:myPlayerId, x:Math.round(player.x), y:Math.round(player.y), pct:0.25, radius:320, ts:Date.now() });
+    authReadyPromise.then(()=>{
+      fbDb.ref('world/'+currentMapId+'/heals').push({ by:myPlayerId, x:Math.round(player.x), y:Math.round(player.y), pct:0.25, radius:500, ts:Date.now() });
+    });
   }
 
   // ---------- #7: Friend interaction menu (tap a nearby player) ----------
@@ -3993,7 +4006,8 @@ body.layout-edit-active #heal-btn {
     showToast(won? '🏆 คุณชนะดวล PVP กับ '+res.vsName+'!' : '💀 คุณแพ้ดวล PVP กับ '+res.vsName);
   }
 
-  function damageMonster(m, dmg, crit){
+  function damageMonster(m, dmg, crit, grantRewards){
+    if(grantRewards === undefined) grantRewards = true;
     if(m.archetype && m.archetype.defMul !== 1) dmg = Math.max(1, Math.round(dmg/m.archetype.defMul));
     m.hp -= dmg; m.hitFlash = 200; m.provoked = true;
     if(isNetActive() && !netIsHost && !m.isDungeon && !m.isTower && m.id!=null){
@@ -4025,6 +4039,7 @@ body.layout-edit-active #heal-btn {
       sfxHit();
     }
     if(m.hp <= 0){
+      if(grantRewards){
       player.kills++;
       player.bestiary[m.type.name] = (player.bestiary[m.type.name]||0)+1;
       const bossMult = m.isBoss ? 4 : 1;
@@ -4093,10 +4108,24 @@ body.layout-edit-active #heal-btn {
       }
       if(dungeonState.active && m.isDungeon) onDungeonMonsterCleared();
       if(towerState.active && m.isTower) onTowerMonsterCleared();
-      monsters = monsters.filter(mm=>mm.id!==m.id);
-      updateHud();
       checkAchievements();
       updateQuestPings();
+      } else {
+        // Sync-only path: host is applying someone else's kill — no personal reward,
+        // but the shared world state still needs to reflect that the monster is gone.
+        spawnDeathPoof(m);
+        sfxDeath(m.r/18);
+        if(m.isFieldBoss){
+          const st = fieldBossState[currentMapId];
+          if(st){ st.active=false; st.nextSpawnAt = Date.now()+FIELD_BOSS_INTERVAL; }
+        }
+        if(m.isWorldBoss){
+          worldBossState.active = false;
+          worldBossState.nextSpawnAt = Date.now() + WORLD_BOSS_INTERVAL;
+        }
+      }
+      monsters = monsters.filter(mm=>mm.id!==m.id);
+      updateHud();
     }
   }
   function rollDamage(baseMultiplier, target){
@@ -4527,26 +4556,38 @@ body.layout-edit-active #heal-btn {
       player.y += joyDY*spd*(dt/16);
       if(joyDX !== 0) player.facing = joyDX>0?1:-1;
     } else if(autoBattle && !dungeonState.active){
-      let target = null, best = Infinity;
       const preferred = questAutoTargetName ? monsters.filter(m=>m.type.name===questAutoTargetName) : null;
       const searchPool = (preferred && preferred.length) ? preferred : monsters;
-      for(const m of searchPool){
-        const d = Math.hypot(m.x-player.x, m.y-player.y);
-        if(d < best){ best = d; target = m; }
+      // stick with the current lock until it dies or falls outside the valid pool — prevents
+      // flip-flopping between targets every frame, which was letting monsters gang up and kill fast
+      let target = getSelectedTarget();
+      if(target && !searchPool.includes(target)) target = null;
+      if(!target){
+        let best = Infinity;
+        for(const m of searchPool){
+          const d = Math.hypot(m.x-player.x, m.y-player.y);
+          if(d < best){ best = d; target = m; }
+        }
+        if(target) selectedTargetId = target.id;
       }
-      if(target && best > getAttackRange()*0.9){
-        const spd = player.speedBase*1.15*classData().statMul.spd*mountSpeedMult();
-        const dx = (target.x-player.x)/best, dy=(target.y-player.y)/best;
-        player.x += dx*spd*(dt/16);
-        player.y += dy*spd*(dt/16);
-        player.facing = dx>0?1:-1;
-      } else if(target){
-        doAttack();
-        const conf = autoConf();
-        if(player.hp < player.maxHp*(conf.healPct/100) && innateHealCd<=0) castInnateHeal();
-        else if(conf.useUlt && skills.ult.cd<=0 && monsters.length>=2) castUlt();
-        else if(conf.useSpin && monsters.length>=conf.spinThreshold && skills.spin.cd<=0) castSpin();
-        else if(conf.useRanged && skills.ranged.cd<=0) fireRanged();
+      if(target){
+        const dist = Math.hypot(target.x-player.x, target.y-player.y);
+        if(dist > getAttackRange()*0.9){
+          const spd = player.speedBase*1.15*classData().statMul.spd*mountSpeedMult();
+          const dx = (target.x-player.x)/dist, dy=(target.y-player.y)/dist;
+          player.x += dx*spd*(dt/16);
+          player.y += dy*spd*(dt/16);
+          player.facing = dx>0?1:-1;
+        } else {
+          doAttack();
+          const conf = autoConf();
+          if(player.hp < player.maxHp*(conf.healPct/100) && innateHealCd<=0) castInnateHeal();
+          else if(conf.useUlt && skills.ult.cd<=0 && monsters.length>=2) castUlt();
+          else if(conf.useSpin && monsters.length>=conf.spinThreshold && skills.spin.cd<=0) castSpin();
+          else if(conf.useRanged && skills.ranged.cd<=0) fireRanged();
+        }
+      } else {
+        selectedTargetId = null;
       }
     } else if(moveTarget){
       const mdx = moveTarget.x-player.x, mdy = moveTarget.y-player.y;
@@ -5113,6 +5154,13 @@ body.layout-edit-active #heal-btn {
       ctx.strokeStyle='#93c5fd'; ctx.lineWidth=1;
       ctx.strokeRect(pbx,pby,pBarW*Math.min(1,player.shield/player.maxHp),3.5);
     }
+    if(player.name){
+      ctx.font='9px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+      ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,0.8)';
+      ctx.strokeText(player.name, sx, pby-4);
+      ctx.fillStyle='#fde047';
+      ctx.fillText(player.name, sx, pby-4);
+    }
   }
 
   function drawClassAccessory(){
@@ -5276,6 +5324,10 @@ body.layout-edit-active #heal-btn {
     for(const c of chests){ mmCtx.beginPath(); mmCtx.arc(c.x*sx, c.y*sy, 2.4, 0, Math.PI*2); mmCtx.fill(); }
     mmCtx.fillStyle = '#22d3ee';
     (MAP_NPCS[currentMapId]||[]).forEach(n=>{ mmCtx.beginPath(); mmCtx.arc(n.x*sx, n.y*sy, 2.2, 0, Math.PI*2); mmCtx.fill(); });
+    mmCtx.fillStyle = '#3b82f6';
+    (typeof otherMapPlayers==='function' ? otherMapPlayers() : []).forEach(rp=>{
+      mmCtx.beginPath(); mmCtx.arc(rp.x*sx, rp.y*sy, 2.6, 0, Math.PI*2); mmCtx.fill();
+    });
     mmCtx.fillStyle = '#a78bfa';
     mmCtx.beginPath(); mmCtx.arc(player.x*sx, player.y*sy, 3, 0, Math.PI*2); mmCtx.fill();
     // viewport rect
@@ -5286,16 +5338,21 @@ body.layout-edit-active #heal-btn {
   let lastTs = 0;
   function updateBossHpBar(){
     const el = document.getElementById('boss-hp-bar');
-    let target = monsters.find(m=>m.isFieldBoss || m.isWorldBoss);
-    const isWorldOrField = !!target;
-    if(!target) target = getSelectedTarget();
+    let target = getSelectedTarget();
+    let isWorldOrField = target ? (target.isWorldBoss || target.isFieldBoss) : false;
     if(!target){
-      // fallback: show whatever monster is currently in melee range (what a basic attack would hit)
+      // whatever you're actually in range to hit right now takes priority
       let best = Infinity;
       for(const m of monsters){
         const d = Math.hypot(m.x-player.x, m.y-player.y);
         if(d <= getAttackRange()+m.r && d < best){ best = d; target = m; }
       }
+      if(target) isWorldOrField = target.isWorldBoss || target.isFieldBoss;
+    }
+    if(!target){
+      // nothing being fought at all — only then show a world/field boss as a fallback heads-up
+      target = monsters.find(m=>m.isFieldBoss || m.isWorldBoss);
+      isWorldOrField = !!target;
     }
     if(!target){ el.classList.remove('show'); return; }
     el.classList.add('show');
@@ -6742,6 +6799,9 @@ body.layout-edit-active #heal-btn {
   function renderMoreModal(){
     sysModalBody.innerHTML = `
       <div class="sys-section">
+        <div class="card card-row" data-more="leaderboard" style="cursor:pointer;">
+          <div class="card-icon">🏆</div><div class="card-title" style="flex:1;">อันดับเซิร์ฟเวอร์</div>
+        </div>
         <div class="card card-row" data-more="party" style="cursor:pointer;">
           <div class="card-icon">👥</div><div class="card-title" style="flex:1;">ปาร์ตี้${partyCode?' <span class="badge-pill" style="background:#16a34a;color:#fff;">'+partyCode+'</span>':''}</div>
         </div>
@@ -6783,7 +6843,8 @@ body.layout-edit-active #heal-btn {
     sysModalBody.querySelectorAll('[data-more]').forEach(el=>{
       el.addEventListener('click', ()=>{
         const key = el.dataset.more;
-        if(key==='party') openModal('👥 ปาร์ตี้', renderPartyModal);
+        if(key==='leaderboard') openModal('🏆 อันดับเซิร์ฟเวอร์', renderLeaderboardModal);
+        else if(key==='party') openModal('👥 ปาร์ตี้', renderPartyModal);
         else if(key==='pet') openModal('สัตว์เลี้ยง', renderPetModal);
         else if(key==='battlepass') openModal('Battle Pass', renderBattlepassModal);
         else if(key==='achievements') openModal('ความสำเร็จ', renderAchievementsModal);
@@ -6915,6 +6976,7 @@ body.layout-edit-active #heal-btn {
       panel.querySelectorAll('#gm-bossatk-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmBossatk)===bossAtkMult));
       panel.querySelectorAll('#gm-goldrate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmGoldrate)===goldRateMult));
       panel.querySelectorAll('#gm-gemrate-row button').forEach(b=> b.classList.toggle('rate-active', parseFloat(b.dataset.gmGemrate)===gemRateMult));
+      broadcastServerRates();
     }
     panel.querySelectorAll('button[data-gm-monpower]').forEach(b=>{
       b.addEventListener('click', ()=>{ monsterPowerMult = parseFloat(b.dataset.gmMonpower); refreshRateButtons(); showToast('ความแข็งแกร่งมอนสเตอร์ x'+monsterPowerMult); });
@@ -7127,6 +7189,28 @@ body.layout-edit-active #heal-btn {
   if(fbAuth){
     fbAuth.onAuthStateChanged(user=>{ if(user && typeof checkGmStatus==='function') checkGmStatus(user.uid); });
     authReadyPromise = fbAuth.signInAnonymously().catch(()=>{});
+  }
+  function broadcastServerRates(){
+    if(!fbReady || !fbDb || typeof isGM==='undefined' || !isGM) return;
+    fbDb.ref('serverConfig/rates').set({
+      monsterPowerMult, bossHpMult, bossAtkMult, goldRateMult, gemRateMult, expRateMult, dropRateMult, ts: Date.now()
+    }).catch(()=>{});
+  }
+  if(fbReady){
+    authReadyPromise.then(()=>{
+      fbDb.ref('serverConfig/rates').on('value', snap=>{
+        const r = snap.val();
+        if(!r) return;
+        if(typeof r.monsterPowerMult==='number') monsterPowerMult = r.monsterPowerMult;
+        if(typeof r.bossHpMult==='number') bossHpMult = r.bossHpMult;
+        if(typeof r.bossAtkMult==='number') bossAtkMult = r.bossAtkMult;
+        if(typeof r.goldRateMult==='number') goldRateMult = r.goldRateMult;
+        if(typeof r.gemRateMult==='number') gemRateMult = r.gemRateMult;
+        if(typeof r.expRateMult==='number') expRateMult = r.expRateMult;
+        if(typeof r.dropRateMult==='number') dropRateMult = r.dropRateMult;
+        updateHud();
+      });
+    });
   }
 
   renderClassSelect();
@@ -7405,7 +7489,18 @@ body.layout-edit-active #heal-btn {
       myPresenceRef = fbDb.ref('world/'+mapId+'/players/'+myPlayerId);
       myPresenceRef.onDisconnect().remove();
       mapPlayersRef = fbDb.ref('world/'+mapId+'/players');
-      mapPlayersRef.on('value', snap=>{ mapPlayers = snap.val() || {}; });
+      mapPlayersRef.on('value', snap=>{
+        const data = snap.val() || {};
+        for(const id in data){
+          if(id===myPlayerId) continue;
+          const oldHp = mapPlayers[id] ? mapPlayers[id].hp : undefined;
+          const newHp = data[id] ? data[id].hp : undefined;
+          if(oldHp!==undefined && newHp!==undefined && newHp < oldHp - 0.5){
+            spawnFloatText(data[id].x, data[id].y-30, '-'+Math.round(oldHp-newHp), '#f87171', false);
+          }
+        }
+        mapPlayers = data;
+      });
     });
   }
   function leaveMapPresence(){
@@ -7457,6 +7552,45 @@ body.layout-edit-active #heal-btn {
     const hpPct = Math.max(0, (rp.hp||0)/(rp.maxHp||1));
     ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(sx-16, sy-24, 32, 3);
     ctx.fillStyle='#4ade80'; ctx.fillRect(sx-16, sy-24, 32*hpPct, 3);
+  }
+  let lbActiveTab = 'level';
+  function renderLeaderboardModal(){
+    if(!fbReady || !fbDb){
+      sysModalBody.innerHTML = `<div class="card-desc" style="text-align:center; padding:20px;">ต่อเซิร์ฟเวอร์ไม่ได้</div>`;
+      return;
+    }
+    sysModalBody.innerHTML = `
+      <div class="chat-tabs" style="margin-bottom:8px;">
+        <div class="chat-tab ${lbActiveTab==='level'?'active':''}" data-lbtab="level">⭐ เลเวล</div>
+        <div class="chat-tab ${lbActiveTab==='power'?'active':''}" data-lbtab="power">💪 พลัง</div>
+        <div class="chat-tab ${lbActiveTab==='tower'?'active':''}" data-lbtab="tower">🗼 หอคอย</div>
+      </div>
+      <div id="lb-list"><div class="card-desc" style="text-align:center; padding:14px;">กำลังโหลด...</div></div>
+    `;
+    sysModalBody.querySelectorAll('[data-lbtab]').forEach(el=>{
+      el.addEventListener('click', ()=>{ lbActiveTab = el.dataset.lbtab; renderLeaderboardModal(); });
+    });
+    const orderField = lbActiveTab==='level' ? 'level' : (lbActiveTab==='power' ? 'powerScore' : 'towerBest');
+    fbDb.ref('leaderboard').orderByChild(orderField).limitToLast(20).once('value').then(snap=>{
+      const data = snap.val() || {};
+      const list = Object.keys(data).map(uid=>({ uid, ...data[uid] })).sort((a,b)=>(b[orderField]||0)-(a[orderField]||0));
+      const listEl = document.getElementById('lb-list');
+      if(!listEl) return;
+      if(list.length===0){ listEl.innerHTML = '<div class="card-desc" style="text-align:center; padding:14px;">ยังไม่มีข้อมูล</div>'; return; }
+      listEl.innerHTML = list.map((p,i)=>{
+        const isMe = fbAuth && fbAuth.currentUser && p.uid===fbAuth.currentUser.uid;
+        const medal = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':'#'+(i+1)));
+        const valText = lbActiveTab==='level' ? 'Lv.'+(p.level||1) : (lbActiveTab==='power' ? (p.powerScore||0)+' พลัง' : 'ชั้น '+(p.towerBest||0));
+        return `<div class="card card-row" style="${isMe?'border-color:#fbbf24;background:rgba(251,191,36,0.08);':''}">
+          <div class="card-icon" style="width:34px;text-align:center;">${medal}</div>
+          <div style="flex:1;"><div class="card-title">${p.name||'นักผจญภัย'}${isMe?' (คุณ)':''}</div></div>
+          <div class="card-title" style="color:#fbbf24;">${valText}</div>
+        </div>`;
+      }).join('');
+    }).catch(()=>{
+      const listEl = document.getElementById('lb-list');
+      if(listEl) listEl.innerHTML = '<div class="card-desc" style="text-align:center; padding:14px;">โหลดไม่สำเร็จ</div>';
+    });
   }
   function renderPartyModal(){
     if(!partyCode){
@@ -7576,7 +7710,7 @@ body.layout-edit-active #heal-btn {
       snap.ref.remove();
       if(!hit) return;
       const target = monsters.find(mm=>mm.id===hit.monsterId);
-      if(target && target.hp>0) damageMonster(target, hit.dmg, hit.crit);
+      if(target && target.hp>0) damageMonster(target, hit.dmg, hit.crit, false);
     });
   }
   function becomeGuest(mapId, hostId){
@@ -7584,7 +7718,16 @@ body.layout-edit-active #heal-btn {
     netMonstersRef = fbDb.ref('world/'+mapId+'/monsters');
     netMonstersRef.on('value', snap=>{
       const data = snap.val() || {};
+      const oldHpById = {};
+      monsters.forEach(m=>{ oldHpById[m.id] = m.hp; });
       monsters = Object.keys(data).map(id=>deserializeMonsterFromSync(id, data[id]));
+      monsters.forEach(m=>{
+        const oldHp = oldHpById[m.id];
+        if(oldHp !== undefined && m.hp < oldHp - 0.5){
+          spawnFloatText(m.x, m.y-20, '-'+Math.round(oldHp-m.hp), '#ffffff', false);
+          spawnHitSpark(m.x, m.y, false);
+        }
+      });
     });
     netChestsRef = fbDb.ref('world/'+mapId+'/chests');
     netChestsRef.on('value', snap=>{
@@ -7647,7 +7790,7 @@ body.layout-edit-active #heal-btn {
   // ==================== Phase 4 ====================
 
   // ---------- #13: draggable control buttons with saved layout ----------
-  const DRAGGABLE_IDS = ['joystick-zone','attack-btn','skill-ult','skill-spin','skill-ranged','jump-btn','auto-btn','auto-settings-btn','quickuse-btn','open-inventory','heal-btn'];
+  const DRAGGABLE_IDS = ['joystick-zone','attack-btn','skill-ult','skill-spin','skill-ranged','jump-btn','auto-btn','auto-settings-btn','quickuse-btn','open-inventory','heal-btn','chat-toggle-btn'];
   let layoutEditMode = false;
   const originalControlLayout = {};
   function captureOriginalLayout(){
@@ -7830,18 +7973,34 @@ body.layout-edit-active #heal-btn {
       panelEl.style.left=nx+'px'; panelEl.style.top=ny+'px'; panelEl.style.right='auto'; panelEl.style.bottom='auto';
     }
     function end(){ if(dragging){ dragging=false; save(); } }
-    handleEl.addEventListener('touchstart', e=>{ e.preventDefault(); const t=e.touches[0]; start(t.clientX,t.clientY); }, {passive:false});
+    handleEl.addEventListener('touchstart', e=>{
+      if(e.target.closest('#chat-close-btn')) return; // let the close button handle its own tap
+      e.preventDefault(); const t=e.touches[0]; start(t.clientX,t.clientY);
+    }, {passive:false});
     handleEl.addEventListener('touchmove', e=>{ if(!dragging) return; e.preventDefault(); const t=e.touches[0]; moveTo(t.clientX,t.clientY); }, {passive:false});
     handleEl.addEventListener('touchend', end);
     handleEl.addEventListener('touchcancel', end);
-    handleEl.addEventListener('mousedown', e=>{ start(e.clientX,e.clientY); });
+    handleEl.addEventListener('mousedown', e=>{
+      if(e.target.closest('#chat-close-btn')) return;
+      start(e.clientX,e.clientY);
+    });
     window.addEventListener('mousemove', e=>{ if(dragging) moveTo(e.clientX,e.clientY); });
     window.addEventListener('mouseup', end);
     load();
   }
   makeDraggableWindow(document.getElementById('chat-drag-handle'), chatPanel, 'mb_chat_pos');
   makeDraggableWindow(document.getElementById('qt-title'), document.getElementById('quest-tracker'), 'mb_quest_pos');
+  document.getElementById('chat-toggle-btn').addEventListener('click', ()=>{
+    chatPanel.classList.toggle('show');
+    if(chatPanel.classList.contains('show')) renderChat();
+  });
+  document.getElementById('chat-toggle-btn').addEventListener('touchstart', e=>{
+    e.preventDefault();
+    chatPanel.classList.toggle('show');
+    if(chatPanel.classList.contains('show')) renderChat();
+  }, {passive:false});
   document.getElementById('chat-close-btn').addEventListener('click', ()=> chatPanel.classList.remove('show'));
+  document.getElementById('chat-close-btn').addEventListener('touchstart', e=>{ e.preventDefault(); e.stopPropagation(); chatPanel.classList.remove('show'); }, {passive:false});
 
   // ---------- #8: fullscreen + adjustable UI scale ----------
   function toggleFullscreen(){
