@@ -1070,6 +1070,47 @@ body.layout-edit-active #heal-btn {
 
 <script>
 (function(){
+  // ==================== Firebase init — MUST be first: several IIFEs below run immediately at load and reference this ====================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAI1UA7vWqJhJaLud0aPuT_2up4Mj_RSRw",
+    authDomain: "monster-basher-coop.firebaseapp.com",
+    databaseURL: "https://monster-basher-coop-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "monster-basher-coop",
+    storageBucket: "monster-basher-coop.firebasestorage.app",
+    messagingSenderId: "39133552780",
+    appId: "1:39133552780:web:ec504645f1fe9e7fcd9ba9"
+  };
+  let fbDb = null, fbReady = false, fbAuth = null;
+  const GM_UID = 'Tfmgt8ZyjXY3D4ep9OebLddBBOb2';
+  let isGM = false;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    fbDb = firebase.database();
+    fbAuth = firebase.auth();
+    fbReady = true;
+  } catch(e){ console.warn('Firebase init failed', e); }
+  let authReadyPromise = Promise.resolve();
+  if(fbAuth){
+    fbAuth.onAuthStateChanged(user=>{ if(user && typeof checkGmStatus==='function') checkGmStatus(user.uid); });
+    authReadyPromise = fbAuth.signInAnonymously().catch(()=>{});
+  }
+  if(fbReady){
+    authReadyPromise.then(()=>{
+      fbDb.ref('serverConfig/rates').on('value', snap=>{
+        const r = snap.val();
+        if(!r) return;
+        if(typeof r.monsterPowerMult==='number') monsterPowerMult = r.monsterPowerMult;
+        if(typeof r.bossHpMult==='number') bossHpMult = r.bossHpMult;
+        if(typeof r.bossAtkMult==='number') bossAtkMult = r.bossAtkMult;
+        if(typeof r.goldRateMult==='number') goldRateMult = r.goldRateMult;
+        if(typeof r.gemRateMult==='number') gemRateMult = r.gemRateMult;
+        if(typeof r.expRateMult==='number') expRateMult = r.expRateMult;
+        if(typeof r.dropRateMult==='number') dropRateMult = r.dropRateMult;
+        if(typeof updateHud==='function') updateHud();
+      });
+    });
+  }
+
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const container = document.getElementById('game-container');
@@ -7168,49 +7209,11 @@ body.layout-edit-active #heal-btn {
     checkAchievements();
     autoSaveGame();
   });
-  // ==================== Firebase init (must run before anything below references it) ====================
-  const firebaseConfig = {
-    apiKey: "AIzaSyAI1UA7vWqJhJaLud0aPuT_2up4Mj_RSRw",
-    authDomain: "monster-basher-coop.firebaseapp.com",
-    databaseURL: "https://monster-basher-coop-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "monster-basher-coop",
-    storageBucket: "monster-basher-coop.firebasestorage.app",
-    messagingSenderId: "39133552780",
-    appId: "1:39133552780:web:ec504645f1fe9e7fcd9ba9"
-  };
-  let fbDb = null, fbReady = false, fbAuth = null;
-  try {
-    firebase.initializeApp(firebaseConfig);
-    fbDb = firebase.database();
-    fbAuth = firebase.auth();
-    fbReady = true;
-  } catch(e){ console.warn('Firebase init failed', e); }
-  let authReadyPromise = Promise.resolve();
-  if(fbAuth){
-    fbAuth.onAuthStateChanged(user=>{ if(user && typeof checkGmStatus==='function') checkGmStatus(user.uid); });
-    authReadyPromise = fbAuth.signInAnonymously().catch(()=>{});
-  }
   function broadcastServerRates(){
     if(!fbReady || !fbDb || typeof isGM==='undefined' || !isGM) return;
     fbDb.ref('serverConfig/rates').set({
       monsterPowerMult, bossHpMult, bossAtkMult, goldRateMult, gemRateMult, expRateMult, dropRateMult, ts: Date.now()
     }).catch(()=>{});
-  }
-  if(fbReady){
-    authReadyPromise.then(()=>{
-      fbDb.ref('serverConfig/rates').on('value', snap=>{
-        const r = snap.val();
-        if(!r) return;
-        if(typeof r.monsterPowerMult==='number') monsterPowerMult = r.monsterPowerMult;
-        if(typeof r.bossHpMult==='number') bossHpMult = r.bossHpMult;
-        if(typeof r.bossAtkMult==='number') bossAtkMult = r.bossAtkMult;
-        if(typeof r.goldRateMult==='number') goldRateMult = r.goldRateMult;
-        if(typeof r.gemRateMult==='number') gemRateMult = r.gemRateMult;
-        if(typeof r.expRateMult==='number') expRateMult = r.expRateMult;
-        if(typeof r.dropRateMult==='number') dropRateMult = r.dropRateMult;
-        updateHud();
-      });
-    });
   }
 
   renderClassSelect();
@@ -7405,8 +7408,6 @@ body.layout-edit-active #heal-btn {
   // GM status is a direct UID match against the account you created in Firebase Auth.
   // This is safe even hardcoded in client code: Firebase Auth (server-side) is what proves
   // a signed-in user actually owns that UID — nobody can fake it without your real password.
-  const GM_UID = 'Tfmgt8ZyjXY3D4ep9OebLddBBOb2';
-  let isGM = false;
   function checkGmStatus(uid, isExplicitAttempt){
     if(uid === GM_UID){
       isGM = true;
