@@ -915,6 +915,7 @@ body.layout-edit-active #heal-btn {
       <div style="position:relative;">
         <canvas id="minimap" class="minimap"></canvas>
         <div id="minimap-name" style="position:absolute; top:1px; left:50%; transform:translateX(-50%); font-size:7px; color:#e2e8f0; background:rgba(0,0,0,0.55); padding:1px 5px; border-radius:5px; white-space:nowrap; pointer-events:none; max-width:94%; overflow:hidden; text-overflow:ellipsis;"></div>
+        <div id="net-status" title="สถานะเครือข่าย" style="position:absolute; top:1px; right:1px; font-size:10px; background:rgba(0,0,0,0.6); padding:1px 4px; border-radius:5px; pointer-events:none; line-height:1;">📶</div>
       </div>
       <div class="panel level-panel" id="level-panel-btn" style="cursor:pointer; position:relative;">
         <span class="ping" id="ping-stats" style="top:-3px; right:-3px;"></span>
@@ -1054,6 +1055,7 @@ body.layout-edit-active #heal-btn {
   <div class="class-select-overlay" id="class-select" style="display:none;">
     <div class="cs-title">🐱 เลือกอาชีพของคุณ</div>
     <div class="cs-sub">แตะเพื่อเทียบสเตตัส เลือกได้ครั้งเดียวตอนเริ่ม</div>
+    <input type="text" id="cs-name-input" placeholder="ตั้งชื่อตัวละคร..." maxlength="16" style="width:100%; max-width:420px; padding:11px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:#fff; font-size:13px; text-align:center; margin-bottom:10px;">
     <div id="class-card-list" class="cs-grid"></div>
     <div id="cs-class-desc" class="cs-class-desc"><div class="ccd-text" style="color:#64748b;">แตะการ์ดด้านบนเพื่อดูรายละเอียดอาชีพ</div></div>
     <button class="cs-confirm-btn" id="cs-confirm" disabled>เริ่มการผจญภัย</button>
@@ -2599,7 +2601,11 @@ body.layout-edit-active #heal-btn {
   }
   function autoSaveGame(){
     if(!gameStarted) return;
-    try { localStorage.setItem('mb_autosave', serializeSave()); } catch(e){}
+    const code = serializeSave();
+    try { localStorage.setItem('mb_autosave', code); } catch(e){}
+    if(fbReady && fbDb && fbAuth && fbAuth.currentUser){
+      fbDb.ref('players/'+fbAuth.currentUser.uid+'/save').set(code).catch(()=>{});
+    }
   }
   function hasAutoSave(){
     try { return !!localStorage.getItem('mb_autosave'); } catch(e){ return false; }
@@ -2820,6 +2826,9 @@ body.layout-edit-active #heal-btn {
     leaveNetMap();
     leaveMapPresence();
     leaveWorldChat();
+    leaveHealChannel();
+    leaveInviteChannel();
+    leavePvpChannel();
     monsters = []; chests = []; projectiles = [];
     WORLD_W = m.w; WORLD_H = m.h; ZONES = m.zones.length? m.zones : [{name:m.name, color:'rgba(255,255,255,0.02)', xMin:0,xMax:m.w,yMin:0,yMax:m.h,diff:1}];
     player.x = m.spawn.x; player.y = m.spawn.y;
@@ -2833,6 +2842,9 @@ body.layout-edit-active #heal-btn {
     if(!m.safe && mapId!=='tower' && fbReady) claimHostIfNeeded(mapId);
     if(fbReady) joinMapPresence(mapId);
     if(fbReady) joinWorldChat(mapId);
+    if(fbReady) joinHealChannel(mapId);
+    if(fbReady) joinInviteChannel(mapId);
+    if(fbReady) joinPvpChannel(mapId);
     updateHud();
   }
   let portalConfirmShownFor = null;
@@ -3364,7 +3376,7 @@ body.layout-edit-active #heal-btn {
   }
 
   function gainExp(amount){
-    amount = Math.round(amount * (1 + (hasSetBonus('wanderingsage')?0.25:0)) * expRateMult);
+    amount = Math.round(amount * (1 + (hasSetBonus('wanderingsage')?0.25:0) + partyBonusPct()) * expRateMult);
     player.exp += amount;
     gainPetExp(Math.round(amount*0.3));
     while(player.exp >= player.expToNext){
@@ -3387,7 +3399,7 @@ body.layout-edit-active #heal-btn {
   }
 
   function gainGold(amount){
-    player.gold += Math.round(amount * (1+totalGoldBonus()) * goldRateMult);
+    player.gold += Math.round(amount * (1+totalGoldBonus()+partyBonusPct()) * goldRateMult);
   }
   function gainGems(amount){
     if(amount<=0) return;
@@ -3407,6 +3419,18 @@ body.layout-edit-active #heal-btn {
     const t = monsters.find(m=>m.id===selectedTargetId);
     if(!t){ selectedTargetId = null; return null; }
     return t;
+  }
+  function pickRemotePlayerAtScreen(clientX, clientY){
+    const canvas = document.getElementById('game');
+    const rect = canvas.getBoundingClientRect();
+    const sx = clientX-rect.left, sy = clientY-rect.top;
+    const wx = sx+camera.x, wy = sy+camera.y;
+    let best = null, bestDist = Infinity;
+    for(const rp of (typeof otherMapPlayers==='function' ? otherMapPlayers() : [])){
+      const d = Math.hypot(rp.x-wx, rp.y-wy);
+      if(d <= 34 && d < bestDist){ bestDist = d; best = rp; }
+    }
+    return best;
   }
   function pickMonsterAtScreen(clientX, clientY){
     const canvas = document.getElementById('game');
@@ -3459,6 +3483,12 @@ body.layout-edit-active #heal-btn {
     function tapUp(x,y){
       if(tapMoved || !gameStarted || sysModal.classList.contains('show')) return;
       if(joyActive || autoBattle) return;
+      const friend = pickRemotePlayerAtScreen(x,y);
+      if(friend){
+        showFriendMenuPopup(friend, x, y);
+        sfxClick();
+        return;
+      }
       const picked = pickMonsterAtScreen(x,y);
       if(picked){
         selectedTargetId = picked.id;
@@ -3769,11 +3799,14 @@ body.layout-edit-active #heal-btn {
   let netChatRef = null;
   function joinWorldChat(mapId){
     if(!fbReady) return;
-    netChatRef = fbDb.ref('world/'+mapId+'/chat').limitToLast(30);
-    netChatRef.on('child_added', snap=>{
-      const msg = snap.val();
-      if(!msg || msg.by===myPlayerId) return; // already shown locally by the sender
-      pushChat('world', msg.name||'นักผจญภัย', msg.text||'');
+    authReadyPromise.then(()=>{
+      if(currentMapId !== mapId) return; // player already left this map
+      netChatRef = fbDb.ref('world/'+mapId+'/chat').limitToLast(30);
+      netChatRef.on('child_added', snap=>{
+        const msg = snap.val();
+        if(!msg || msg.by===myPlayerId) return; // already shown locally by the sender
+        pushChat('world', msg.name||'นักผจญภัย', msg.text||'');
+      });
     });
   }
   function leaveWorldChat(){
@@ -3784,6 +3817,180 @@ body.layout-edit-active #heal-btn {
     if(fbReady && netChatRef){
       fbDb.ref('world/'+currentMapId+'/chat').push({ name: player.name||'นักผจญภัย', text, by: myPlayerId, ts: Date.now() });
     }
+  }
+
+  let netHealsRef = null;
+  function joinHealChannel(mapId){
+    if(!fbReady) return;
+    authReadyPromise.then(()=>{
+      if(currentMapId !== mapId) return;
+      netHealsRef = fbDb.ref('world/'+mapId+'/heals').limitToLast(5);
+      netHealsRef.on('child_added', snap=>{
+        const h = snap.val();
+        if(!h || h.by===myPlayerId || player.isDead) return;
+        const dist = Math.hypot(h.x-player.x, h.y-player.y);
+        if(dist < (h.radius||320)){
+          const heal = Math.round(player.maxHp*(h.pct||0.25));
+          player.hp = Math.min(player.maxHp, player.hp+heal);
+          spawnFloatText(player.x, player.y-30, '+'+heal+' HP (เพื่อน)', '#67e8f9', true);
+          updateHud();
+        }
+      });
+    });
+  }
+  function leaveHealChannel(){
+    if(netHealsRef){ netHealsRef.off(); netHealsRef = null; }
+  }
+  function broadcastHealPulse(){
+    if(!fbReady) return;
+    fbDb.ref('world/'+currentMapId+'/heals').push({ by:myPlayerId, x:Math.round(player.x), y:Math.round(player.y), pct:0.25, radius:320, ts:Date.now() });
+  }
+
+  // ---------- #7: Friend interaction menu (tap a nearby player) ----------
+  function showFriendMenuPopup(rp, x, y){
+    closeItemPopup();
+    const cd = CLASSES[rp.classKey] || CLASSES.warrior;
+    const pop = document.createElement('div');
+    pop.className = 'item-popup'; pop.id = 'item-popup-el';
+    pop.innerHTML = `
+      <div class="ip-title">${cd.icon} ${rp.name||'เพื่อน'}</div>
+      <div class="ip-stat">Lv.${rp.lvl||1} · ${cd.name||''}</div>
+      <div class="ip-stat">HP ${Math.round(rp.hp||0)}/${rp.maxHp||0}</div>
+      <div class="ip-btns">
+        <button class="ip-equip" id="ip-friend-party">👥 ชวนปาร์ตี้</button>
+        <button class="ip-sell" id="ip-friend-pvp">⚔️ ท้าดวล PVP</button>
+        <button class="ip-close" id="ip-close-btn">ปิด</button>
+      </div>
+    `;
+    document.body.appendChild(pop);
+    let px = x-100, py = y+10;
+    if(px+200 > window.innerWidth) px = window.innerWidth-206;
+    if(px < 6) px = 6;
+    if(py+190 > window.innerHeight) py = Math.max(6, y-196);
+    pop.style.left = px+'px'; pop.style.top = py+'px';
+    armPopupAutoClose();
+    document.getElementById('ip-friend-party').addEventListener('click', ()=>{
+      sendPartyInvite(rp._id, rp.name||'เพื่อน');
+      closeItemPopup();
+    });
+    document.getElementById('ip-friend-pvp').addEventListener('click', ()=>{
+      challengePvp(rp);
+      closeItemPopup();
+    });
+    document.getElementById('ip-close-btn').addEventListener('click', closeItemPopup);
+  }
+
+  // ---------- #7: real party invites (works across two real players) ----------
+  let netInviteRef = null;
+  function joinInviteChannel(mapId){
+    if(!fbReady) return;
+    authReadyPromise.then(()=>{
+      if(currentMapId !== mapId) return;
+      netInviteRef = fbDb.ref('world/'+mapId+'/partyInvites/'+myPlayerId);
+      netInviteRef.on('value', snap=>{
+        const inv = snap.val();
+        if(!inv) return;
+        netInviteRef.remove();
+        showPartyInvitePopup(inv);
+      });
+    });
+  }
+  function leaveInviteChannel(){ if(netInviteRef){ netInviteRef.off(); netInviteRef=null; } }
+  function sendPartyInvite(targetId, targetName){
+    if(!fbReady){ showToast('ต่อเซิร์ฟเวอร์ไม่ได้'); return; }
+    if(!partyCode) createParty();
+    fbDb.ref('world/'+currentMapId+'/partyInvites/'+targetId).set({ code:partyCode, fromName:player.name||'เพื่อน', ts:Date.now() });
+    showToast('ส่งคำเชิญปาร์ตี้ให้ '+targetName+' แล้ว');
+  }
+  function showPartyInvitePopup(inv){
+    closeItemPopup();
+    const pop = document.createElement('div');
+    pop.className='item-popup'; pop.id='item-popup-el';
+    pop.innerHTML = `<div class="ip-title">👥 คำเชิญปาร์ตี้</div>
+      <div class="ip-stat">${inv.fromName} ชวนคุณเข้าปาร์ตี้!</div>
+      <div class="ip-btns">
+        <button class="ip-equip" id="ip-invite-accept">ตอบรับ</button>
+        <button class="ip-close" id="ip-invite-decline">ปฏิเสธ</button>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.style.left='50%'; pop.style.top='40%'; pop.style.transform='translate(-50%,-50%)';
+    document.getElementById('ip-invite-accept').addEventListener('click', ()=>{
+      joinPartyByCode(inv.code, false);
+      closeItemPopup();
+    });
+    document.getElementById('ip-invite-decline').addEventListener('click', closeItemPopup);
+  }
+
+  // ---------- #7: real PVP challenge — resolved from both players' actual current stats ----------
+  let netPvpRef = null;
+  function joinPvpChannel(mapId){
+    if(!fbReady) return;
+    authReadyPromise.then(()=>{
+      if(currentMapId !== mapId) return;
+      netPvpRef = fbDb.ref('world/'+mapId+'/pvpChallenges/'+myPlayerId);
+      netPvpRef.on('value', snap=>{
+        const ch = snap.val();
+        if(!ch) return;
+        netPvpRef.remove();
+        if(ch.type==='challenge') showPvpChallengePopup(ch);
+        else if(ch.type==='result') showPvpResultPopup(ch);
+      });
+    });
+  }
+  function leavePvpChannel(){ if(netPvpRef){ netPvpRef.off(); netPvpRef=null; } }
+  function challengePvp(rp){
+    if(!fbReady){ showToast('ต่อเซิร์ฟเวอร์ไม่ได้'); return; }
+    if(!rp._id){ showToast('ท้าดวลผู้เล่นนี้ไม่ได้'); return; }
+    fbDb.ref('world/'+currentMapId+'/pvpChallenges/'+rp._id).set({
+      type:'challenge', fromId:myPlayerId, fromName:player.name||'เพื่อน',
+      fromLvl:player.level, fromAtk:totalATK(), fromDef:totalDEF(), fromHp:player.maxHp,
+      ts:Date.now()
+    });
+    showToast('ส่งคำท้า PVP ให้ '+(rp.name||'เพื่อน')+' แล้ว');
+  }
+  function showPvpChallengePopup(ch){
+    closeItemPopup();
+    const pop = document.createElement('div');
+    pop.className='item-popup'; pop.id='item-popup-el';
+    pop.innerHTML = `<div class="ip-title">⚔️ คำท้าดวล PVP</div>
+      <div class="ip-stat">${ch.fromName} (Lv.${ch.fromLvl}) ท้าคุณดวล!</div>
+      <div class="ip-btns">
+        <button class="ip-equip" id="ip-pvp-accept">ตอบรับ</button>
+        <button class="ip-close" id="ip-pvp-decline">ปฏิเสธ</button>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.style.left='50%'; pop.style.top='40%'; pop.style.transform='translate(-50%,-50%)';
+    document.getElementById('ip-pvp-accept').addEventListener('click', ()=>{
+      resolvePvpDuel(ch);
+      closeItemPopup();
+    });
+    document.getElementById('ip-pvp-decline').addEventListener('click', ()=>{
+      fbDb.ref('world/'+currentMapId+'/pvpChallenges/'+ch.fromId).set({ type:'result', declined:true, vsName:player.name||'เพื่อน', ts:Date.now() });
+      closeItemPopup();
+    });
+  }
+  function resolvePvpDuel(ch){
+    // Resolved from both sides' real current stats — the accepting player computes it once and tells the challenger the outcome
+    const myPower = totalATK()*1.0 + totalDEF()*0.6 + player.maxHp*0.05 + player.level*2;
+    const theirPower = (ch.fromAtk||10)*1.0 + (ch.fromDef||5)*0.6 + (ch.fromHp||100)*0.05 + (ch.fromLvl||1)*2;
+    const total = myPower+theirPower;
+    const myWinChance = total>0 ? myPower/total : 0.5;
+    const iWin = Math.random() < myWinChance;
+    pvpState.elo = Math.max(0, pvpState.elo + (iWin?18:-12));
+    if(iWin){ player.stats.pvpWins++; } else { player.stats.pvpLosses++; }
+    updateHud(); checkAchievements();
+    showToast(iWin? '🏆 คุณชนะดวล PVP กับ '+ch.fromName+'!' : '💀 คุณแพ้ดวล PVP กับ '+ch.fromName);
+    fbDb.ref('world/'+currentMapId+'/pvpChallenges/'+ch.fromId).set({
+      type:'result', vsName: player.name||'เพื่อน', youWon: !iWin, ts: Date.now()
+    });
+  }
+  function showPvpResultPopup(res){
+    if(res.declined){ showToast(res.vsName+' ปฏิเสธคำท้าดวล'); return; }
+    const won = !!res.youWon;
+    pvpState.elo = Math.max(0, pvpState.elo + (won?18:-12));
+    if(won){ player.stats.pvpWins++; } else { player.stats.pvpLosses++; }
+    updateHud(); checkAchievements();
+    showToast(won? '🏆 คุณชนะดวล PVP กับ '+res.vsName+'!' : '💀 คุณแพ้ดวล PVP กับ '+res.vsName);
   }
 
   function damageMonster(m, dmg, crit){
@@ -4296,6 +4503,12 @@ body.layout-edit-active #heal-btn {
     }
     sfxHeal();
     updateHud();
+    if(player.classKey === 'priest'){
+      // #8: priest's heal also pulses to nearby party/teammates — their support identity
+      spawnParticle({ type:'ring', x:player.x, y:player.y, life:600, startRadius:20, endRadius:320, color:'#67e8f9', lineWidth:2 });
+      if(typeof broadcastHealPulse === 'function') broadcastHealPulse();
+      showToast('💚 ส่งพลังฮีลให้เพื่อนรอบตัวด้วย!');
+    }
   }
   document.getElementById('heal-btn').addEventListener('click', castInnateHeal);
   document.getElementById('heal-btn').addEventListener('touchstart', e=>{ e.preventDefault(); castInnateHeal(); }, {passive:false});
@@ -6763,6 +6976,11 @@ body.layout-edit-active #heal-btn {
     if(!text.startsWith('/')) return false;
     const parts = text.slice(1).trim().split(/\s+/);
     const cmd = (parts[0]||'').toLowerCase();
+    const GM_CMDS = ['gold','gem','gems','exprate','droprate','item','mat','boss','worldboss'];
+    if(GM_CMDS.includes(cmd) && !isGM){
+      pushChat('system','ระบบ','⛔ คำสั่งนี้สำหรับ GM เท่านั้น');
+      return true;
+    }
     if(cmd==='gold'){
       const amt = parseInt(parts[1])||0;
       player.gold = Math.max(0, player.gold+amt); updateHud();
@@ -6791,15 +7009,10 @@ body.layout-edit-active #heal-btn {
       spawnBossNearPlayer();
     } else if(cmd==='worldboss'){
       forceWorldBoss();
-    } else if(cmd==='gm'){
-      const btn = document.getElementById('gm-float-btn');
-      btn.classList.toggle('unlocked');
-      if(!btn.classList.contains('unlocked')) document.getElementById('gm-panel').classList.remove('show');
-      pushChat('system','ระบบ', btn.classList.contains('unlocked') ? '🛠️ ปลดล็อกปุ่ม GM แล้ว' : '🛠️ ซ่อนปุ่ม GM แล้ว');
     } else if(cmd==='help'){
-      pushChat('system','ระบบ','คำสั่ง: /gold [±จำนวน] · /gem [±จำนวน] · /exprate [เท่า] · /droprate [เท่า] · /item [key] [จำนวน] · /mat [key] [จำนวน] · /boss · /worldboss · /gm');
+      pushChat('system','ระบบ', isGM ? 'คำสั่ง GM: /gold [±จำนวน] · /gem [±จำนวน] · /exprate [เท่า] · /droprate [เท่า] · /item [key] [จำนวน] · /mat [key] [จำนวน] · /boss · /worldboss' : 'พิมพ์ข้อความคุยกับผู้เล่นอื่นได้เลย');
     } else {
-      pushChat('system','ระบบ','ไม่รู้จักคำสั่ง พิมพ์ /help เพื่อดูคำสั่งทั้งหมด');
+      pushChat('system','ระบบ','ไม่รู้จักคำสั่ง');
     }
     return true;
   }
@@ -6874,6 +7087,9 @@ body.layout-edit-active #heal-btn {
   }
   document.getElementById('cs-confirm').addEventListener('click', ()=>{
     if(!selectedClassKey) return;
+    const nameVal = document.getElementById('cs-name-input').value.trim();
+    if(!nameVal){ showToast('กรุณาตั้งชื่อตัวละครก่อน'); return; }
+    player.name = nameVal.slice(0,16);
     requestGameFullscreen();
     player.classKey = selectedClassKey;
     recomputePassives();
@@ -6888,6 +7104,7 @@ body.layout-edit-active #heal-btn {
     pushChat('system','ระบบ','ยินดีต้อนรับสู่โลก Monster Basher MMO! เดินไปที่วงแหวนพอร์ทัลเพื่อออกผจญภัย');
     pushChat('world','ระบบ','ผจญภัยให้สนุกนะครับทุกคน');
     checkAchievements();
+    autoSaveGame();
   });
   renderClassSelect();
 
@@ -6982,7 +7199,17 @@ body.layout-edit-active #heal-btn {
   requestAnimationFrame(loginLoop);
 
   function updateContinueBtnState(){
-    document.getElementById('login-continue-btn').disabled = !hasAutoSave();
+    const btn = document.getElementById('login-continue-btn');
+    btn.disabled = !hasAutoSave();
+    if(fbReady && fbDb){
+      authReadyPromise.then(()=>{
+        const uid = fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : null;
+        if(!uid) return;
+        fbDb.ref('players/'+uid+'/save').once('value').then(snap=>{
+          if(snap.val()) btn.disabled = false;
+        }).catch(()=>{});
+      });
+    }
   }
   updateContinueBtnState();
   document.getElementById('login-newgame-btn').addEventListener('click', ()=>{
@@ -6991,20 +7218,32 @@ body.layout-edit-active #heal-btn {
     document.getElementById('class-select').style.display = 'flex';
   });
   document.getElementById('login-continue-btn').addEventListener('click', ()=>{
-    if(!hasAutoSave()) return;
-    let code; try { code = localStorage.getItem('mb_autosave'); } catch(e){ code = null; }
-    if(!code){ showToast('ไม่พบเซฟที่บันทึกไว้'); return; }
-    const mapId = deserializeSave(code);
-    if(!mapId){ showToast('เซฟเสียหาย ลองเริ่มเกมใหม่แทน'); return; }
-    loginAnimActive = false;
-    document.getElementById('login-screen').classList.add('hide');
-    requestGameFullscreen();
-    applyClassSkillIcons();
-    gameStarted = true;
-    initDailyQuests();
-    switchMap(mapId);
-    updateHud();
-    showToast('โหลดเซฟล่าสุดสำเร็จ!');
+    let localCode; try { localCode = localStorage.getItem('mb_autosave'); } catch(e){ localCode = null; }
+    function proceedWithCode(code){
+      if(!code){ showToast('ไม่พบเซฟที่บันทึกไว้'); return; }
+      const mapId = deserializeSave(code);
+      if(!mapId){ showToast('เซฟเสียหาย ลองเริ่มเกมใหม่แทน'); return; }
+      loginAnimActive = false;
+      document.getElementById('login-screen').classList.add('hide');
+      requestGameFullscreen();
+      applyClassSkillIcons();
+      gameStarted = true;
+      initDailyQuests();
+      switchMap(mapId);
+      updateHud();
+      showToast('โหลดเซฟล่าสุดสำเร็จ!');
+    }
+    if(fbReady && fbDb){
+      authReadyPromise.then(()=>{
+        const uid = fbAuth && fbAuth.currentUser ? fbAuth.currentUser.uid : null;
+        if(!uid){ proceedWithCode(localCode); return; }
+        fbDb.ref('players/'+uid+'/save').once('value').then(snap=>{
+          proceedWithCode(snap.val() || localCode);
+        }).catch(()=> proceedWithCode(localCode));
+      });
+    } else {
+      proceedWithCode(localCode);
+    }
   });
   function renderLoginSettingsModal(){
     sysModalBody.innerHTML = `
@@ -7058,32 +7297,49 @@ body.layout-edit-active #heal-btn {
     fbReady = true;
   } catch(e){ console.warn('Firebase init failed', e); }
 
+  // ---------- Network status indicator ----------
+  function updateNetStatusIcon(connected){
+    const el = document.getElementById('net-status');
+    if(!el) return;
+    if(connected){ el.textContent = '📶'; el.style.color = '#4ade80'; el.title = 'เชื่อมต่อเซิร์ฟเวอร์อยู่'; }
+    else { el.textContent = '📵'; el.style.color = '#f87171'; el.title = 'ขาดการเชื่อมต่อเซิร์ฟเวอร์'; }
+  }
+  if(fbReady){
+    fbDb.ref('.info/connected').on('value', snap=>{ updateNetStatusIcon(!!snap.val()); });
+  } else {
+    updateNetStatusIcon(false);
+  }
+
   // ---------- GM verification (real login, not the old /gm chat trick) ----------
   // GM status is a direct UID match against the account you created in Firebase Auth.
   // This is safe even hardcoded in client code: Firebase Auth (server-side) is what proves
   // a signed-in user actually owns that UID — nobody can fake it without your real password.
   const GM_UID = 'Tfmgt8ZyjXY3D4ep9OebLddBBOb2';
   let isGM = false;
-  function checkGmStatus(uid){
+  function checkGmStatus(uid, isExplicitAttempt){
     if(uid === GM_UID){
       isGM = true;
-      showToast('🛠️ เข้าสู่ระบบในฐานะ GM แล้ว');
+      showToast('🛠️ ยืนยันสิทธิ์ GM สำเร็จ!');
       const gmBtn = document.getElementById('gm-float-btn');
       if(gmBtn) gmBtn.classList.add('unlocked');
+    } else if(isExplicitAttempt){
+      showToast('⚠️ ล็อกอินสำเร็จ แต่บัญชีนี้ไม่มีสิทธิ์ GM');
     }
   }
   function gmSignIn(email, pass){
     if(!fbAuth){ showToast('ต่อระบบยืนยันตัวตนไม่ได้'); return; }
     if(!email || !pass){ showToast('กรอกอีเมลและรหัสผ่านก่อน'); return; }
     fbAuth.signInWithEmailAndPassword(email.trim(), pass).then(cred=>{
-      checkGmStatus(cred.user.uid);
+      showToast('✅ ล็อกอินสำเร็จ');
+      checkGmStatus(cred.user.uid, true);
     }).catch(()=>{
-      showToast('เข้าสู่ระบบไม่สำเร็จ: อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      showToast('❌ เข้าสู่ระบบไม่สำเร็จ: อีเมลหรือรหัสผ่านไม่ถูกต้อง');
     });
   }
+  let authReadyPromise = Promise.resolve();
   if(fbAuth){
     fbAuth.onAuthStateChanged(user=>{ if(user) checkGmStatus(user.uid); });
-    fbAuth.signInAnonymously().catch(()=>{});
+    authReadyPromise = fbAuth.signInAnonymously().catch(()=>{});
   }
 
   let myPlayerId = null;
@@ -7096,6 +7352,19 @@ body.layout-edit-active #heal-btn {
   let partyMembers = {};
   let partyMemberRef = null;
   let partySyncTimer = 0;
+  // #6: Party bonus — rewards teaming up without being overpowered
+  function partySize(){
+    if(!partyCode) return 1;
+    const others = Object.keys(partyMembers).filter(id=>id!==myPlayerId && partyMembers[id] && Date.now()-(partyMembers[id].lastSeen||0)<15000);
+    return 1 + others.length;
+  }
+  function partyBonusPct(){
+    const n = partySize();
+    if(n>=4) return 0.30;
+    if(n===3) return 0.20;
+    if(n===2) return 0.10;
+    return 0;
+  }
   const PARTY_CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no ambiguous chars (0/O, 1/I)
   function genPartyCode(){
     let s=''; for(let i=0;i<5;i++) s+=PARTY_CODE_CHARS[Math.floor(Math.random()*PARTY_CODE_CHARS.length)];
@@ -7129,10 +7398,13 @@ body.layout-edit-active #heal-btn {
   function joinMapPresence(mapId){
     if(!fbReady) return;
     leaveMapPresence();
-    myPresenceRef = fbDb.ref('world/'+mapId+'/players/'+myPlayerId);
-    myPresenceRef.onDisconnect().remove();
-    mapPlayersRef = fbDb.ref('world/'+mapId+'/players');
-    mapPlayersRef.on('value', snap=>{ mapPlayers = snap.val() || {}; });
+    authReadyPromise.then(()=>{
+      if(currentMapId !== mapId) return; // player already left this map
+      myPresenceRef = fbDb.ref('world/'+mapId+'/players/'+myPlayerId);
+      myPresenceRef.onDisconnect().remove();
+      mapPlayersRef = fbDb.ref('world/'+mapId+'/players');
+      mapPlayersRef.on('value', snap=>{ mapPlayers = snap.val() || {}; });
+    });
   }
   function leaveMapPresence(){
     if(myPresenceRef){ myPresenceRef.remove(); myPresenceRef = null; }
@@ -7155,7 +7427,7 @@ body.layout-edit-active #heal-btn {
       if(id===myPlayerId) continue;
       const m = mapPlayers[id];
       if(!m || Date.now()-(m.lastSeen||0) > 15000) continue;
-      list.push(m);
+      list.push({ ...m, _id: id });
     }
     return list;
   }
@@ -7210,11 +7482,12 @@ body.layout-edit-active #heal-btn {
             <div style="font-size:28px; font-weight:900; color:#fbbf24; letter-spacing:4px; margin:6px 0;">${partyCode}</div>
             <div class="card-desc">ส่งรหัสนี้ให้เพื่อนเพื่อเข้าร่วม</div>
           </div>
+          <div class="badge-pill" style="background:#16a34a;color:#fff;margin-top:6px;">🎉 โบนัสปาร์ตี้: EXP+ทอง +${Math.round(partyBonusPct()*100)}%</div>
         </div>
         <div class="sys-section">
           <div class="sys-title">สมาชิกในปาร์ตี้ (${others.length+1})</div>
           <div class="card card-row"><div class="card-icon">${CLASSES[player.classKey]?CLASSES[player.classKey].icon:'🐱'}</div><div style="flex:1;"><div class="card-title">${player.name||'คุณ'} (คุณ)</div><div class="card-desc">Lv.${player.level} · ${currentMapId}</div></div></div>
-          ${others.length===0? '<div class="card-desc" style="text-align:center; padding:10px;">รอเพื่อนเข้าร่วม...</div>' : others.map(m=>{
+          ${others.length===0? '<div class="card-desc" style="text-align:center; padding:10px;">รอเพื่อนเข้าร่วม... (2 คน +10% · 3 คน +20% · 4+ คน +30%)</div>' : others.map(m=>{
             const online = Date.now()-(m.lastSeen||0) < 15000;
             return `<div class="card card-row">
               <div class="card-icon">${CLASSES[m.classKey]?CLASSES[m.classKey].icon:'🐱'}</div>
@@ -7321,20 +7594,23 @@ body.layout-edit-active #heal-btn {
   function claimHostIfNeeded(mapId){
     if(!fbReady) return;
     netMapId = mapId;
-    const ref = fbDb.ref('world/'+mapId+'/hostId');
-    ref.transaction(cur=> cur===null ? myPlayerId : undefined, (err, committed, snap)=>{
-      if(netMapId !== mapId) return; // left already
-      if(committed && snap.val()===myPlayerId){ becomeHost(mapId); return; }
-      const existingHost = snap ? snap.val() : null;
-      if(!existingHost){ becomeGuest(mapId, null); return; }
-      fbDb.ref('world/'+mapId+'/hostHeartbeat').once('value').then(hbSnap=>{
-        if(netMapId !== mapId) return;
-        const hb = hbSnap.val()||0;
-        if(Date.now()-hb > 8000){
-          ref.set(myPlayerId).then(()=>becomeHost(mapId));
-        } else {
-          becomeGuest(mapId, existingHost);
-        }
+    authReadyPromise.then(()=>{
+      if(netMapId !== mapId) return; // player already left this map
+      const ref = fbDb.ref('world/'+mapId+'/hostId');
+      ref.transaction(cur=> cur===null ? myPlayerId : undefined, (err, committed, snap)=>{
+        if(netMapId !== mapId) return; // left already
+        if(committed && snap.val()===myPlayerId){ becomeHost(mapId); return; }
+        const existingHost = snap ? snap.val() : null;
+        if(!existingHost){ becomeGuest(mapId, null); return; }
+        fbDb.ref('world/'+mapId+'/hostHeartbeat').once('value').then(hbSnap=>{
+          if(netMapId !== mapId) return;
+          const hb = hbSnap.val()||0;
+          if(Date.now()-hb > 8000){
+            ref.set(myPlayerId).then(()=>becomeHost(mapId));
+          } else {
+            becomeGuest(mapId, existingHost);
+          }
+        });
       });
     });
   }
