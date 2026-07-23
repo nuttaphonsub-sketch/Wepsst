@@ -2798,6 +2798,8 @@ body.layout-edit-active #heal-btn {
     const m = MAPS[mapId];
     if(!m) return;
     currentMapId = mapId;
+    leaveNetMap();
+    leaveMapPresence();
     monsters = []; chests = []; projectiles = [];
     WORLD_W = m.w; WORLD_H = m.h; ZONES = m.zones.length? m.zones : [{name:m.name, color:'rgba(255,255,255,0.02)', xMin:0,xMax:m.w,yMin:0,yMax:m.h,diff:1}];
     player.x = m.spawn.x; player.y = m.spawn.y;
@@ -2808,6 +2810,8 @@ body.layout-edit-active #heal-btn {
     zoneNameEl.textContent = m.name;
     const mmName = document.getElementById('minimap-name');
     if(mmName) mmName.textContent = m.name;
+    if(!m.safe && mapId!=='tower' && fbReady) claimHostIfNeeded(mapId);
+    if(fbReady) joinMapPresence(mapId);
     updateHud();
   }
   let portalConfirmShownFor = null;
@@ -3744,6 +3748,9 @@ body.layout-edit-active #heal-btn {
   function damageMonster(m, dmg, crit){
     if(m.archetype && m.archetype.defMul !== 1) dmg = Math.max(1, Math.round(dmg/m.archetype.defMul));
     m.hp -= dmg; m.hitFlash = 200; m.provoked = true;
+    if(isNetActive() && !netIsHost && !m.isDungeon && !m.isTower && m.id!=null){
+      pushHitEvent(m.id, dmg, crit);
+    }
     const lifestealPct = classData().lifestealPct || 0;
     if(lifestealPct > 0 && !player.isDead && player.hp > 0){
       const healAmt = Math.round(dmg*lifestealPct);
@@ -5061,13 +5068,18 @@ body.layout-edit-active #heal-btn {
       updateSafeZoneHeal(dt);
       tryEnterPortal();
       checkNpcProximity();
-      updateMonsters(dt);
+      const inInstancedContent = dungeonState.active || towerState.active || raidState.active;
+      if(isMapHost() || inInstancedContent){
+        updateMonsters(dt);
+      } else {
+        guestContactDamageCheck(dt);
+      }
       updateProjectiles(dt);
       updateParticles(dt);
       updateShake(dt);
       updateCombo(dt);
       renderCooldowns(dt);
-      spawnAmbient(dt);
+      if(isMapHost() || inInstancedContent) spawnAmbient(dt);
       updatePetFollow(dt);
       updatePetMastery(dt);
       updateBossHpBar();
@@ -5078,7 +5090,11 @@ body.layout-edit-active #heal-btn {
       updateChests(dt);
       updateWorldEvents(dt);
       updateSetBonuses(dt);
-      updatePartySync(dt);
+      updateMapPresence(dt);
+      if(isNetActive() && netIsHost && !inInstancedContent){
+        netSnapshotTimer += dt;
+        if(netSnapshotTimer > 220){ netSnapshotTimer = 0; pushMonsterSnapshot(); }
+      }
 
       worldBossUiTimer += dt;
       if(worldBossUiTimer > 900){ worldBossUiTimer = 0; updateWorldBoss(dt); updateFieldBoss(dt); }
@@ -5096,7 +5112,7 @@ body.layout-edit-active #heal-btn {
       drawNPCs();
       drawChests();
       monsters.forEach(drawMonster);
-      otherPartyMembers().forEach(drawRemotePlayer);
+      otherMapPlayers().forEach(drawRemotePlayer);
       const selTarget = getSelectedTarget();
       if(selTarget) drawTargetSelection(selTarget);
       drawProjectiles();
@@ -7031,24 +7047,36 @@ body.layout-edit-active #heal-btn {
     if(partyCode){ try{ fbDb.ref('parties/'+partyCode+'/members').off(); }catch(e){} }
     partyCode = null; partyMembers = {}; partyMemberRef = null;
   }
-  function updatePartySync(dt){
-    if(!fbReady || !partyCode || !gameStarted || !partyMemberRef) return;
+  let myPresenceRef = null, mapPlayersRef = null, mapPlayers = {};
+  function joinMapPresence(mapId){
+    if(!fbReady) return;
+    leaveMapPresence();
+    myPresenceRef = fbDb.ref('world/'+mapId+'/players/'+myPlayerId);
+    myPresenceRef.onDisconnect().remove();
+    mapPlayersRef = fbDb.ref('world/'+mapId+'/players');
+    mapPlayersRef.on('value', snap=>{ mapPlayers = snap.val() || {}; });
+  }
+  function leaveMapPresence(){
+    if(myPresenceRef){ myPresenceRef.remove(); myPresenceRef = null; }
+    if(mapPlayersRef){ mapPlayersRef.off(); mapPlayersRef = null; }
+    mapPlayers = {};
+  }
+  function updateMapPresence(dt){
+    if(!fbReady || !gameStarted || !myPresenceRef) return;
     partySyncTimer += dt;
     if(partySyncTimer < 250) return;
     partySyncTimer = 0;
-    partyMemberRef.set({
+    myPresenceRef.set({
       name: player.name||'นักผจญภัย', classKey: player.classKey, x: Math.round(player.x), y: Math.round(player.y),
-      mapId: currentMapId, lvl: player.level, hp: Math.round(player.hp), maxHp: player.maxHp,
-      facing: player.facing, lastSeen: Date.now()
+      lvl: player.level, hp: Math.round(player.hp), maxHp: player.maxHp, facing: player.facing, lastSeen: Date.now()
     });
   }
-  function otherPartyMembers(){
+  function otherMapPlayers(){
     const list = [];
-    for(const id in partyMembers){
+    for(const id in mapPlayers){
       if(id===myPlayerId) continue;
-      const m = partyMembers[id];
+      const m = mapPlayers[id];
       if(!m || Date.now()-(m.lastSeen||0) > 15000) continue;
-      if(m.mapId !== currentMapId) continue;
       list.push(m);
     }
     return list;
@@ -7124,6 +7152,126 @@ body.layout-edit-active #heal-btn {
         renderPartyModal();
       });
     }
+  }
+
+  // ==================== Shared World: host-authoritative monster sync ====================
+  // One player per map becomes "host" and runs the real simulation (unchanged spawnAmbient/
+  // updateMonsters). Everyone else on that map mirrors the host's monster snapshot instead of
+  // running their own — so everyone sees the exact same monsters at the exact same HP.
+  // When offline/alone, isMapHost() always returns true, so solo play is 100% unchanged.
+  let netMapId = null, netIsHost = false, netHostId = null;
+  let netMonstersRef = null, netHitsRef = null, netHostIdRef = null, netHbRef = null, netHbInterval = null;
+  let netSnapshotTimer = 0;
+  function isNetActive(){ return fbReady && netMapId === currentMapId && netMapId !== null; }
+  function isMapHost(){ return !isNetActive() || netIsHost; }
+  function findTypeByName(name){
+    const pools = [MONSTER_TYPES, DESERT_MONSTER_TYPES, SNOW_MONSTER_TYPES];
+    for(const pool of pools){ const f = pool.find(t=>t.name===name); if(f) return f; }
+    return MONSTER_TYPES[0];
+  }
+  function serializeMonsterForSync(m){
+    return {
+      x:Math.round(m.x), y:Math.round(m.y), hp:Math.round(m.hp), maxHp:m.maxHp, r:Math.round(m.r),
+      lvl:m.lvl, isBoss:!!m.isBoss, isWorldBoss:!!m.isWorldBoss, isFieldBoss:!!m.isFieldBoss,
+      typeName:m.type.name, archetypeKey: m.archetype ? m.archetype.key : null
+    };
+  }
+  function deserializeMonsterFromSync(id, s){
+    return {
+      id, x:s.x, y:s.y, hp:s.hp, maxHp:s.maxHp, r:s.r, lvl:s.lvl,
+      isBoss:s.isBoss, isWorldBoss:s.isWorldBoss, isFieldBoss:s.isFieldBoss,
+      type: findTypeByName(s.typeName), archetype: s.archetypeKey ? MONSTER_ARCHETYPES[s.archetypeKey] : null,
+      hitFlash:0, wobble:Date.now()%1000, provoked:true, isNetGhost:true
+    };
+  }
+  function pushMonsterSnapshot(){
+    if(!netMonstersRef) return;
+    const out = {};
+    monsters.forEach(m=>{ out[m.id] = serializeMonsterForSync(m); });
+    netMonstersRef.set(out);
+  }
+  function leaveNetMap(){
+    if(netHbInterval){ clearInterval(netHbInterval); netHbInterval = null; }
+    if(netIsHost && netHostIdRef){ netHostIdRef.remove(); }
+    if(netHitsRef){ netHitsRef.off(); netHitsRef = null; }
+    if(netMonstersRef){ netMonstersRef.off(); netMonstersRef = null; }
+    netHostIdRef = null; netHbRef = null;
+    netMapId = null; netIsHost = false; netHostId = null;
+  }
+  function becomeHost(mapId){
+    netIsHost = true; netHostId = myPlayerId;
+    netHostIdRef = fbDb.ref('world/'+mapId+'/hostId');
+    netHostIdRef.onDisconnect().remove();
+    netHbRef = fbDb.ref('world/'+mapId+'/hostHeartbeat');
+    netHbRef.onDisconnect().remove();
+    netHbRef.set(Date.now());
+    netHbInterval = setInterval(()=>{ if(netIsHost) netHbRef.set(Date.now()); }, 3000);
+    netMonstersRef = fbDb.ref('world/'+mapId+'/monsters');
+    netMonstersRef.onDisconnect().remove();
+    netHitsRef = fbDb.ref('world/'+mapId+'/hits');
+    netHitsRef.on('child_added', snap=>{
+      const hit = snap.val();
+      snap.ref.remove();
+      if(!hit) return;
+      const target = monsters.find(mm=>mm.id===hit.monsterId);
+      if(target && target.hp>0) damageMonster(target, hit.dmg, hit.crit);
+    });
+  }
+  function becomeGuest(mapId, hostId){
+    netIsHost = false; netHostId = hostId;
+    netMonstersRef = fbDb.ref('world/'+mapId+'/monsters');
+    netMonstersRef.on('value', snap=>{
+      const data = snap.val() || {};
+      monsters = Object.keys(data).map(id=>deserializeMonsterFromSync(id, data[id]));
+    });
+    netHitsRef = fbDb.ref('world/'+mapId+'/hits'); // guests write here, don't listen
+  }
+  function claimHostIfNeeded(mapId){
+    if(!fbReady) return;
+    netMapId = mapId;
+    const ref = fbDb.ref('world/'+mapId+'/hostId');
+    ref.transaction(cur=> cur===null ? myPlayerId : undefined, (err, committed, snap)=>{
+      if(netMapId !== mapId) return; // left already
+      if(committed && snap.val()===myPlayerId){ becomeHost(mapId); return; }
+      const existingHost = snap ? snap.val() : null;
+      if(!existingHost){ becomeGuest(mapId, null); return; }
+      fbDb.ref('world/'+mapId+'/hostHeartbeat').once('value').then(hbSnap=>{
+        if(netMapId !== mapId) return;
+        const hb = hbSnap.val()||0;
+        if(Date.now()-hb > 8000){
+          ref.set(myPlayerId).then(()=>becomeHost(mapId));
+        } else {
+          becomeGuest(mapId, existingHost);
+        }
+      });
+    });
+  }
+  function pushHitEvent(monsterId, dmg, crit){
+    if(!netHitsRef) return;
+    netHitsRef.push({ monsterId, dmg, crit, ts: Date.now() });
+  }
+  function guestContactDamageCheck(dt){
+    if(player.isDead || isInSafeZone()) return;
+    for(const m of monsters){
+      const dist = Math.hypot(m.x-player.x, m.y-player.y);
+      if(dist < m.r+player.r+4 && playerDamageCooldown<=0 && player.invulTimer<=0){
+        if(Math.random() < totalDodge()){
+          playerDamageCooldown = 350;
+          spawnFloatText(player.x, player.y-46, 'DODGE', '#93c5fd', false);
+        } else {
+          const archetypeAtkMul = m.archetype ? m.archetype.atkMul : 1;
+          const rawDmg = (4+Math.floor(Math.random()*5) + m.lvl*0.6) * monsterPowerMult * (m.isBoss?1.3*bossAtkMult:1) * archetypeAtkMul;
+          let dmg = Math.max(1, Math.round(rawDmg - totalDEF()*0.3));
+          playerDamageCooldown = 800;
+          if(player.shield > 0){ const absorbed = Math.min(player.shield, dmg); player.shield -= absorbed; dmg -= absorbed; spawnFloatText(player.x, player.y-46, '-'+absorbed+' โล่', '#93c5fd'); }
+          if(dmg > 0){ player.hp -= dmg; player.hitFlash = 150; spawnFloatText(player.x, player.y-30, '-'+dmg, '#f87171'); }
+          if(player.hp <= 0) startDeathSequence();
+          updateHud();
+        }
+        break;
+      }
+    }
+    if(playerDamageCooldown > 0) playerDamageCooldown -= dt;
   }
 
   // ==================== Phase 4 ====================
