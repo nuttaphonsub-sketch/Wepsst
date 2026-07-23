@@ -4400,6 +4400,19 @@ body.layout-edit-active #heal-btn {
     if(diff <= 10) return { color:'#c2410c' };
     return { color:'#dc2626' };
   }
+  function nearestTargetForMonster(m){
+    let best = { x: player.x, y: player.y, isSelf: true };
+    let bestDist = Math.hypot(player.x-m.x, player.y-m.y);
+    if(typeof mapPlayers === 'object' && mapPlayers){
+      for(const id in mapPlayers){
+        const rp = mapPlayers[id];
+        if(!rp || Date.now()-(rp.lastSeen||0) > 15000) continue;
+        const d = Math.hypot(rp.x-m.x, rp.y-m.y);
+        if(d < bestDist){ bestDist = d; best = { x:rp.x, y:rp.y, isSelf:false }; }
+      }
+    }
+    return best;
+  }
   function updateMonsters(dt){
     const spawnPt = MAPS[currentMapId].spawn;
     // #3 Aggro System: cap how many *aggressive* (zone 2/3) monsters can actively chase at once,
@@ -4409,7 +4422,10 @@ body.layout-edit-active #heal-btn {
     const allowedChaseIds = new Set(aggroNearby.slice(0,5).map(m=>m.id));
     for(const m of monsters){
       m.wobble += dt;
-      const dx = player.x-m.x, dy = player.y-m.y;
+      // Chase whoever is actually nearest (host's own character OR another real player on the map) —
+      // previously this always targeted the host's own position, so monsters never approached guests at all.
+      const chaseTarget = nearestTargetForMonster(m);
+      const dx = chaseTarget.x-m.x, dy = chaseTarget.y-m.y;
       const dist = Math.hypot(dx,dy) || 1;
       let shouldChase;
       if(m.isBoss){
@@ -4452,7 +4468,9 @@ body.layout-edit-active #heal-btn {
       }
       if(m.hitFlash > 0) m.hitFlash -= dt;
       const playerInSafeZone = MAPS[currentMapId].noSafeZone ? false : (spawnPt && Math.hypot(player.x-spawnPt.x, player.y-spawnPt.y) < SAFE_ZONE_RADIUS);
-      if(!playerInSafeZone && shouldChase && dist < m.r+player.r+4 && playerDamageCooldown <= 0 && player.invulTimer<=0){
+      // Only apply contact damage to the host's own player when the host is actually the nearest
+      // target — if a guest is nearer, that guest's own guestContactDamageCheck handles it on their end.
+      if(chaseTarget.isSelf && !playerInSafeZone && shouldChase && dist < m.r+player.r+4 && playerDamageCooldown <= 0 && player.invulTimer<=0){
         if(Math.random() < totalDodge()){
           playerDamageCooldown = 350;
           spawnFloatText(player.x, player.y-46, 'DODGE', '#93c5fd', false);
@@ -7710,7 +7728,7 @@ body.layout-edit-active #heal-btn {
       const hit = snap.val();
       snap.ref.remove();
       if(!hit) return;
-      const target = monsters.find(mm=>mm.id===hit.monsterId);
+      const target = monsters.find(mm=>String(mm.id)===String(hit.monsterId));
       if(target && target.hp>0) damageMonster(target, hit.dmg, hit.crit, false);
     });
   }
